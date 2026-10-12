@@ -1,0 +1,4 @@
+D-DIN typeface by Datto, Inc.
+Licensed under the SIL Open Font License, Version 1.1 — https://openfontlicense.org
+Source: https://fontlibrary.org/en/font/d-din
+Self-hosted here: D-DIN.ttf (Regular 400), D-DIN-Bold.ttf (Bold 700).

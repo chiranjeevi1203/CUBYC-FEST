@@ -12,8 +12,11 @@ import {
   PLANET_SCALE,
   SCROLL_EARTH_ORBITS,
   SOLAR,
+  STATIONS,
+  BODIES,
   mulberry32,
 } from '../../config/experience';
+import StationModel from './StationModel';
 import { getScene, useExperience } from '../../store/useExperience';
 import { interaction } from '../../lib/interaction';
 
@@ -338,6 +341,85 @@ function Moon({ data, index }) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Space station: its own orbit (dashed), same reveal / hover / focus rules  */
+/* -------------------------------------------------------------------------- */
+
+// Revealed together with the planet just inside its orbit (Mars).
+const STATION_REVEAL_WITH = PLANETS.findIndex((p) => p.name === 'Mars');
+const STATION_ORBIT_SEGMENTS = 256;
+
+function Station({ data, index }) {
+  const orbitGroup = useRef(null);
+  const angle = useRef(data.angle);
+  const boost = useRef(1);
+  const lineGlow = useRef(0);
+  const size = data.size * PLANET_SCALE;
+  const radius = data.radius * PLANET_SCALE;
+  const orbit = data.orbit * ORBIT_SCALE;
+  const sunPos = useMemo(() => SUN_WORLD.clone(), []);
+  const reveal = useMemo(() => ({ value: 0 }), []);
+  const glow = useMemo(() => ({ value: 0 }), []);
+
+  // Dashed gold orbit: reads as a constructed path, distinct from the planets' orbits.
+  const { line, lineMaterial } = useMemo(() => {
+    const pts = [];
+    for (let i = 0; i <= STATION_ORBIT_SEGMENTS; i++) {
+      const a = (i / STATION_ORBIT_SEGMENTS) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * orbit, 0, -Math.sin(a) * orbit));
+    }
+    const geometry = new THREE.BufferGeometry().setFromPoints(pts);
+    const l = new THREE.Line(
+      geometry,
+      new THREE.LineDashedMaterial({ color: PALETTE.orbit, dashSize: 0.9, gapSize: 0.7, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }),
+    );
+    l.computeLineDistances();
+    return { line: l, lineMaterial: l.material };
+  }, [orbit]);
+
+  useEffect(() => {
+    interaction.bodies[index] = { group: orbitGroup.current, radius };
+    return () => {
+      interaction.bodies[index] = null;
+      line.geometry.dispose();
+      lineMaterial.dispose();
+    };
+  }, [index, radius, line, lineMaterial]);
+
+  useFrame((_, delta) => {
+    const s = getScene();
+    const v = (s.planets[STATION_REVEAL_WITH]?.v ?? 0) * sysFade();
+    angle.current += delta * data.speed;
+    const g = orbitGroup.current;
+    g.visible = v > 0.002;
+    const k = 1 - Math.exp(-delta * 8);
+    const hot = isHighlighted(index) ? 1 : 0;
+    lineGlow.current += (hot - lineGlow.current) * (1 - Math.exp(-delta * 7));
+    const o = Math.min(s.orbits * sysFade() * 1.4, 1);
+    lineMaterial.opacity = o * (0.26 + lineGlow.current * 0.5);
+    line.visible = o > 0.002;
+    if (!g.visible) return;
+    const a = angle.current + scrollAngle(data.speed);
+    g.position.set(Math.cos(a) * orbit, 0, -Math.sin(a) * orbit);
+    boost.current += ((hot ? 1.22 : 1) - boost.current) * k;
+    g.scale.setScalar((0.6 + 0.4 * Math.min(v, 1)) * boost.current);
+    reveal.value = Math.min(v, 1);
+    glow.value += (hot - glow.value) * k;
+  });
+
+  return (
+    <>
+      <primitive object={line} />
+      <group ref={orbitGroup}>
+        {/* Gently tipped so the ring reads as an ellipse from the landing camera. */}
+        <group rotation={[0.28, 0, 0.22]} scale={size}>
+          <StationModel colors={data.colors} sunPos={sunPos} reveal={reveal} glow={glow} spin={0.35} lightSize={1.8} />
+        </group>
+      </group>
+    </>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Orbit rings that draw themselves in + asteroid belt                       */
 /* -------------------------------------------------------------------------- */
 
@@ -528,6 +610,9 @@ export default function SolarSystem({ quality }) {
         ))}
         {MOONS.map((moon, i) => (
           <Moon key={moon.name} data={moon} index={PLANETS.length + i} />
+        ))}
+        {STATIONS.map((station) => (
+          <Station key={station.key} data={station} index={BODIES.findIndex((b) => b.key === station.key)} />
         ))}
         <OrbitLines />
         <MotionTrails />

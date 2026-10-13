@@ -1,5 +1,6 @@
-import { useEffect, useId, useRef, useState } from 'react';
-import { EVENT, prefersReducedMotion } from '../../config/experience';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { EVENT, mulberry32, prefersReducedMotion } from '../../config/experience';
+import Frame from './Frame';
 
 const START = new Date(EVENT.start).getTime();
 const END = new Date(EVENT.end).getTime();
@@ -29,114 +30,164 @@ function moonPath(lit, r = 30, cx = 32, cy = 32) {
   return `M ${cx} ${cy - r} A ${r} ${r} 0 0 1 ${cx} ${cy + r} A ${rx} ${r} 0 0 ${sweep} ${cx} ${cy - r} Z`;
 }
 
-function phaseName(lit) {
-  if (lit < 0.03) return 'New moon';
-  if (lit < 0.3) return 'Waxing crescent';
-  if (lit < 0.48) return 'First quarter';
-  if (lit < 0.52) return 'Half moon';
-  if (lit < 0.97) return 'Waxing gibbous';
-  return 'Full moon';
-}
+/* -------------------------------------------------------------------------- */
+/*  A realistic lunar surface, painted once into a canvas                     */
+/* -------------------------------------------------------------------------- */
 
-// Doodle-tile art lives on a 100×100 canvas; the moon sits in the middle.
-const MOON = { r: 30, cx: 50, cy: 50 };
-const tilePath = (lit) => moonPath(lit, MOON.r, MOON.cx, MOON.cy);
-
-// Illustrated craters (x, y, r) — drawn faintly on the dark side, brighter where lit.
-const CRATERS = [
-  [40, 38, 6.2],
-  [60, 45, 4.3],
-  [47, 62, 7.6],
-  [65, 63, 3.6],
-  [33, 55, 3.3],
-  [56, 30, 2.9],
-];
-
-// Fine rays radiating around the moon, alternating long / short (like the doodle tiles).
-const RAYS = Array.from({ length: 32 }, (_, i) => {
-  const a = (i / 32) * Math.PI * 2;
-  const r1 = 35.5;
-  const r2 = i % 2 ? 40 : 44;
-  return [50 + Math.cos(a) * r1, 50 + Math.sin(a) * r1, 50 + Math.cos(a) * r2, 50 + Math.sin(a) * r2];
-});
-
-// Four-point sparkles + dots scattered in the tile corners.
-const SPARKLES = [
-  [13, 15, 3.2],
-  [87, 18, 2.4],
-  [85, 84, 3],
-  [16, 86, 2.2],
-];
-const DOTS = [
-  [24, 10],
-  [92, 34],
-  [9, 64],
-  [72, 92],
-  [33, 91],
-  [78, 9],
-];
-const sparkle = (x, y, s) =>
-  `M ${x} ${y - s} Q ${x + s * 0.18} ${y - s * 0.18} ${x + s} ${y} Q ${x + s * 0.18} ${y + s * 0.18} ${x} ${y + s} Q ${x - s * 0.18} ${y + s * 0.18} ${x - s} ${y} Q ${x - s * 0.18} ${y - s * 0.18} ${x} ${y - s} Z`;
+const TEX_SIZE = 256;
+let moonTextureUrl = null;
 
 /**
- * Doodle-style tile art: radiating rays, sparkles, and a flat illustrated moon
- * (navy night side, pale lavender lit side, craters) showing the current phase.
+ * Procedural full-moon disc: grey regolith with darker maria, craters with a
+ * sunlit rim and shadowed wall (light from the right, as the moon waxes),
+ * and limb darkening. Generated once, then shared by every moon as an image.
  */
-function MoonArt({ lit, pathRef, variant }) {
+function moonTexture() {
+  if (moonTextureUrl) return moonTextureUrl;
+  const N = TEX_SIZE;
+  const canvas = document.createElement('canvas');
+  canvas.width = N;
+  canvas.height = N;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(N, N);
+  const rand = mulberry32(1969);
+
+  // Smooth value noise + fractal sum.
+  const G = 128;
+  const grid = new Float32Array(G * G);
+  for (let i = 0; i < grid.length; i++) grid[i] = rand();
+  const at = (i, j) => grid[(((j % G) + G) % G) * G + (((i % G) + G) % G)];
+  const smooth = (t) => t * t * (3 - 2 * t);
+  const noise = (x, y) => {
+    const xi = Math.floor(x);
+    const yi = Math.floor(y);
+    const u = smooth(x - xi);
+    const v = smooth(y - yi);
+    const a = at(xi, yi);
+    const b = at(xi + 1, yi);
+    const c = at(xi, yi + 1);
+    const d = at(xi + 1, yi + 1);
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+  };
+  const fbm = (x, y, octaves = 5) => {
+    let f = 0;
+    let amp = 0.5;
+    for (let o = 0; o < octaves; o++) {
+      f += amp * noise(x, y);
+      x *= 2.03;
+      y *= 2.03;
+      amp *= 0.5;
+    }
+    return f;
+  };
+  const sstep = (a, b, x) => {
+    const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+    return t * t * (3 - 2 * t);
+  };
+
+  // Craters: many small, few large (x, y in -1…1, r in disc units).
+  const craters = [];
+  for (let i = 0; i < 70; i++) {
+    const r = 0.018 + Math.pow(rand(), 3.2) * 0.12;
+    const a = rand() * Math.PI * 2;
+    const d = Math.sqrt(rand()) * 0.95;
+    craters.push({ x: Math.cos(a) * d, y: Math.sin(a) * d, r });
+  }
+  const L = { x: 0.95, y: -0.3 }; // light from the right, slightly above
+
+  for (let py = 0; py < N; py++) {
+    for (let px = 0; px < N; px++) {
+      const nx = ((px + 0.5) / N) * 2 - 1;
+      const ny = ((py + 0.5) / N) * 2 - 1;
+      const r2 = nx * nx + ny * ny;
+      const o = (py * N + px) * 4;
+      if (r2 > 1) {
+        img.data[o + 3] = 0;
+        continue;
+      }
+      const z = Math.sqrt(1 - r2);
+      // Highlands, with maria (the dark "seas") weighted to the upper left like the real near side.
+      let v = 0.7 + (fbm(nx * 3 + 5, ny * 3 + 5) - 0.5) * 0.24;
+      const m = fbm(nx * 1.25 + 11, ny * 1.25 + 3, 4) + (-nx * 0.08 - ny * 0.1);
+      v *= 1 - sstep(0.5, 0.6, m) * 0.36;
+      v += (noise(px * 0.45, py * 0.45) - 0.5) * 0.06; // regolith grain
+
+      for (const c of craters) {
+        const dx = nx - c.x;
+        const dy = ny - c.y;
+        const d = Math.sqrt(dx * dx + dy * dy) / c.r;
+        if (d > 1.35) continue;
+        if (d < 1) {
+          // Floor slightly darker; inner wall facing the light is bright, the far wall in shadow.
+          const facing = -(dx * L.x + dy * L.y) / (c.r * Math.max(d, 0.001));
+          v *= 1 - 0.1 * (1 - sstep(0.6, 1, d));
+          v += facing * sstep(0.45, 1, d) * 0.16;
+        } else {
+          v += (1 - sstep(1, 1.35, d)) * 0.035; // ejecta apron
+        }
+      }
+
+      // Limb darkening + antialiased edge.
+      v *= 0.62 + 0.38 * Math.pow(z, 0.55);
+      const edge = Math.min(Math.max((1 - Math.sqrt(r2)) * (N / 2), 0), 1);
+      img.data[o] = Math.min(255, v * 242);
+      img.data[o + 1] = Math.min(255, v * 236);
+      img.data[o + 2] = Math.min(255, v * 226);
+      img.data[o + 3] = edge * 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  moonTextureUrl = canvas.toDataURL('image/png');
+  return moonTextureUrl;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Moon + countdown                                                          */
+/* -------------------------------------------------------------------------- */
+
+const R = 48;
+const phasePath = (lit) => moonPath(lit, R, 50, 50);
+
+/**
+ * A realistic moon in its current phase: the lit side is the lunar surface,
+ * the terminator is softened, and the night side keeps a faint earthshine.
+ */
+function Moon({ lit, pathRef }) {
   const id = useId().replace(/:/g, '');
-  const light = variant === 'light';
+  const tex = useMemo(moonTexture, []);
   return (
     <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden="true">
       <defs>
-        {/* Warm ivory moonlight — the site's ivory / gold palette */}
-        <radialGradient id={`${id}-lit`} cx="60%" cy="36%" r="75%">
-          <stop offset="0" stopColor="#fffaf0" />
-          <stop offset="0.6" stopColor="#f3e7cc" />
-          <stop offset="1" stopColor="#d9c493" />
-        </radialGradient>
-        <clipPath id={`${id}-clip`}>
-          <path ref={pathRef} d={tilePath(lit)} />
+        <filter id={`${id}-soft`} x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation="1.8" />
+        </filter>
+        <mask id={`${id}-phase`} maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+          <path ref={pathRef} d={phasePath(lit)} fill="#fff" filter={`url(#${id}-soft)`} />
+        </mask>
+        <clipPath id={`${id}-disc`}>
+          <circle cx="50" cy="50" r={R} />
         </clipPath>
+        <radialGradient id={`${id}-shade`} cx="62%" cy="40%" r="70%">
+          <stop offset="0.55" stopColor="#000" stopOpacity="0" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.28" />
+        </radialGradient>
       </defs>
-
-      {/* Rays + sparkles */}
-      <g stroke={light ? 'rgba(233,194,122,0.55)' : 'rgba(233,194,122,0.28)'} strokeWidth="0.9" strokeLinecap="round">
-        {RAYS.map(([x1, y1, x2, y2], i) => (
-          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />
-        ))}
+      <g clipPath={`url(#${id}-disc)`}>
+        {/* Night side: deep shadow with a whisper of earthshine */}
+        <circle cx="50" cy="50" r={R} fill="#070912" />
+        <image href={tex} x={50 - R} y={50 - R} width={R * 2} height={R * 2} opacity="0.1" />
+        {/* Day side */}
+        <g mask={`url(#${id}-phase)`}>
+          <image href={tex} x={50 - R} y={50 - R} width={R * 2} height={R * 2} />
+          <circle cx="50" cy="50" r={R} fill={`url(#${id}-shade)`} />
+        </g>
       </g>
-      <g fill={light ? 'rgba(247,231,196,0.95)' : 'rgba(243,217,164,0.7)'}>
-        {SPARKLES.map(([x, y, s]) => (
-          <path key={`${x}-${y}`} d={sparkle(x, y, s)} />
-        ))}
-        {DOTS.map(([x, y]) => (
-          <circle key={`${x}-${y}`} cx={x} cy={y} r="0.9" />
-        ))}
-      </g>
-
-      {/* Night side with faint craters */}
-      <circle cx={MOON.cx} cy={MOON.cy} r={MOON.r} fill={light ? '#1f1a44' : '#161c42'} />
-      {CRATERS.map(([x, y, r]) => (
-        <circle key={`n${x}-${y}`} cx={x} cy={y} r={r} fill="rgba(255,255,255,0.06)" />
-      ))}
-
-      {/* Lit side (phase) with illustrated craters */}
-      <g clipPath={`url(#${id}-clip)`}>
-        <circle cx={MOON.cx} cy={MOON.cy} r={MOON.r} fill={`url(#${id}-lit)`} />
-        {CRATERS.map(([x, y, r]) => (
-          <circle key={`l${x}-${y}`} cx={x} cy={y} r={r} fill="#d8c59a" opacity="0.7" />
-        ))}
-        {CRATERS.map(([x, y, r]) => (
-          <circle key={`h${x}-${y}`} cx={x - r * 0.25} cy={y - r * 0.25} r={r * 0.55} fill="#f0e4c6" opacity="0.8" />
-        ))}
-      </g>
-      <circle cx={MOON.cx} cy={MOON.cy} r={MOON.r - 0.4} fill="none" stroke="rgba(233,194,122,0.35)" strokeWidth="0.8" />
     </svg>
   );
 }
 
 /** Seconds moon: re-shaped every animation frame for a perfectly smooth sweep. */
-function LiveSecondsMoon({ variant }) {
+function LiveSecondsMoon() {
   const pathRef = useRef(null);
   const [initial] = useState(() => 1 - ((START - Date.now()) % 60000) / 60000);
   useEffect(() => {
@@ -144,33 +195,31 @@ function LiveSecondsMoon({ variant }) {
     let raf = 0;
     const loop = () => {
       const remaining = Math.max(START - Date.now(), 0);
-      pathRef.current?.setAttribute('d', tilePath(1 - (remaining % 60000) / 60000));
+      pathRef.current?.setAttribute('d', phasePath(1 - (remaining % 60000) / 60000));
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, []);
-  return <MoonArt lit={initial} pathRef={pathRef} variant={variant} />;
+  return <Moon lit={initial} pathRef={pathRef} />;
 }
 
-/** A doodle-style moon tile: framed moon-phase art, then value, unit and phase name. */
-function MoonCard({ value, label, lit, live = false, minDigits = 2, variant = 'dark' }) {
+/** One unit of the countdown: its moon, the value and the unit. */
+function Unit({ value, label, lit, live = false, minDigits = 2 }) {
   return (
-    <div className={`moon-card moon-card--${variant}`}>
-      <div className="moon-card__art">{live ? <LiveSecondsMoon variant={variant} /> : <MoonArt lit={lit} variant={variant} />}</div>
-      <span key={value} className="moon-card__value">
+    <div className="moon-timer__unit">
+      <div className="moon-timer__moon">{live ? <LiveSecondsMoon /> : <Moon lit={lit} />}</div>
+      <span key={value} className="moon-timer__value">
         {String(value).padStart(minDigits, '0')}
       </span>
-      <span className="moon-card__label">{label}</span>
-      <span className="moon-card__phase">{live ? 'Waxing' : phaseName(lit)}</span>
+      <span className="moon-timer__label">{label}</span>
     </div>
   );
 }
 
 /**
- * Live countdown to the fest, as four moon-phase cards (inspired by Google's
- * "Rise of the Half Moon" doodle). Each moon waxes toward full as its unit
- * counts down; the days moon reaches full moon on fest day.
+ * Live countdown to the fest on one glass panel. Each unit's moon waxes toward
+ * full as it counts down; the days moon reaches full moon on fest day.
  */
 export default function EventCountdown() {
   const [now, setNow] = useState(() => Date.now());
@@ -206,13 +255,13 @@ export default function EventCountdown() {
     <div
       role="timer"
       aria-label={`Countdown to ${EVENT.dateLabel}: ${days} days, ${hours} hours, ${minutes} minutes`}
-      className="grid grid-cols-4 gap-2 sm:gap-4"
+      className="moon-timer"
     >
-      {/* Tiles alternate deep navy / midnight violet, like the doodle's card grid. */}
-      <MoonCard value={days} label="Days" lit={daysLit} variant="dark" />
-      <MoonCard value={hours} label="Hours" lit={1 - hours / 24} variant="light" />
-      <MoonCard value={minutes} label="Minutes" lit={1 - minutes / 60} variant="dark" />
-      <MoonCard value={seconds} label="Seconds" live variant="light" />
+      <Frame />
+      <Unit value={days} label="Days" lit={daysLit} />
+      <Unit value={hours} label="Hours" lit={1 - hours / 24} />
+      <Unit value={minutes} label="Minutes" lit={1 - minutes / 60} />
+      <Unit value={seconds} label="Seconds" live />
     </div>
   );
 }

@@ -47,8 +47,23 @@ export const useExperience = create((set) => ({
   // Focused body for the fly-to + info card: 0…7 (planet index), 'sun', or null.
   focus: null,
 
+  // Department pages (see lib/deptRoute.js — always change these through navigate()).
+  // dept: department key ('sun', 'earth', 'moon', …) or null.
+  // deptView: 'orbit' (the world rising as a semicircle) | 'events' (inside the world).
+  // deptEvent: selected event slug in the events view.
+  dept: null,
+  deptView: 'orbit',
+  deptEvent: null,
+  // true once a full-screen page (a department, the gallery) covers the landing → the main canvas can pause.
+  deptCovered: false,
+  // The campus gallery page (#/gallery).
+  galleryOpen: false,
+
   setPhase: (phase) => set((state) => (state.phase === phase ? state : { phase })),
   setFocus: (focus) => set((state) => (state.focus === focus ? state : { focus })),
+  setRoute: ({ dept = null, view = 'orbit', event = null }) => set({ dept, deptView: dept ? view : 'orbit', deptEvent: dept ? event : null }),
+  setGalleryOpen: (galleryOpen) => set((state) => (state.galleryOpen === galleryOpen ? state : { galleryOpen })),
+  setDeptCovered: (deptCovered) => set((state) => (state.deptCovered === deptCovered ? state : { deptCovered })),
   setCanvasReady: () => set({ canvasReady: true }),
   finishLoader: () => set({ hudMounted: false, phase: PHASES.LANDING_IDLE }),
 }));

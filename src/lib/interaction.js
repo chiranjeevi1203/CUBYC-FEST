@@ -36,4 +36,4 @@ export const interaction = {
 
 /** Elements that should keep normal clicks / text selection (no drag-to-orbit). */
 export const INTERACTIVE_SELECTOR =
-  'a, button, input, textarea, select, label, summary, [role="button"], [data-no-orbit], .glass, .nav-bar, .moon-card, .explore-panel, .explore-pill';
+  'a, button, input, textarea, select, label, summary, [role="button"], [data-no-orbit], .glass, .nav-bar, .moon-timer, .explore-panel, .explore-pill';

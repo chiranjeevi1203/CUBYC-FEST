@@ -355,95 +355,87 @@
     transform: translateY(-2px);
   }
 
-  /* ---------- Landing: moon-phase countdown (after "Rise of the Half Moon") ---------- */
-  /* Doodle-style tiles (after "Rise of the Half Moon") in the site palette:
-     deep navy / midnight violet, gold inset frame, paper grain, ivory moons. */
-  .moon-card {
+  /* ---------- Landing: countdown — realistic moons on one Apple-style glass panel ---------- */
+  .moon-timer {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: clamp(4.9rem, 21vw, 8.25rem);
-    padding: clamp(0.3rem, 1.1vw, 0.45rem) clamp(0.3rem, 1.1vw, 0.45rem) clamp(0.65rem, 2vw, 0.95rem);
-    border-radius: clamp(0.85rem, 2.6vw, 1.2rem);
-    transition:
-      transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
-      box-shadow 0.6s ease;
-  }
-  .moon-card--dark {
-    color: #f6f1e7;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: min(calc(100vw - 2.5rem), 32rem);
+    padding: clamp(0.95rem, 2.6vw, 1.35rem) clamp(0.4rem, 1.6vw, 0.9rem);
+    border-radius: clamp(1.4rem, 4vw, 2rem);
     background:
-      radial-gradient(120% 70% at 50% 0%, rgba(233, 194, 122, 0.07), transparent 60%),
-      linear-gradient(160deg, #141a3d 0%, #0d1129 58%, #080b1c 100%);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 45%, rgba(255, 255, 255, 0.025) 100%),
+      rgba(16, 18, 40, 0.18);
+    -webkit-backdrop-filter: blur(26px) saturate(180%) brightness(1.06);
+    backdrop-filter: blur(26px) saturate(180%) brightness(1.06);
     box-shadow:
-      inset 0 0 0 1px rgba(233, 194, 122, 0.18),
-      0 18px 40px -22px rgba(0, 0, 0, 0.9);
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+      inset 0 18px 30px -24px rgba(255, 255, 255, 0.35),
+      0 30px 60px -30px rgba(0, 0, 0, 0.8),
+      0 0 0 0.5px rgba(0, 0, 0, 0.25);
   }
-  /* "Light" tile = the richer midnight-violet one (nebula violet, gold detailing). */
-  .moon-card--light {
-    color: #f6f1e7;
-    background:
-      radial-gradient(120% 70% at 50% 0%, rgba(233, 194, 122, 0.12), transparent 60%),
-      linear-gradient(160deg, #2a2259 0%, #1b1640 55%, #110d2a 100%);
-    box-shadow:
-      inset 0 0 0 1px rgba(233, 194, 122, 0.32),
-      0 18px 40px -22px rgba(0, 0, 0, 0.9);
-  }
-  /* Inset frame line, like the doodle cards */
-  .moon-card::before {
-    content: "";
-    position: absolute;
-    inset: clamp(3px, 0.7vw, 5px);
-    z-index: 1;
-    border-radius: clamp(0.6rem, 2vw, 0.9rem);
-    border: 1.2px solid rgba(233, 194, 122, 0.2);
-    pointer-events: none;
-  }
-  .moon-card--light::before {
-    border-color: rgba(233, 194, 122, 0.42);
-  }
-  /* Painterly paper grain */
-  .moon-card::after {
+  /* Liquid-glass edge: a light rim brightest at the top-left and bottom-right */
+  .moon-timer::before {
     content: "";
     position: absolute;
     inset: 0;
-    z-index: 2;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    background-size: 140px 140px;
-    opacity: 0.2;
-    mix-blend-mode: overlay;
+    z-index: -1;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.08) 30%, rgba(255, 255, 255, 0.04) 60%, rgba(255, 255, 255, 0.3));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
     pointer-events: none;
   }
-  .moon-card:hover {
-    transform: translateY(-4px);
+  /* Soft specular sheen across the upper glass */
+  .moon-timer::after {
+    content: "";
+    position: absolute;
+    inset: 1px 1px 45% 1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, 0.14), transparent 60%);
+    pointer-events: none;
   }
-  .moon-card--dark:hover,
-  .moon-card--light:hover {
-    box-shadow:
-      inset 0 0 0 1px rgba(233, 194, 122, 0.6),
-      0 0 40px -12px rgba(233, 194, 122, 0.55),
-      0 18px 40px -22px rgba(0, 0, 0, 0.9);
-  }
-  .moon-card__art {
+  .moon-timer__unit {
     position: relative;
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+  .moon-timer__unit + .moon-timer__unit::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12%;
+    bottom: 12%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  }
+  .moon-timer__moon {
+    width: clamp(2.5rem, 10vw, 3.6rem);
     aspect-ratio: 1;
+    border-radius: 9999px;
+    filter: drop-shadow(0 0 14px rgba(240, 232, 214, 0.16));
   }
-  .moon-card__art svg {
-    filter: drop-shadow(0 0 10px rgba(243, 217, 164, 0.22));
-  }
-  .moon-card__value {
-    position: relative;
-    z-index: 3;
-    margin-top: clamp(0.05rem, 0.5vw, 0.25rem);
+  .moon-timer__value {
+    margin-top: clamp(0.55rem, 1.6vw, 0.8rem);
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(1.15rem, 4.6vw, 2rem);
+    font-size: clamp(1.35rem, 5.4vw, 2.15rem);
     line-height: 1;
     letter-spacing: 0.04em;
     font-variant-numeric: tabular-nums;
+    color: #f6f1e7;
     animation: value-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   @keyframes value-in {
@@ -458,29 +450,19 @@
       filter: blur(0);
     }
   }
-  .moon-card__label {
-    position: relative;
-    z-index: 3;
-    margin-top: 0.35rem;
-    font-family: var(--font-sans);
+  .moon-timer__label {
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
     font-weight: 700;
-    font-size: clamp(0.48rem, 1.6vw, 0.6rem);
-    letter-spacing: 0.32em;
+    font-size: clamp(0.48rem, 1.5vw, 0.58rem);
+    letter-spacing: clamp(0.18em, 0.7vw, 0.3em);
     text-transform: uppercase;
-    opacity: 0.78;
+    color: rgba(255, 255, 255, 0.55);
   }
-  .moon-card__phase {
-    position: relative;
-    z-index: 3;
-    margin-top: 0.25rem;
-    padding-inline: 0.25rem;
-    font-family: var(--font-sans);
-    font-size: clamp(0.46rem, 1.4vw, 0.6rem);
-    line-height: 1.25;
-    letter-spacing: 0.1em;
-    text-align: center;
-    text-transform: uppercase;
-    color: rgba(243, 217, 164, 0.72);
+  .low-gfx .moon-timer {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(14, 16, 36, 0.86);
   }
   /* ---------- Interactive background ---------- */
   html.is-orbiting,
@@ -698,14 +680,12 @@
     .hero-compact .title-cosmic {
       font-size: clamp(3.4rem, min(10.6vw, 15vh), 9rem);
     }
-    .hero-compact .moon-card {
-      width: clamp(4.9rem, 15vh, 7.25rem);
-      padding-top: 0.75rem;
-      padding-bottom: 0.7rem;
+    .hero-compact .moon-timer__moon {
+      width: clamp(2.3rem, 6.4vh, 3.4rem);
     }
-    .hero-compact .moon-card__value {
-      margin-top: 0.45rem;
-      font-size: clamp(1.15rem, 3.4vh, 1.75rem);
+    .hero-compact .moon-timer__value {
+      margin-top: 0.5rem;
+      font-size: clamp(1.3rem, 3.9vh, 2rem);
     }
   }
 
@@ -840,6 +820,1009 @@
     to { rotate: 360deg; }
   }
 
+  /* ---------- Department pages ---------- */
+  html.dept-open,
+  html.dept-open body {
+    overflow: hidden;
+  }
+  .dept-view {
+    background: #03040a;
+    user-select: none;
+  }
+  .dept-view p,
+  .dept-view h1,
+  .dept-view h2,
+  .dept-view h3,
+  .dept-events {
+    user-select: text;
+  }
+  .dept-view.is-over-world {
+    cursor: pointer;
+  }
+  .dept-vignette {
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 42%, transparent 55%, rgba(3, 4, 10, 0.7) 100%),
+      linear-gradient(180deg, rgba(3, 4, 10, 0.55), transparent 28%);
+  }
+  /* The copy is centred in the sky between the top bar and the world's crest. */
+  .dept-orbit-copy {
+    height: calc(var(--dept-top) - 0.25rem);
+    justify-content: safe center;
+    padding-top: calc(env(safe-area-inset-top) + 4.5rem);
+    padding-bottom: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .dept-orbit-copy {
+      padding-top: 5rem;
+    }
+  }
+  @media (min-width: 640px) and (max-height: 860px) {
+    .dept-intro {
+      display: none;
+    }
+  }
+  @media (max-height: 640px) {
+    .dept-intro {
+      display: none;
+    }
+  }
+  .dept-event-chips {
+    display: none;
+  }
+  @media (min-width: 768px) and (min-height: 700px) {
+    .dept-event-chips {
+      display: flex;
+    }
+  }
+
+  .dept-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(233, 194, 122, 0.3);
+    background: linear-gradient(180deg, rgba(233, 194, 122, 0.1), rgba(233, 194, 122, 0.02));
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-gold-200);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .dept-chip__dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 9999px;
+    background: #f3d9a4;
+    box-shadow: 0 0 10px rgba(243, 217, 164, 0.9);
+  }
+
+  /* "Enter" — sits on the crest of the world */
+  .dept-enter {
+    top: calc(var(--dept-top) + 1.4rem);
+  }
+  .dept-enter__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1.2rem 0.7rem 0.95rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(233, 194, 122, 0.45);
+    background: linear-gradient(180deg, rgba(10, 12, 30, 0.55), rgba(10, 12, 30, 0.3));
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    color: var(--color-gold-200);
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    box-shadow: 0 0 36px -14px rgba(233, 194, 122, 0.7);
+    transition:
+      border-color 0.4s ease,
+      box-shadow 0.5s ease,
+      transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+      color 0.4s ease;
+  }
+  .dept-enter__btn svg {
+    animation: dept-nudge 2.2s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  }
+  @keyframes dept-nudge {
+    0%, 100% { transform: translateY(-1px); }
+    50% { transform: translateY(3px); }
+  }
+  .dept-enter__btn:hover,
+  .dept-enter__btn:focus-visible,
+  .is-over-world .dept-enter__btn {
+    color: #fff;
+    border-color: rgba(243, 217, 164, 0.9);
+    box-shadow:
+      0 0 50px -8px rgba(233, 194, 122, 0.85),
+      inset 0 0 18px rgba(233, 194, 122, 0.15);
+    transform: translateY(-3px);
+  }
+
+  /* Wheel buttons — beside the semicircle */
+  .dept-wheel-btn {
+    position: absolute;
+    bottom: calc(env(safe-area-inset-bottom) + 1rem);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    color: #f6f1e7;
+  }
+  .dept-wheel-btn--prev {
+    left: 0.75rem;
+  }
+  .dept-wheel-btn--next {
+    right: 0.75rem;
+  }
+  .dept-wheel-btn__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03) 60%, rgba(140, 155, 255, 0.06));
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 18px 40px -22px rgba(0, 0, 0, 0.8);
+    transition:
+      border-color 0.4s ease,
+      box-shadow 0.5s ease,
+      transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+      color 0.4s ease;
+  }
+  .dept-wheel-btn__label {
+    display: none;
+    flex-direction: column;
+    gap: 0.25rem;
+    transition: color 0.4s ease;
+  }
+  .dept-wheel-btn:hover .dept-wheel-btn__icon,
+  .dept-wheel-btn:focus-visible .dept-wheel-btn__icon {
+    color: var(--color-gold-200);
+    border-color: rgba(233, 194, 122, 0.75);
+    box-shadow: 0 0 40px -8px rgba(233, 194, 122, 0.75);
+  }
+  .dept-wheel-btn--next:hover .dept-wheel-btn__icon {
+    transform: rotate(-20deg) scale(1.06);
+  }
+  .dept-wheel-btn--prev:hover .dept-wheel-btn__icon {
+    transform: rotate(20deg) scale(1.06);
+  }
+  .dept-wheel-btn:hover .dept-wheel-btn__label {
+    color: var(--color-gold-200);
+  }
+  @media (min-width: 768px) {
+    .dept-wheel-btn {
+      bottom: 2.5rem;
+    }
+    .dept-wheel-btn--prev {
+      left: auto;
+      right: min(calc(50% + var(--dept-r) + 1.5rem), calc(100% - 15rem));
+    }
+    .dept-wheel-btn--next {
+      right: auto;
+      left: min(calc(50% + var(--dept-r) + 1.5rem), calc(100% - 15rem));
+    }
+    .dept-wheel-btn__icon {
+      width: 3.5rem;
+      height: 3.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .dept-wheel-btn__label {
+      display: flex;
+    }
+  }
+
+  /* Top bar */
+  .dept-topbar {
+    background: linear-gradient(180deg, rgba(3, 4, 10, 0.85), rgba(3, 4, 10, 0));
+  }
+  .dept-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    height: 2.75rem;
+    padding: 0 1.1rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-display);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition:
+      border-color 0.4s ease,
+      color 0.4s ease,
+      box-shadow 0.5s ease;
+  }
+  .dept-back:hover,
+  .dept-back:focus-visible {
+    border-color: rgba(233, 194, 122, 0.6);
+    color: var(--color-gold-200);
+    box-shadow: 0 0 30px -10px rgba(233, 194, 122, 0.6);
+  }
+  .dept-close {
+    display: grid;
+    place-items: center;
+    border-radius: 9999px;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease;
+  }
+  .dept-close:hover,
+  .dept-close:focus-visible {
+    transform: rotate(-12deg) scale(1.06);
+    filter: drop-shadow(0 0 12px rgba(233, 194, 122, 0.6));
+  }
+  .dept-dots.is-muted {
+    opacity: 0.35;
+  }
+  .dept-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.25);
+    transition:
+      width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+  .dept-dot:hover:not(:disabled) {
+    background: rgba(243, 217, 164, 0.7);
+  }
+  .dept-dot.is-active {
+    width: 1.6rem;
+    background: #f3d9a4;
+    box-shadow: 0 0 12px rgba(243, 217, 164, 0.8);
+  }
+
+  /* Events view */
+  .dept-events {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(233, 194, 122, 0.35) transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* ---------- Holo-deck (events view) ---------- */
+  /* The hologram: translucent glass in the site's gold/ivory, scanlines, HUD corners. */
+  .holo-screen {
+    position: relative;
+    isolation: isolate;
+    padding: clamp(1.4rem, 4vw, 2.6rem) clamp(1.2rem, 4vw, 2.75rem) clamp(1.6rem, 4vw, 2.4rem);
+    border-radius: 1.5rem;
+    color: #f4f1ea;
+    background:
+      radial-gradient(120% 60% at 50% 100%, rgba(233, 194, 122, 0.1), transparent 60%),
+      linear-gradient(180deg, rgba(243, 217, 164, 0.075) 0%, rgba(243, 217, 164, 0.02) 35%, rgba(130, 150, 255, 0.035) 100%),
+      rgba(7, 9, 20, 0.74);
+    border: 1px solid rgba(243, 217, 164, 0.26);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 240, 210, 0.28),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+      inset 0 0 70px rgba(233, 194, 122, 0.06),
+      0 0 60px -22px rgba(233, 194, 122, 0.45),
+      0 40px 90px -40px rgba(0, 0, 0, 0.95);
+    will-change: transform;
+  }
+  /* Scanlines, drifting slowly */
+  .holo-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: repeating-linear-gradient(0deg, rgba(243, 217, 164, 0.035) 0 1px, transparent 1px 4px);
+    animation: holo-scan 8s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes holo-scan {
+    to { background-position: 0 -64px; }
+  }
+  /* Projected light catching the top edge */
+  .holo-screen::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 236, 196, 0.9), transparent);
+    box-shadow: 0 0 16px 1px rgba(233, 194, 122, 0.55);
+    pointer-events: none;
+  }
+  .holo-screen__hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px dashed rgba(243, 217, 164, 0.16);
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(243, 217, 164, 0.6);
+  }
+  .holo-led {
+    width: 0.4rem;
+    height: 0.4rem;
+    flex: none;
+    border-radius: 9999px;
+    background: #f3d9a4;
+    box-shadow: 0 0 8px rgba(243, 217, 164, 0.95);
+    animation: holo-led 2.4s ease-in-out infinite;
+  }
+  @keyframes holo-led {
+    50% { opacity: 0.45; }
+  }
+  .holo-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.42rem 0.95rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(243, 217, 164, 0.35);
+    background: rgba(233, 194, 122, 0.08);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-gold-200);
+  }
+  .holo-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 3.6vw, 2.4rem);
+    line-height: 1.08;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fbf6ec;
+    text-shadow: 0 0 22px rgba(233, 194, 122, 0.28);
+  }
+  .holo-reticle {
+    display: none;
+    flex: none;
+    width: 4.5rem;
+    height: 4.5rem;
+    color: rgba(243, 217, 164, 0.7);
+    filter: drop-shadow(0 0 8px rgba(233, 194, 122, 0.4));
+  }
+  @media (min-width: 640px) {
+    .holo-reticle { display: block; }
+  }
+  .holo-reticle__spin {
+    transform-origin: 32px 32px;
+    animation: orbit-spin 24s linear infinite;
+  }
+  .holo-person {
+    padding: 0.95rem 1.1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(243, 217, 164, 0.14);
+    background: linear-gradient(180deg, rgba(243, 217, 164, 0.06), rgba(243, 217, 164, 0.015));
+  }
+  .holo-rule {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    column-gap: 0.75rem;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(243, 217, 164, 0.08);
+  }
+  .holo-rule:first-child {
+    border-top: 0;
+  }
+  @media (min-width: 640px) {
+    .holo-rule { grid-template-columns: 2.5rem 1fr; }
+  }
+  .holo-rule__num {
+    padding-top: 0.1rem;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(243, 217, 164, 0.75);
+  }
+
+  /* The deck: a curved console docked to the bottom of the screen */
+  .holo-deck {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-top: auto;
+    padding-top: 3rem;
+    pointer-events: none;
+  }
+  .holo-deck__beam {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% - 3.2rem);
+    width: min(70%, 34rem);
+    height: 7rem;
+    translate: -50% 0;
+    background: linear-gradient(0deg, rgba(243, 217, 164, 0.22), rgba(243, 217, 164, 0.05) 55%, transparent);
+    clip-path: polygon(38% 100%, 62% 100%, 100% 0, 0 0);
+    filter: blur(6px);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  .holo-deck__body {
+    position: relative;
+    max-width: 58rem;
+    margin-inline: auto;
+    padding: 0.95rem clamp(0.75rem, 2.4vw, 1.5rem) calc(env(safe-area-inset-bottom) + 0.8rem);
+    border-radius: 50% 50% 0 0 / 1.9rem 1.9rem 0 0;
+    border-top: 1px solid rgba(243, 217, 164, 0.55);
+    background:
+      radial-gradient(60% 120% at 50% 0%, rgba(233, 194, 122, 0.12), transparent 70%),
+      linear-gradient(180deg, rgba(24, 26, 46, 0.97), rgba(8, 9, 18, 0.99));
+    box-shadow:
+      0 -1px 26px -6px rgba(233, 194, 122, 0.55),
+      inset 0 1px 0 rgba(255, 240, 210, 0.3),
+      0 -30px 60px -24px rgba(0, 0, 0, 0.9);
+    overflow: hidden;
+    pointer-events: auto;
+    /* Own compositing layer: the sticky deck repaints whole over the scrolling hologram. */
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  .holo-deck__circuits {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: rgba(233, 194, 122, 0.13);
+    pointer-events: none;
+  }
+  .holo-deck__emitter {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: min(42%, 18rem);
+    height: 2px;
+    translate: -50% 0;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, transparent, #fff3d6, transparent);
+    box-shadow: 0 0 14px 2px rgba(243, 217, 164, 0.75);
+  }
+  .holo-deck__status {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(243, 217, 164, 0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Layout: event tabs on the left, the hologram on the right */
+  .holo-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
+  }
+  @media (min-width: 1024px) {
+    .holo-layout {
+      grid-template-columns: 15.5rem minmax(0, 1fr);
+      gap: 1.75rem;
+      align-items: start;
+    }
+  }
+  .holo-tabs {
+    position: relative;
+    min-width: 0;
+  }
+  @media (min-width: 1024px) {
+    .holo-tabs {
+      position: sticky;
+      top: 6rem;
+    }
+  }
+  .holo-tabs__list {
+    position: relative;
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    margin-inline: -1rem;
+    padding: 0.2rem 1rem 0.9rem;
+    scrollbar-width: none;
+  }
+  .holo-tabs__list::-webkit-scrollbar {
+    display: none;
+  }
+  .holo-tabs__list > li {
+    flex: none;
+  }
+  @media (min-width: 1024px) {
+    .holo-tabs__list {
+      flex-direction: column;
+      gap: 0.4rem;
+      overflow: visible;
+      margin: 0;
+      padding: 0 0 0 0.9rem;
+    }
+  }
+
+  /* A chamfered tab (cut bottom-right corner, as in a ship's console index).
+     The outer layer is the gold edge; ::before is the glass face inset by 1px. */
+  .holo-tab {
+    --cut: 0.85rem;
+    --face-a: rgba(20, 22, 44, 0.92);
+    --face-b: rgba(12, 13, 28, 0.9);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: min(15rem, 72vw);
+    padding: 0.85rem 1.4rem 0.85rem 0.95rem;
+    color: rgba(246, 241, 231, 0.66);
+    background: linear-gradient(135deg, rgba(243, 217, 164, calc(0.16 + var(--tone, 0) * 0.08)), rgba(243, 217, 164, 0.06));
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%);
+    transition:
+      color 0.45s ease,
+      transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .holo-tab::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut) + 0.4px), calc(100% - var(--cut) + 0.4px) 100%, 0 100%);
+    background:
+      linear-gradient(180deg, rgba(243, 217, 164, calc(0.03 + var(--tone, 0) * 0.05)), transparent),
+      linear-gradient(135deg, var(--face-a), var(--face-b));
+    transition: background 0.5s ease;
+  }
+  /* Scan sheen that sweeps across on hover / selection */
+  .holo-tab::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 240, 210, 0.16) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+  }
+  .holo-tab:hover,
+  .holo-tab:focus-visible {
+    color: #f6f1e7;
+  }
+  .holo-tab:hover::after,
+  .holo-tab.is-active::after {
+    transform: translateX(120%);
+  }
+  @media (min-width: 1024px) {
+    .holo-tab {
+      width: 100%;
+    }
+    .holo-tab:hover {
+      transform: translateX(4px);
+    }
+  }
+  .holo-tab.is-active {
+    --face-a: rgba(70, 54, 30, 0.95);
+    --face-b: rgba(30, 24, 30, 0.94);
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255, 236, 196, 0.85), rgba(233, 194, 122, 0.35));
+  }
+  /* Glow on the wrapper: a filter on the tab itself would be cut off by its clip-path */
+  .holo-tabs__list > li:has(.holo-tab.is-active) {
+    filter: drop-shadow(0 0 14px rgba(233, 194, 122, 0.45));
+  }
+  @media (min-width: 1024px) {
+    .holo-tab.is-active {
+      transform: translateX(10px);
+    }
+  }
+  .holo-tab__num {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    color: rgba(243, 217, 164, 0.55);
+    transition: color 0.4s ease;
+  }
+  .holo-tab.is-active .holo-tab__num {
+    color: var(--color-gold-200);
+  }
+  .holo-tab__name {
+    font-family: var(--font-display);
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .holo-tab__meta {
+    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(243, 217, 164, 0.6);
+  }
+  /* The light rail: rides along the stack's spine (under the row on phones) */
+  .holo-tabs__rail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 0;
+    border-radius: 9999px;
+    background: linear-gradient(180deg, #fff3d6, #e9c27a);
+    box-shadow: 0 0 12px 1px rgba(243, 217, 164, 0.8);
+    pointer-events: none;
+  }
+  .holo-tabs__list::before {
+    /* Faint spine the rail travels on (desktop) */
+    content: "";
+    position: absolute;
+    left: 1px;
+    top: 0.3rem;
+    bottom: 0.3rem;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(243, 217, 164, 0.22), transparent);
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .holo-tabs__list::before {
+      display: block;
+    }
+  }
+  /* The link beam: from the selected tab across to the hologram (desktop) */
+  .holo-tabs__link {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: calc(100% + 0.6rem);
+    width: 1.15rem;
+    height: 1px;
+    transform-origin: left center;
+    background: linear-gradient(90deg, rgba(255, 240, 210, 0.95), rgba(233, 194, 122, 0.2));
+    box-shadow: 0 0 10px rgba(243, 217, 164, 0.8);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  @media (min-width: 1024px) {
+    .holo-tabs__link {
+      display: block;
+    }
+  }
+
+  /* CUBYC hub (inside the sun): fest at a glance + department directory */
+  .dept-hub-stats {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 1rem 0.5rem;
+    border-radius: 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(12, 14, 32, 0.8), rgba(10, 12, 28, 0.72));
+  }
+  .dept-hub-stats > div + div {
+    border-left: 1px solid rgba(233, 194, 122, 0.22);
+  }
+  .dept-hub-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+    padding: 1.05rem 1.15rem;
+    border-radius: 1.3rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, rgba(14, 16, 36, 0.84), rgba(10, 12, 28, 0.78));
+    transition:
+      border-color 0.4s ease,
+      box-shadow 0.5s ease,
+      transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .dept-hub-card:hover,
+  .dept-hub-card:focus-visible {
+    border-color: rgba(233, 194, 122, 0.55);
+    box-shadow: 0 0 40px -16px rgba(233, 194, 122, 0.7);
+    transform: translateY(-2px);
+  }
+
+  /* Inside a world the canvas behind keeps moving: a live backdrop blur would be
+     recomputed every frame over large panels. Use solid tinted glass instead. */
+  .dept-events .glass,
+  .dept-events .dept-chip {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .dept-events .dept-chip {
+    background: rgba(20, 18, 30, 0.75);
+  }
+  .dept-events {
+    contain: strict;
+  }
+
+  .low-gfx .dept-wheel-btn__icon,
+  .low-gfx .dept-enter__btn,
+  .low-gfx .dept-chip,
+  .low-gfx .dept-back {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .low-gfx .dept-wheel-btn__icon {
+    background: rgba(12, 15, 38, 0.88);
+  }
+
+  /* ---------- Gallery page: the black hole ---------- */
+  .bh-page {
+    background: #020308;
+    touch-action: pan-y;
+    user-select: none;
+    cursor: grab;
+  }
+  .bh-page:active {
+    cursor: grabbing;
+  }
+  .bh-vignette {
+    background:
+      radial-gradient(ellipse 90% 75% at 50% 58%, transparent 55%, rgba(2, 3, 8, 0.75) 100%),
+      linear-gradient(180deg, rgba(2, 3, 8, 0.7), transparent 26%);
+  }
+  .bh-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0;
+    transform-origin: 50% 50%;
+    will-change: transform, opacity, filter;
+    cursor: pointer;
+  }
+  /* The photo itself is drawn on the canvas; the button is its invisible hit area. */
+  .bh-card {
+    background: transparent;
+  }
+  .bh-card__caption {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 0.55rem);
+    z-index: 2;
+    max-width: 100%;
+    padding: 0.38rem 0.7rem;
+    border: 1px solid rgba(243, 217, 164, 0.45);
+    background: rgba(6, 8, 20, 0.82);
+    font-family: var(--font-display);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #f6f1e7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 0 24px -8px rgba(233, 194, 122, 0.6);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.35s ease,
+      transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+  }
+  .bh-card.is-hot .bh-card__caption,
+  .bh-card:focus-visible .bh-card__caption {
+    opacity: 1;
+    transform: none;
+  }
+  .bh-card:focus-visible {
+    outline: 1px solid var(--color-gold-400);
+    outline-offset: 2px;
+  }
+
+  .bh-controls {
+    position: absolute;
+    left: 50%;
+    bottom: calc(env(safe-area-inset-bottom) + 1.25rem);
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    translate: -50% 0;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)), rgba(8, 10, 24, 0.55);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 20px 40px -22px rgba(0, 0, 0, 0.9);
+    cursor: default;
+  }
+  .bh-controls__text {
+    padding: 0 0.6rem 0 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+  }
+  .bh-btn {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(246, 241, 231, 0.85);
+    transition:
+      border-color 0.4s ease,
+      color 0.4s ease,
+      box-shadow 0.5s ease,
+      background-color 0.4s ease;
+  }
+  .bh-btn:hover,
+  .bh-btn:focus-visible {
+    border-color: rgba(233, 194, 122, 0.7);
+    color: var(--color-gold-200);
+    background: rgba(233, 194, 122, 0.08);
+    box-shadow: 0 0 26px -8px rgba(233, 194, 122, 0.7);
+  }
+
+  .bh-lightbox {
+    position: absolute;
+    inset: 0;
+    z-index: 45;
+    display: grid;
+    place-items: center;
+    padding: 5.5rem 1rem 1.5rem;
+    background: radial-gradient(ellipse at 50% 58%, rgba(2, 3, 8, 0.45), rgba(2, 3, 8, 0.88));
+    cursor: zoom-out;
+  }
+  .bh-lightbox__panel {
+    position: relative;
+    width: min(64rem, 100%);
+    padding: 0.9rem;
+    border: 1px solid rgba(243, 217, 164, 0.3);
+    background: linear-gradient(180deg, rgba(20, 22, 44, 0.92), rgba(8, 9, 20, 0.95));
+    box-shadow:
+      0 0 80px -20px rgba(233, 194, 122, 0.5),
+      0 50px 100px -40px rgba(0, 0, 0, 0.95);
+    cursor: default;
+  }
+  .bh-lightbox__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    max-height: calc(100svh - 14rem);
+    width: 100%;
+    overflow: hidden;
+    background: #05060d;
+  }
+  .bh-lightbox__media img,
+  .bh-lightbox__media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .bh-lightbox__bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0.5rem 0.25rem;
+  }
+  .low-gfx .bh-controls {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(8, 10, 24, 0.9);
+  }
+
+  /* ---------- Celestial frame (see ui/Frame.jsx) ---------- */
+  /* A fine gold hairline inset from a panel's edge, scooped corners with a dot at
+     each corner point, and an optional star set into a break at the top. */
+  .frame {
+    --frame-inset: 8px;
+    --fr: 14px;
+    position: absolute;
+    inset: var(--frame-inset);
+    z-index: 1; /* above sibling glass (backdrop-filter makes it its own layer) */
+    color: rgba(233, 194, 122, 0.34);
+    pointer-events: none;
+    transition: color 0.5s ease;
+  }
+  .frame--sm {
+    --frame-inset: 6px;
+    --fr: 10px;
+  }
+  .frame--lg {
+    --frame-inset: 11px;
+    --fr: 18px;
+  }
+  .frame__line {
+    position: absolute;
+    inset: 0;
+    border: 1px solid currentColor;
+    --cut: transparent var(--fr), #000 calc(var(--fr) + 0.5px);
+    -webkit-mask:
+      radial-gradient(circle at 0 0, var(--cut)),
+      radial-gradient(circle at 100% 0, var(--cut)),
+      radial-gradient(circle at 0 100%, var(--cut)),
+      radial-gradient(circle at 100% 100%, var(--cut));
+    -webkit-mask-composite: source-in;
+    mask:
+      radial-gradient(circle at 0 0, var(--cut)),
+      radial-gradient(circle at 100% 0, var(--cut)),
+      radial-gradient(circle at 0 100%, var(--cut)),
+      radial-gradient(circle at 100% 100%, var(--cut));
+    mask-composite: intersect;
+  }
+  /* Leave a break in the top line for the star */
+  .frame--star .frame__line {
+    -webkit-mask:
+      radial-gradient(circle at 0 0, var(--cut)),
+      radial-gradient(circle at 100% 0, var(--cut)),
+      radial-gradient(circle at 0 100%, var(--cut)),
+      radial-gradient(circle at 100% 100%, var(--cut)),
+      radial-gradient(circle at 50% 0, transparent 11px, #000 11.5px);
+    -webkit-mask-composite: source-in;
+    mask:
+      radial-gradient(circle at 0 0, var(--cut)),
+      radial-gradient(circle at 100% 0, var(--cut)),
+      radial-gradient(circle at 0 100%, var(--cut)),
+      radial-gradient(circle at 100% 100%, var(--cut)),
+      radial-gradient(circle at 50% 0, transparent 11px, #000 11.5px);
+    mask-composite: intersect;
+  }
+  .frame__corner {
+    position: absolute;
+    width: var(--fr);
+    height: var(--fr);
+    overflow: visible;
+  }
+  .frame__corner--tl { top: 0; left: 0; }
+  .frame__corner--tr { top: 0; right: 0; transform: scaleX(-1); }
+  .frame__corner--bl { bottom: 0; left: 0; transform: scaleY(-1); }
+  .frame__corner--br { bottom: 0; right: 0; transform: scale(-1); }
+  .frame__star {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 13px;
+    height: 13px;
+    translate: -50% -50%;
+    color: rgba(243, 217, 164, 0.85);
+    filter: drop-shadow(0 0 5px rgba(233, 194, 122, 0.55));
+  }
+  .frame--sm .frame__star {
+    width: 10px;
+    height: 10px;
+  }
+  .holo-frame {
+    color: rgba(243, 217, 164, 0.42);
+  }
+  .gallery__frame {
+    z-index: 2;
+    color: rgba(243, 217, 164, 0.45);
+  }
+  /* Panels that light up on hover brighten their frame too */
+  .group:hover > .frame,
+  .orbit-card:hover > .frame,
+  .dept-hub-card:hover > .frame {
+    color: rgba(243, 217, 164, 0.6);
+  }
+
   /* ---------- Watercolour illustration ---------- */
   .wc-sphere {
     --lx: 34%;
@@ -919,4 +1902,31 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ---------- Square corners, site-wide ---------- */
+/* Every box, card, panel, button and chip is square-cornered… */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+/* …except what is genuinely round: celestial bodies, rings and indicator dots. */
+.wc-sphere,
+.wc-sphere::after,
+.wc-sun,
+.planet-ring,
+.hero-shade,
+.moon-timer__moon {
+  border-radius: 50% !important;
+}
+.is-round,
+.explore-pill__beacon,
+.explore-pill__beacon::after,
+.holo-led,
+.dept-chip__dot,
+.planet-tooltip__dot,
+.live-dot,
+.dept-dot {
+  border-radius: 9999px !important;
 }

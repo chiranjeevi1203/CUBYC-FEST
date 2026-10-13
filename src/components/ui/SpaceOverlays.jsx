@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { BODIES, BRAND, EVENT, TOUR } from '../../config/experience';
-import { PLANET_ART } from '../../lib/planetArt';
+import { BODIES, SUN_BODY, TOUR, keyOfFocus } from '../../config/experience';
+import BodyIcon from './BodyIcon';
+import Frame from './Frame';
 import { interaction } from '../../lib/interaction';
+import { navigate } from '../../lib/deptRoute';
 import { PHASES, useExperience } from '../../store/useExperience';
 
 /** Floating label that follows the hovered planet (positioned by PlanetInteraction each frame). */
@@ -66,30 +68,30 @@ function FocusCard() {
       aria-live="polite"
     >
       <div className="glass relative overflow-hidden rounded-[1.75rem] p-6">
+        <Frame />
         <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(233,194,122,0.18),transparent_65%)]" />
         <div className="relative flex items-start gap-4">
           <span className="relative mt-1 block h-14 w-14 shrink-0">
             {isSun ? (
-              <span className="block h-full w-full rounded-full bg-[radial-gradient(circle_at_40%_35%,#fffaf0,#ffc04a_45%,#e2581c)] shadow-[0_0_30px_rgba(255,180,80,0.6)]" />
+              <span className="is-round block h-full w-full rounded-full bg-[radial-gradient(circle_at_40%_35%,#fffaf0,#ffc04a_45%,#e2581c)] shadow-[0_0_30px_rgba(255,180,80,0.6)]" />
             ) : planet ? (
-              <span
-                className="wc-sphere absolute inset-0 rounded-full"
-                style={{ backgroundImage: PLANET_ART[planet.name.toLowerCase()], filter: 'url(#watercolour-sm)' }}
-              />
+              <BodyIcon bodyKey={planet.key} className="absolute inset-0 w-full" />
             ) : null}
           </span>
           <div className="min-w-0 flex-1">
             <p className="font-mono text-[0.58rem] tracking-[0.32em] text-white/50 uppercase">
               {isSun
-                ? 'The Sun · Heart of the system'
+                ? 'The Sun · Christ University Yeshwanthpur Campus'
                 : planet?.kind === 'moon'
                   ? `Moon of ${planet.parent} · ${planet.name}`
-                  : planet
+                  : planet?.kind === 'station'
+                    ? 'Orbital stage · Space Station'
+                    : planet
                     ? `Planet ${String(shown + 1).padStart(2, '0')} · ${planet.name}`
                     : ''}
             </p>
             <h3 className="mt-1.5 font-display text-xl font-bold tracking-[0.1em] text-[#f6f1e7] uppercase">
-              {isSun ? BRAND.heroTitle.join('-') : planet?.track}
+              {isSun ? SUN_BODY.track : planet?.track}
             </h3>
           </div>
           <CardButton onClick={() => setFocus(null)} label="Close">
@@ -100,17 +102,17 @@ function FocusCard() {
         </div>
 
         <p className="relative mt-4 text-sm leading-relaxed text-white/65">
-          {isSun ? `${BRAND.subline} — ${EVENT.dateLabel}, ${BRAND.campus}.` : planet?.blurb}
+          {isSun ? SUN_BODY.blurb : planet?.blurb}
         </p>
 
         <div className="relative mt-5 flex items-center justify-between gap-3">
-          <a
-            href={isSun ? '#about' : '#events'}
-            onClick={() => setFocus(null)}
+          <button
+            type="button"
+            onClick={() => navigate({ dept: keyOfFocus(shown), view: 'orbit' })}
             className="inline-flex items-center gap-2 font-display text-[0.66rem] font-medium tracking-[0.24em] text-gold-200 uppercase transition hover:text-white"
           >
-            {isSun ? 'About the fest' : 'View event'} <span aria-hidden="true">→</span>
-          </a>
+            {isSun ? 'Explore CUBYC' : 'Enter department'} <span aria-hidden="true">→</span>
+          </button>
           <div className="flex items-center gap-2">
             <CardButton onClick={() => step(-1)} label="Previous world">
               <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden="true">
@@ -135,7 +137,8 @@ function FocusCard() {
 /** DOM layers for the interactive solar system (tooltip + focus card); live landing page only. */
 export default function SpaceOverlays() {
   const live = useExperience((s) => s.phase === PHASES.LANDING_IDLE);
-  if (!live) return null;
+  const covered = useExperience((s) => s.deptCovered);
+  if (!live || covered) return null;
   return (
     <>
       <PlanetTooltip />

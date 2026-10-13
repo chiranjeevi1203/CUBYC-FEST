@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { BODIES, BRAND, CAMERA, TOUR } from '../../config/experience';
+import { BODIES, CAMERA, SUN_BODY, TOUR, keyOfFocus } from '../../config/experience';
 import { PHASES, getScene, useExperience } from '../../store/useExperience';
 import { INTERACTIVE_SELECTOR, interaction } from '../../lib/interaction';
+import { openFromScene } from '../../lib/deptRoute';
 
 const CLICK_MOVE_PX = 6;
 const CLICK_MS = 650;
 
 /** Is the landing page live (interactions only make sense after the loader)? */
-const isLive = () => useExperience.getState().phase === PHASES.LANDING_IDLE;
+const isLive = () => {
+  const s = useExperience.getState();
+  return s.phase === PHASES.LANDING_IDLE && !s.dept && !s.galleryOpen;
+};
 /**
  * Planets / sun only respond inside the "Explore" section. In the hero the
  * system is pure backdrop: no hover, drag or click.
@@ -21,7 +25,8 @@ const canInteract = () => isLive() && interaction.section > 0.6;
  * Active only inside the "Explore" section (see canInteract):
  *  - drag empty space to orbit the system (with inertia),
  *  - hover a planet / the sun for a label + highlight,
- *  - click a body to fly to it (info card), click empty space for a shooting star.
+ *  - click a body to fly to it and open its department page,
+ *    click empty space for a shooting star.
  * Listens on window because the canvas sits behind the page.
  */
 export default function PlanetInteraction() {
@@ -144,7 +149,8 @@ export default function PlanetInteraction() {
       const hit = pick.current();
       interaction.hasInteracted = true;
       if (hit !== -1) {
-        setFocus(hit);
+        // Fly toward the world, then its department page takes over.
+        openFromScene(keyOfFocus(hit));
       } else if (focus !== null) {
         setFocus(null);
       } else {
@@ -212,8 +218,9 @@ export default function PlanetInteraction() {
         if (best === -1) {
           tip.dataset.visible = 'false';
         } else {
-          const name = best === 'sun' ? 'The Sun' : BODIES[best].name;
-          const track = best === 'sun' ? BRAND.title : BODIES[best].track;
+          // Department first; its world second.
+          const name = best === 'sun' ? SUN_BODY.track : BODIES[best].track;
+          const track = best === 'sun' ? 'The Sun' : BODIES[best].name;
           tip.querySelector('[data-name]').textContent = name;
           tip.querySelector('[data-track]').textContent = track;
           tip.dataset.visible = 'true';

@@ -1,11 +1,12 @@
 import { memo } from 'react';
+import Frame from './ui/Frame';
 
 /**
  * Past-fest moments. Each tile is procedural SVG art so the site ships with no
  * image assets. To use real photos, add `src: '/gallery/stage.jpg'` (files in
  * /public) to an item and it renders the photo instead of the art.
  */
-const GALLERY = [
+export const GALLERY = [
   { title: 'Main Stage', caption: 'CUBYC ’26 · Headline night', art: 'stage' },
   { title: 'Robo Wars', caption: 'Arena finals', art: 'robots' },
   { title: 'Code Sprint', caption: '24 hours, 300 builders', art: 'hack' },
@@ -181,7 +182,7 @@ function Art({ kind, uid }) {
   }
 }
 
-function Media({ item, uid }) {
+export function Media({ item, uid }) {
   if (item.src) {
     return <img src={item.src} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />;
   }
@@ -195,6 +196,7 @@ function Media({ item, uid }) {
 function GalleryTile({ item, uid, duplicate, soft }) {
   return (
     <figure className="gallery__item" data-cursor="hover" aria-hidden={duplicate || undefined}>
+      <Frame size="sm" star={false} className="gallery__frame" />
       <div className="gallery__media">
         <Media item={item} uid={`${uid}-a`} />
         {/* Pre-blurred copy; hover fades it out, so only opacity animates. */}
@@ -218,7 +220,7 @@ function GalleryTile({ item, uid, duplicate, soft }) {
 function Gallery({ quality }) {
   const soft = quality !== 'low';
   return (
-    <section aria-label="Moments from past fests" className="relative py-16 sm:py-24">
+    <section id="gallery" aria-label="Moments from past fests" className="relative scroll-mt-28 py-16 sm:py-24">
       <p data-reveal className="mb-8 text-center font-mono text-[0.65rem] tracking-[0.4em] text-gold-300/70 uppercase">
         Moments from past orbits
       </p>

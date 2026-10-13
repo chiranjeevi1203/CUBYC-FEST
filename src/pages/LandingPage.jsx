@@ -3,38 +3,51 @@ import BrandLogo from '../components/hud/BrandLogo';
 import Gallery from '../components/Gallery';
 import FestMark from '../components/ui/FestMark';
 import EventCountdown from '../components/ui/EventCountdown';
-import { BRAND, EVENT, PLANETS } from '../config/experience';
+import SolarButton from '../components/ui/SolarButton';
+import Star from '../components/ui/Star';
+import BodyIcon from '../components/ui/BodyIcon';
+import Frame from '../components/ui/Frame';
+import SiteNav, { MENU_LINKS } from '../components/ui/SiteNav';
+import { BRAND, EVENT, BODY_BY_KEY } from '../config/experience';
+import { DEPARTMENTS, DEPT_ORDER, EVENT_COUNT } from '../config/departments';
 import { PHASES, useExperience } from '../store/useExperience';
-import { PLANET_ART } from '../lib/planetArt';
 import { interaction } from '../lib/interaction';
+import { navigate } from '../lib/deptRoute';
 
 /* -------------------------------------------------------------------------- */
 /*  Content                                                                   */
 /* -------------------------------------------------------------------------- */
 
-const NAV_LINKS = [
-  { label: 'Home', id: 'home' },
-  { label: 'Events', id: 'events' },
-  { label: 'About', id: 'about' },
-  { label: 'Gallery', id: 'gallery' },
-  { label: 'Schedule', id: 'schedule' },
-  { label: 'Rules', id: 'rules' },
-];
-const MENU_LINKS = [...NAV_LINKS, { label: 'Contact', id: 'contact' }];
 
-// Event tracks — one per planet, defined with the planets in config/experience.js.
-const EVENTS = PLANETS.map((p) => ({ planet: p.name, art: p.name.toLowerCase(), track: p.track, copy: p.blurb, ring: p.name === 'Saturn' }));
+// Departments — one per world (the planets, the Moon and the space station), from config/departments.js.
+const EVENTS = DEPT_ORDER.map((key) => ({
+  key,
+  name: DEPARTMENTS[key].name,
+  world: key === 'moon' ? 'The Moon' : BODY_BY_KEY[key].name,
+  copy: DEPARTMENTS[key].tagline,
+  count: DEPARTMENTS[key].events.length,
+}));
 
-// Placeholder programme for the two days.
+// Programme outline for the two days (detailed timings to be announced).
 const SCHEDULE = [
-  { day: 'Day 01', date: EVENT.days[0], title: 'Ignition', items: ['Opening ceremony', 'Code Sprint & Robo Wars heats', 'Fine Arts gallery opens', 'Culture Night'] },
-  { day: 'Day 02', date: EVENT.days[1], title: 'Escape Velocity', items: ['Impact Summit keynotes', 'Launchpad pitches', 'Deep Play grand finals', 'Main Stage headliner'] },
+  {
+    day: 'Day 01',
+    date: EVENT.days[0],
+    title: 'Ignition',
+    items: ['Opening ceremony', '6-Hour Filmithon · theme reveal at 9:00 AM', 'Preliminary rounds across departments', 'Best Manager & Percepta · Day 1 rounds'],
+  },
+  {
+    day: 'Day 02',
+    date: EVENT.days[1],
+    title: 'Escape Velocity',
+    items: ['Best Manager · stage final', 'Percepta · HR Shark Tank', 'Department finals', 'Closing ceremony'],
+  },
 ];
 
 const STATS = [
   { value: '02', label: 'Days in orbit' },
-  { value: '08', label: 'Planetary tracks' },
-  { value: '40+', label: 'Events & stages' },
+  { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Departments' },
+  { value: String(EVENT_COUNT).padStart(2, '0'), label: 'Events' },
   { value: '1st', label: 'Edition' },
 ];
 
@@ -73,38 +86,6 @@ function WatercolourFilters() {
   );
 }
 
-function SolarButton({ href, children, size = 'lg', className = '' }) {
-  const handleMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--fx', `${e.clientX - rect.left}px`);
-    e.currentTarget.style.setProperty('--fy', `${e.clientY - rect.top}px`);
-  };
-  return (
-    <a href={href} onPointerMove={handleMove} className={`btn-solar ${size === 'sm' ? 'btn-solar--sm' : ''} ${className}`}>
-      <span className="btn-solar__flare" aria-hidden="true" />
-      <span className="btn-solar__label">{children}</span>
-    </a>
-  );
-}
-
-function Planet({ art, className = '', ring = false }) {
-  return (
-    <span className={`relative block aspect-square ${className}`}>
-      {ring && <span className="planet-ring planet-ring--back" aria-hidden="true" />}
-      <span className="wc-sphere absolute inset-0 rounded-full" style={{ backgroundImage: PLANET_ART[art], filter: 'url(#watercolour-sm)' }} />
-      {ring && <span className="planet-ring planet-ring--front" aria-hidden="true" />}
-    </span>
-  );
-}
-
-function Star({ className = 'h-2 w-2' }) {
-  return (
-    <svg viewBox="0 0 12 12" className={className} aria-hidden="true">
-      <path d="M6 0 l1.3 4.7 4.7 1.3 -4.7 1.3 -1.3 4.7 -1.3 -4.7 -4.7 -1.3 4.7 -1.3z" fill="currentColor" />
-    </svg>
-  );
-}
-
 function SectionHeading({ eyebrow, children }) {
   return (
     <div className="mb-14 flex flex-col items-center gap-4 text-center">
@@ -131,10 +112,12 @@ export default function LandingPage({ landingRef }) {
   const interactive = useExperience((s) => s.phase === PHASES.LANDING_IDLE);
   const quality = useExperience((s) => s.quality);
   const focused = useExperience((s) => s.focus !== null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState('home');
   const scrimRef = useRef(null);
   const setFocus = useExperience((s) => s.setFocus);
+  // A department page covers the landing: hide it (keeps its scroll position).
+  const covered = useExperience((s) => s.deptCovered);
+  const inDept = useExperience((s) => s.dept !== null || s.galleryOpen);
   const cosmosRef = useRef(null);
 
   // Darken the live scene as the reader scrolls past the hero (one write per frame, max).
@@ -194,19 +177,12 @@ export default function LandingPage({ landingRef }) {
     return () => observer.disconnect();
   }, []);
 
-  // Close the menu with Escape.
-  useEffect(() => {
-    if (!menuOpen) return undefined;
-    const onKey = (e) => e.key === 'Escape' && setMenuOpen(false);
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [menuOpen]);
-
   return (
     <div
       ref={landingRef}
-      inert={!interactive}
+      inert={!interactive || inDept}
       className={`relative z-10 min-h-svh overflow-x-clip text-[#f4f1ea] ${interactive ? '' : 'invisible'}`}
+      style={covered ? { visibility: 'hidden' } : undefined}
     >
       <WatercolourFilters />
 
@@ -220,76 +196,7 @@ export default function LandingPage({ landingRef }) {
       {/* ------------------------------------------------------------------ */}
       {/*  Navigation                                                        */}
       {/* ------------------------------------------------------------------ */}
-      <header data-reveal className="nav-bar fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top)]">
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:h-[4.5rem] sm:px-8">
-          <a href="#home" className="flex items-center gap-3" aria-label={`${BRAND.fest} — home`}>
-            <FestMark className="h-9 sm:h-10" />
-            <span className="font-display text-base font-semibold tracking-[0.22em] sm:text-lg">{BRAND.fest}</span>
-          </a>
-
-          <ul className="hidden items-center gap-7 lg:flex xl:gap-9">
-            {NAV_LINKS.map((l) => (
-              <li key={l.id}>
-                <a
-                  href={`#${l.id}`}
-                  aria-current={active === l.id ? 'true' : undefined}
-                  className={`nav-link font-display text-[0.74rem] font-bold tracking-[0.18em] uppercase transition-colors ${
-                    active === l.id ? 'is-active text-gold-200' : 'text-white/70 hover:text-white'
-                  }`}
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex items-center gap-3 sm:gap-5">
-            <button
-              type="button"
-              className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-white/85 transition hover:border-gold-400/60 hover:text-gold-200"
-              aria-expanded={menuOpen}
-              aria-controls="site-menu"
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              <span className="relative block h-3 w-4">
-                <span className={`absolute left-0 top-0 h-px w-4 bg-current transition ${menuOpen ? 'translate-y-[5.5px] rotate-45' : ''}`} />
-                <span className={`absolute left-0 top-[5.5px] h-px w-4 bg-current transition ${menuOpen ? 'opacity-0' : ''}`} />
-                <span className={`absolute left-0 top-[11px] h-px w-4 bg-current transition ${menuOpen ? '-translate-y-[5.5px] -rotate-45' : ''}`} />
-              </span>
-            </button>
-            <span className="hidden h-8 w-px bg-white/10 sm:block" aria-hidden="true" />
-            <BrandLogo className="h-9 sm:h-10" title={BRAND.universityFull} />
-          </div>
-        </nav>
-
-        <div
-          id="site-menu"
-          className={`mx-auto max-w-7xl overflow-hidden px-4 transition-all duration-500 sm:px-8 ${
-            menuOpen ? 'max-h-[34rem] pb-5 opacity-100' : 'pointer-events-none max-h-0 opacity-0'
-          }`}
-        >
-          <div className="glass grid gap-2 rounded-3xl p-3 sm:grid-cols-[1fr_auto] sm:items-center sm:p-4">
-            <ul className="grid grid-cols-2 gap-1 sm:grid-cols-4">
-              {MENU_LINKS.map((l) => (
-                <li key={l.id}>
-                  <a
-                    href={`#${l.id}`}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-2xl px-4 py-3 font-display text-sm tracking-[0.18em] text-white/85 uppercase transition hover:bg-white/5 hover:text-gold-200"
-                  >
-                    <Star className="h-2 w-2 text-gold-400/70" />
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <SolarButton href="#contact" className="justify-center">
-              Register Now
-            </SolarButton>
-          </div>
-        </div>
-      </header>
+      <SiteNav active={active} reveal />
 
       <main className="relative">
         {/* ------------------------------------------------------------------ */}
@@ -383,6 +290,7 @@ export default function LandingPage({ landingRef }) {
 
               {/* Desktop: glass panel on the right */}
               <aside className="explore-panel pointer-events-auto hidden lg:flex" aria-label="Explore departments">
+                <Frame size="sm" />
                 <p className="flex items-center gap-3 text-[0.6rem] font-bold tracking-[0.34em] text-gold-200/90 uppercase">
                   <span className="explore-pill__beacon" aria-hidden="true" />
                   Interactive system
@@ -435,28 +343,34 @@ export default function LandingPage({ landingRef }) {
 
         {/* Events */}
         <section id="events" className="relative mx-auto max-w-7xl scroll-mt-28 px-5 py-24 sm:px-8 sm:py-32">
-          <SectionHeading eyebrow="Events · Eight Orbits">
-            Every planet is a <span className="text-gold-gradient">world of events</span>
+          <SectionHeading eyebrow={`Events · ${DEPT_ORDER.length} Departments · ${EVENT_COUNT} Events`}>
+            Every world is a <span className="text-gold-gradient">department of events</span>
           </SectionHeading>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {EVENTS.map((e, i) => (
-              <li key={e.planet}>
+              <li key={e.key}>
                 <a
-                  href="#contact"
+                  href={`#/dept/${e.key}`}
+                  onClick={(ev) => {
+                    ev.preventDefault();
+                    navigate({ dept: e.key, view: 'orbit' });
+                  }}
                   className="orbit-card glass group relative flex h-full flex-col overflow-hidden rounded-3xl p-6 transition duration-500 hover:-translate-y-1.5"
                 >
+                  <Frame size="sm" />
                   <div className="flex items-start justify-between">
                     <span className="font-mono text-[0.65rem] tracking-[0.3em] text-white/40">{String(i + 1).padStart(2, '0')}</span>
-                    <Planet
-                      art={e.art}
-                      ring={e.ring}
-                      className={`w-16 transition duration-700 group-hover:rotate-12 group-hover:scale-110 ${e.ring ? 'mr-3' : ''}`}
+                    <BodyIcon
+                      bodyKey={e.key}
+                      className={`w-14 transition duration-700 group-hover:rotate-12 group-hover:scale-110 ${e.key === 'saturn' ? 'mr-3' : ''}`}
                     />
                   </div>
-                  <h3 className="mt-6 font-display text-xl font-bold tracking-[0.12em] uppercase">{e.planet}</h3>
-                  <p className="mt-1 font-mono text-[0.65rem] tracking-[0.3em] text-gold-300/90 uppercase">{e.track}</p>
+                  <h3 className="mt-6 font-display text-lg font-bold leading-snug tracking-[0.1em] uppercase">{e.name}</h3>
+                  <p className="mt-1 font-mono text-[0.62rem] tracking-[0.3em] text-gold-300/90 uppercase">
+                    {e.world} · {e.count} event{e.count === 1 ? '' : 's'}
+                  </p>
                   <p className="mt-4 text-sm leading-relaxed text-white/55">{e.copy}</p>
-                  <span className="mt-6 inline-flex items-center gap-2 text-[0.7rem] tracking-[0.2em] text-white/60 uppercase transition group-hover:text-gold-200">
+                  <span className="mt-auto inline-flex items-center gap-2 pt-6 text-[0.7rem] tracking-[0.2em] text-white/60 uppercase transition group-hover:text-gold-200">
                     Enter orbit <span className="transition group-hover:translate-x-1">→</span>
                   </span>
                 </a>
@@ -476,9 +390,13 @@ export default function LandingPage({ landingRef }) {
                 {BRAND.fest} is the 1st flagship annual fest of {BRAND.universityFull}, {BRAND.campus} — two days where
                 code, culture, art and ambition share one sky.
               </p>
-              <p>Eight planetary tracks, one gravitational pull. Find your world, gather your crew and launch with us on {EVENT.dateLabel}.</p>
+              <p>
+                {DEPT_ORDER.length} departments, {EVENT_COUNT} events, one gravitational pull. Find your world, gather your crew and launch with us on{' '}
+                {EVENT.dateLabel}.
+              </p>
             </div>
-            <div className="glass grid grid-cols-2 gap-px overflow-hidden rounded-3xl">
+            <div className="glass relative grid grid-cols-2 gap-px overflow-hidden rounded-3xl">
+              <Frame />
               {STATS.map((s) => (
                 <div key={s.label} className="flex flex-col items-center gap-1 bg-white/[0.01] px-4 py-8 text-center">
                   <span className="text-gold-gradient font-display text-4xl font-semibold sm:text-5xl">{s.value}</span>
@@ -498,7 +416,8 @@ export default function LandingPage({ landingRef }) {
           <ol className="grid gap-4 md:grid-cols-2">
             {SCHEDULE.map((d, i) => (
               <li key={d.day}>
-                <div className="glass h-full rounded-3xl p-7 transition duration-500 hover:border-gold-400/30" data-cursor="hover">
+                <div className="glass group relative h-full rounded-3xl p-7 transition duration-500 hover:border-gold-400/30" data-cursor="hover">
+                  <Frame />
                   <div className="mb-5 flex items-center gap-4">
                     <span className="grid h-12 w-12 place-items-center rounded-full border border-gold-400/40 font-display text-base text-gold-200">
                       {String(i + 1).padStart(2, '0')}
@@ -526,6 +445,8 @@ export default function LandingPage({ landingRef }) {
         {/* Rules & regulations */}
         <section id="rules" className="relative mx-auto max-w-4xl scroll-mt-28 px-5 pb-24 sm:px-8 sm:pb-32">
           <SectionHeading eyebrow="Mission protocol">Rules &amp; regulations</SectionHeading>
+          <div className="relative">
+          <Frame />
           <ol className="glass divide-y divide-white/5 rounded-3xl px-6 sm:px-10">
             {RULES.map((r, i) => (
               <li key={r} className="flex items-start gap-5 py-5 text-left text-white/70">
@@ -534,12 +455,14 @@ export default function LandingPage({ landingRef }) {
               </li>
             ))}
           </ol>
+          </div>
           <p className="mt-5 text-center font-mono text-[0.6rem] tracking-[0.3em] text-white/40 uppercase">Full rulebook will be published soon</p>
         </section>
 
         {/* Contact / registration */}
         <section id="contact" className="relative scroll-mt-28 px-5 pb-16 sm:px-8">
           <div className="glass relative mx-auto max-w-5xl overflow-hidden rounded-[2.5rem] px-6 py-20 text-center sm:px-12 sm:py-24">
+            <Frame size="lg" />
             <div
               className="pointer-events-none absolute -top-1/2 left-1/2 h-[140%] w-[140%] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,190,90,0.16),transparent_55%)]"
               aria-hidden="true"

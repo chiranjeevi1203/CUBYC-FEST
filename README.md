@@ -60,6 +60,15 @@ src/components/hud/BrandLogo.jsx
 src/pages/LandingPage.jsx
 src/components/ui/FestMark.jsx        ← ringed-planet fest mark (SVG)
 src/components/ui/EventCountdown.jsx  ← live countdown to EVENT.start
+src/config/departments.js            ← departments, their worlds and every event (from the events sheet)
+src/lib/deptRoute.js                 ← #/dept/… routes (Back / Forward, deep links)
+src/lib/deptShaders.js               ← radiation aura, ejecta, backdrop, "inside the world" environment
+src/components/dept/DepartmentView.jsx ← department pages: GSAP choreography + DOM
+src/components/dept/DeptScene.jsx    ← department pages' own WebGL scene
+src/components/dept/EventsPanel.jsx  ← event list + full brief (format, contacts, rules)
+src/components/dept/HubPanel.jsx     ← inside the Sun: CUBYC at a glance + department directory
+src/components/scene/StationModel.jsx ← the space station (landing + department page)
+src/lib/stationShaders.js            ← station hull, solar panels, window lights
 src/assets/                          ← christ-university-logo.png goes here
 ```
 
@@ -78,6 +87,29 @@ src/assets/                          ← christ-university-logo.png goes here
 - **Framing:** the system is auto-fitted to cover the viewport (`CAMERA.heroBox`). Phones roll the view so the orbits run lengthwise (`CAMERA.portraitRoll`).
 - **Event info** for each planet (`track`, `blurb`) lives on `PLANETS` in config. The landing Events grid and the 3D info card both read it.
 - **Countdown:** moon-phase cards (`ui/EventCountdown.jsx`). Each moon waxes toward full as its unit counts down, and the days moon becomes full on fest day (`EVENT.countdownFrom`).
+
+## Department pages
+
+The Sun is **CUBYC**, Christ University Yeshwanthpur Campus, the host. Its page is the hub: diving into it shows the directory of every department.
+
+Every other world is a department: Economics (Mercury), Psychology (Venus), Computer Science (Earth), Mathematics (Moon), Commerce (Mars), **Cultural Events · SWO (the Space Station)**, Media Studies (Jupiter), English & Cultural Studies (Saturn), Management (Uranus) and DPS (Neptune).
+
+The space station (`STATIONS` in config, `scene/StationModel.jsx`, `lib/stationShaders.js`) has its own dashed orbit between the asteroid belt and Jupiter. It has a rotating habitat ring with lit windows, a hub with a gold docking collar, and navy-and-gold solar wings, and it is lit like the planets. It hovers, clicks, flies-to and tours like any planet. Its interior is a gliding ring corridor.
+
+- **Open:** click a world in the Explore section (the camera starts flying to it, then its page fades in), use **Enter department** on the tour card, or click a card in the Events grid.
+- **Orbit view:** the world rises from the bottom edge as a semicircle with its radiation aura, which swells as it approaches and as the pointer nears it. The department name and brief sit above it.
+- **Next / previous:** the buttons beside the semicircle, **← / →**, the dots in the top bar, or a sideways swipe on phones. The worlds hang off a wheel whose hub is below the screen, so a swap reads as a rotation.
+- **Inside the world:** click the world (or **Enter**). It fills the screen from below, the atmosphere streaks past, and its environment becomes the backdrop for the events: the list, plus each event's format, faculty and student in-charge, and rules.
+- **Leave:** **Esc** steps back (events → orbit → solar system). Browser Back / Forward work, and the landing keeps its scroll position.
+- **Routes:** `#/dept/<world>`, `#/dept/<world>/events` and `#/dept/<world>/events/<event>` (for example `#/dept/earth/events/prime-prompt-ai-prompt-wars`) are deep-linkable.
+- **Content:** everything lives in `src/config/departments.js`. Rules are `'Label: text'` strings, and lines starting with `- ` render as bullets. Department names and taglines also drive the planet tooltip, the tour card and the Events grid.
+
+## Gallery page (`#/gallery`)
+
+The navbar's **Gallery** link opens a full-screen page around an Interstellar-style black hole (`gallery/GalleryPage.jsx`, shaders in `lib/blackHole.js`). Photos drift in from the left and right on spiral paths. Near the hole they stretch, heat up and vanish behind the event horizon.
+
+- **Interaction:** hover (or press) a photo to hold it, click to open it in a lightbox. The buttons, mouse wheel, drag and the arrow keys move the stream, Space pauses it, and **Esc** returns to the landing page.
+- **Your photos:** drop images into **`src/assets/gallery/`** (jpg, png, webp or avif). They appear automatically in filename order. Titles come from the filenames, so `01-main-auditorium.jpg` becomes "Main Auditorium". Until then, the illustrated placeholders are shown.
 
 ## Customization (`src/config/experience.js`)
 

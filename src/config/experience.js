@@ -1,7 +1,10 @@
 /**
  * Central tuning file for the CUBYC — FEST'2027 opening experience.
  * Copy, timing, colours, camera path, particle budgets and planets all live here.
+ * Department names / events live in ./departments.js and are attached to the bodies below.
  */
+
+import { DEPARTMENTS } from './departments';
 
 /* -------------------------------------------------------------------------- */
 /*  Brand + copy                                                              */
@@ -16,7 +19,7 @@ export const BRAND = {
   title: "CUBYC — FEST'2027",
   subline: 'Our 1st Flagship Annual Fest',
   heroTitle: ['CUBYC', 'FEST'],
-  tagline: 'Eight worlds. One orbit. The cosmos comes to campus.',
+  tagline: 'Ten departments. One orbit. The cosmos comes to campus.',
 };
 
 /** Event dates (IST). The landing-page countdown targets `start`. */
@@ -206,44 +209,44 @@ export const ORBIT_SCALE = 1;
  */
 export const PLANETS = [
   {
-    name: 'Mercury', track: 'Code Sprint', blurb: 'A 24-hour hackathon at the speed of the innermost world.',
+    name: 'Mercury',
     type: 'rocky', radius: 0.55, orbit: 9, angle: 0.3, orbitDays: 87.97, dayLength: 58.65, tilt: 0.03,
     colors: ['#8f8079', '#5d524d', '#cdb9a5'], atmosphere: '#d8c7b8', seed: 1.3,
   },
   {
-    name: 'Venus', track: 'Fine Arts', blurb: 'Live painting, sculpture and installations under golden light.',
+    name: 'Venus',
     type: 'gas', bands: 5, radius: 0.95, orbit: 12.5, angle: 2.1, orbitDays: 224.7, dayLength: -243, tilt: 0.05,
     colors: ['#efcf98', '#d19a5c', '#f8e6c2'], atmosphere: '#ffd9a0', seed: 2.7,
   },
   {
-    name: 'Earth', track: 'Impact Summit', blurb: 'Sustainability talks, social ventures and the ideas that heal.',
+    name: 'Earth',
     type: 'earth', radius: 1.0, orbit: 16.5, angle: 4.0, orbitDays: 365.25, dayLength: 0.997, tilt: 0.41,
     colors: ['#2c6cb8', '#5e9a48', '#e9dcae'], atmosphere: '#7cc0ff', seed: 4.1,
   },
   {
-    name: 'Mars', track: 'Robo Wars', blurb: 'Robotics arena, drone racing and red-planet engineering.',
+    name: 'Mars',
     type: 'rocky', radius: 0.7, orbit: 20.5, angle: 1.0, orbitDays: 686.98, dayLength: 1.026, tilt: 0.44,
     colors: ['#c4572f', '#8a3820', '#eaa173'], atmosphere: '#ff9a6a', seed: 5.9,
   },
   {
-    name: 'Jupiter', track: 'Main Stage', blurb: 'Headline concerts — the gravitational centre of the fest.',
+    name: 'Jupiter',
     type: 'gas', bands: 14, spot: 1, spotColor: '#b4513a', radius: 2.6, orbit: 29, angle: 2.8, orbitDays: 4332.6, dayLength: 0.414, tilt: 0.05,
     colors: ['#dcb88e', '#a06a45', '#f4e5ca'], atmosphere: '#f3d2a5', seed: 7.3,
   },
   {
-    name: 'Saturn', track: 'Culture Night', blurb: 'Dance, theatre and fashion wrapped in rings of rhythm.',
+    name: 'Saturn',
     type: 'gas', bands: 12, radius: 2.2, orbit: 37.5, angle: 5.3, orbitDays: 10759.2, dayLength: 0.444, tilt: 0.47,
     colors: ['#e9d4a1', '#c39f63', '#f7edd2'], atmosphere: '#f7e2b0', seed: 8.8,
     ring: { inner: 1.35, outer: 2.35, colors: ['#ecd7a6', '#a88a5a'], opacity: 0.9 },
   },
   {
-    name: 'Uranus', track: 'Launchpad', blurb: 'Startup pitches and innovation expos, tilted toward the future.',
+    name: 'Uranus',
     type: 'gas', bands: 4, radius: 1.5, orbit: 44.5, angle: 0.55, orbitDays: 30688.5, dayLength: -0.718, tilt: 1.7,
     colors: ['#a3dde0', '#7cc2c9', '#d9f3f1'], atmosphere: '#bff4ff', seed: 10.2,
     ring: { inner: 1.55, outer: 1.9, colors: ['#cfeff2', '#7fa7b0'], opacity: 0.45 },
   },
   {
-    name: 'Neptune', track: 'Deep Play', blurb: 'E-sports and gaming leagues from the far edge of the system.',
+    name: 'Neptune',
     type: 'gas', bands: 6, spot: 0.7, spotColor: '#1d2a6e', radius: 1.45, orbit: 51, angle: 3.7, orbitDays: 60182, dayLength: 0.671, tilt: 0.49,
     colors: ['#3e63d4', '#283f9c', '#86a8f2'], atmosphere: '#7aa2ff', seed: 11.6,
   },
@@ -256,27 +259,67 @@ export const PLANETS = [
  */
 export const MOONS = [
   {
-    name: 'Moon', parent: 'Earth', track: 'Lunar Lounge', blurb: 'Open mic, poetry and acoustic sets under a silver sky.',
+    name: 'Moon', parent: 'Earth',
     type: 'rocky', radius: 0.27, distance: 3.1, inclination: 0.09, angle: 1.2, orbitDays: 27.32, dayLength: 27.32, tilt: 0.03,
     colors: ['#bdb8ae', '#7d786f', '#e6e1d6'], atmosphere: '#d9d6cf', seed: 13.4,
   },
 ];
 
-// Derive angular speeds from the real periods (same ratios as the real solar system).
-for (const p of [...PLANETS, ...MOONS]) {
+/**
+ * Space stations: their own heliocentric orbit, interactive like the planets.
+ * radius: hit / focus size (world units, before PLANET_SCALE) · size: habitat-ring radius.
+ * colors: [hull, solar panels, gold accents].
+ */
+export const STATIONS = [
+  {
+    name: 'Space Station', key: 'station',
+    type: 'station', radius: 0.85, size: 0.78, orbit: 25.8, angle: 3.6, orbitDays: 1200, dayLength: 1, tilt: 0,
+    colors: ['#d8d0bf', '#1b2552', '#e9c27a'], atmosphere: '#e9c27a', seed: 14.2,
+  },
+];
+
+// Derive angular speeds from the real periods (same ratios as the real solar system),
+// and attach each body's department: `track` = department name, `blurb` = its tagline.
+for (const p of [...PLANETS, ...MOONS, ...STATIONS]) {
   p.speed = (EARTH_ORBIT_SPEED * 365.25) / p.orbitDays;
   p.spin = EARTH_SPIN / p.dayLength;
+  p.key = p.key ?? p.name.toLowerCase();
+  p.department = DEPARTMENTS[p.key];
+  p.track = p.department.name;
+  p.blurb = p.department.tagline;
 }
 
-/** Every interactive body, indexed the way focus / hover ids are: planets 0–7, then moons. */
+/** The sun as a page body (CUBYC — the host campus and hub of every department). */
+export const SUN_BODY = {
+  name: 'Sun',
+  key: 'sun',
+  type: 'sun',
+  department: DEPARTMENTS.sun,
+  track: DEPARTMENTS.sun.name,
+  blurb: DEPARTMENTS.sun.tagline,
+  colors: [PALETTE.sunMid, PALETTE.sunEdge, PALETTE.sunCore],
+  atmosphere: PALETTE.sunGlowInner,
+  seed: 0.7,
+};
+
+/** Every interactive body, indexed the way focus / hover ids are: planets 0–7, then moons, then stations. */
 export const BODIES = [
   ...PLANETS.map((p) => ({ ...p, kind: 'planet' })),
   ...MOONS.map((m) => ({ ...m, kind: 'moon' })),
+  ...STATIONS.map((s) => ({ ...s, kind: 'station' })),
 ];
-/** Tour order for ← / →: each moon follows its parent planet. */
-export const TOUR = BODIES.flatMap((b, i) =>
-  b.kind === 'moon' ? [] : [i, ...BODIES.map((m, j) => (m.kind === 'moon' && m.parent === b.name ? j : -1)).filter((j) => j >= 0)],
-);
+/** Tour order for ← / →: outward by orbit (stations included); each moon follows its parent planet. */
+export const TOUR = BODIES.map((b, i) => [b, i])
+  .filter(([b]) => b.kind !== 'moon')
+  .sort(([a], [b]) => a.orbit - b.orbit)
+  .flatMap(([b, i]) => [i, ...BODIES.map((m, j) => (m.kind === 'moon' && m.parent === b.name ? j : -1)).filter((j) => j >= 0)]);
+
+/** Department key ('sun', 'earth', 'moon', …) → the body's data. */
+export const BODY_BY_KEY = Object.fromEntries([['sun', SUN_BODY], ...BODIES.map((b) => [b.key, b])]);
+/** Department key → focus id used by the landing scene (planet / moon index, or 'sun'). */
+export const focusIdOf = (key) => (key === 'sun' ? 'sun' : BODIES.findIndex((b) => b.key === key));
+/** Focus id → department key. */
+export const keyOfFocus = (focus) => (focus === 'sun' ? 'sun' : typeof focus === 'number' ? BODIES[focus]?.key ?? null : null);
 
 /* -------------------------------------------------------------------------- */
 /*  Helpers                                                                   */

@@ -275,6 +275,7 @@ export const planetShader = {
     uniform vec3 uColorC;
     uniform vec3 uAtmo;
     uniform vec3 uSpotColor;
+    uniform float uSmooth;   // 0 = painterly steps (landing), 1 = smooth (close-ups); unset → 0
     varying vec3 vObj;
     varying vec3 vWorldPos;
     varying vec3 vWorldNormal;
@@ -326,7 +327,7 @@ export const planetShader = {
       float ndl = dot(N, L);
       float wrap = clamp((ndl + 0.35) / 1.35, 0.0, 1.0);
       float stepped = floor(wrap * 4.0 + 0.5) / 4.0;
-      float light = mix(wrap, stepped, 0.35);
+      float light = mix(wrap, stepped, 0.35 * (1.0 - uSmooth));
 
       // Violet-tinted shadows — the illustrator's trick instead of black
       vec3 shadowTint = vec3(0.07, 0.05, 0.2);
@@ -339,7 +340,7 @@ export const planetShader = {
 
       // Wet edge where pigment pools along the terminator
       float edge = smoothstep(0.1, 0.0, abs(ndl + 0.05 + bleed * 0.1));
-      col = mix(col, col * 0.72, edge * 0.55);
+      col = mix(col, col * 0.72, edge * 0.55 * (1.0 - uSmooth * 0.75));
 
       // Pigment pooling at the silhouette
       float rim = 1.0 - max(dot(N, V), 0.0);

@@ -47,6 +47,8 @@ function SceneReady() {
  */
 function Experience() {
   const quality = useExperience((s) => s.quality);
+  // A department page covers the screen with its own canvas: pause this one meanwhile.
+  const covered = useExperience((s) => s.deptCovered);
   const [dpr, setDpr] = useState(() => {
     const max = quality === 'low' ? 1.5 : 2;
     return Math.min(Math.max(window.devicePixelRatio || 1, 1), max);
@@ -56,6 +58,7 @@ function Experience() {
     <div className="pointer-events-none fixed inset-0 z-0 bg-black" aria-hidden="true">
       <Canvas
         dpr={dpr}
+        frameloop={covered ? 'never' : 'always'}
         camera={{ position: CAMERA.start.pos, fov: CAMERA.baseFov, near: 0.1, far: 3000 }}
         gl={{ antialias: quality !== 'low', alpha: false, powerPreference: 'high-performance', stencil: false }}
         onCreated={({ gl }) => gl.setClearColor('#000000', 1)}

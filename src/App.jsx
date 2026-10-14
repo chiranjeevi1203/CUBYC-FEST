@@ -6,6 +6,10 @@ import LandingPage from './pages/LandingPage';
 import SpaceOverlays from './components/ui/SpaceOverlays';
 import DepartmentView from './components/dept/DepartmentView';
 import GalleryPage from './components/gallery/GalleryPage';
+import SchedulePage from './components/schedule/SchedulePage';
+import RulesPage from './components/rules/RulesPage';
+import EventsPage from './components/eventsPage/EventsPage';
+import ChatBot from './components/chat/ChatBot';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
 
@@ -16,6 +20,10 @@ import { parseHash, syncFromLocation } from './lib/deptRoute';
  *   <SpaceOverlays/> planet tooltip, focus card, interaction hint (live landing only)
  *   <DepartmentView/> department pages (own canvas) — #/dept/<key>[/events[/<event>]]
  *   <GalleryPage/>  the campus gallery around a black hole — #/gallery
+ *   <SchedulePage/> the two-day flight plan along the Milky Way — #/schedule
+ *   <RulesPage/>    the spacecraft bridge; rules on a hologram — #/rules
+ *   <EventsPage/>   all 27 events as a fan of glass cards — #/events
+ *   <ChatBot/>      CUBYC Comms: floating freighter (every page) → chat overlay
  *   <LoaderHUD/>    DOM overlay that owns the GSAP master timeline; removed at hand-off
  *   <CometCursor/>  pointer layer (fine pointers only)
  */
@@ -41,10 +49,16 @@ export default function App() {
     return () => window.removeEventListener('popstate', syncFromLocation);
   }, [live]);
 
-  // Gallery page: open whenever the hash is #/gallery (navbar link, Back / Forward, deep link).
+  // Gallery / schedule pages: open whenever the hash says so (navbar link, Back / Forward, deep link).
   useEffect(() => {
     if (!live) return undefined;
-    const sync = () => useExperience.getState().setGalleryOpen(window.location.hash === '#/gallery');
+    const sync = () => {
+      const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen } = useExperience.getState();
+      setEventsOpen(window.location.hash === '#/events');
+      setGalleryOpen(window.location.hash === '#/gallery');
+      setScheduleOpen(window.location.hash === '#/schedule');
+      setRulesOpen(window.location.hash === '#/rules');
+    };
     sync();
     window.addEventListener('hashchange', sync);
     window.addEventListener('popstate', sync);
@@ -61,6 +75,10 @@ export default function App() {
       <SpaceOverlays />
       <DepartmentView />
       <GalleryPage />
+      <SchedulePage />
+      <RulesPage />
+      <EventsPage />
+      <ChatBot />
       {hudMounted && <LoaderHUD landingRef={landingRef} />}
       <CometCursor />
     </>

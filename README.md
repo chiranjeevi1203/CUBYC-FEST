@@ -111,6 +111,42 @@ The navbar's **Gallery** link opens a full-screen page around an Interstellar-st
 - **Interaction:** hover (or press) a photo to hold it, click to open it in a lightbox. The buttons, mouse wheel, drag and the arrow keys move the stream, Space pauses it, and **Esc** returns to the landing page.
 - **Your photos:** drop images into **`src/assets/gallery/`** (jpg, png, webp or avif). They appear automatically in filename order. Titles come from the filenames, so `01-main-auditorium.jpg` becomes "Main Auditorium". Until then, the illustrated placeholders are shown.
 
+## Schedule page (`#/schedule`)
+
+The navbar's **Schedule** link opens a flight plan over a live Milky Way (`schedule/SchedulePage.jsx`, `schedule/Shuttle.jsx`, sky shader in `lib/milkyWay.js`).
+
+- **Flying:** scroll, drag or swipe (or use the arrow keys, Home and End) to fly the shuttle from centre-left toward centre-right. A glowing flight line is drawn behind it, and each stop opens off the line in time order, alternating above and below.
+- **Switching days:** click the shuttle (or the Day 01 / Day 02 switch) to boost it. The hull turns orange for Day 2, and the line rewinds and redraws with that day's plan. **Esc** returns to the landing page.
+- **Content:** the timings are placeholders. Edit **`src/config/schedule.js`**, where each stop has a time, title, venue and tag.
+
+## Rules page (`#/rules`)
+
+The navbar's **Rules** link opens a spacecraft bridge (`rules/RulesPage.jsx`, window view in `lib/spaceView.js`). Galaxies and streaming stars fly past the window, and the craft keeps moving.
+
+- **Console:** three live screens (systems, navigation radar, telemetry) and toggles for nav lights, shields and autopilot. The throttle sets the flight speed.
+- **Display protocol:** powers the screens down and projects the rules on a gold hologram. Only the hologram scrolls, and its section tabs jump between sections. **Esc** closes the hologram, then the page.
+- **Content:** edit **`src/config/rules.js`**. Wrap a key phrase in `**double asterisks**` to highlight it.
+
+## Events page (`#/events`)
+
+The navbar's **Events** link opens all 27 events as a fan of gold-framed glass cards (`eventsPage/EventsPage.jsx`, list built in `config/allEvents.js` from the departments).
+
+- **Moving through the cards:** scroll, drag, swipe or use the arrow keys. The fan settles on the nearest card, and the orb on the left shows that event's world (planet, Moon or space station).
+- **Search and filter:** search matches event, department and world names. The filter narrows by team size and department.
+- **Opening a card:** clicking a side card brings it to the centre, and clicking the centre card (or **Enter**) opens its brief. **Register** goes to the event's full page in its department, and Back returns to the Events page.
+
+## CUBYC Comms chatbot
+
+A freighter floats in the bottom-right of every page (`chat/ChatBot.jsx`, `chat/Freighter.jsx`). Clicking it fires a laser volley, and the comms room opens: a porthole onto Earth from orbit (`lib/orbitView.js`) and a gold hologram where the chat happens. **Esc** closes it.
+
+- **Built-in brain (always on):** `src/lib/chatBrain.js` answers fest questions instantly, offline and free: events (rules, team size, contacts, timing), departments, dates, venue, registration, schedule, general rules, and practical questions. It tolerates typos, remembers the event you were discussing ("who's the coordinator?"), and its answers include buttons that open the right page. Everything comes from the site's own config, so it stays in sync.
+- **AI for everything else (optional):** questions the brain can't answer go to `api/chat.js`, a Vercel serverless function that calls Claude with the whole fest knowledge in its system prompt. To enable it:
+  1. Deploy the project on **Vercel** (it detects Vite and the `api/` folder automatically).
+  2. In Vercel → Project → Settings → Environment Variables, add **`ANTHROPIC_API_KEY`** (from console.anthropic.com), then redeploy.
+
+  The key stays on the server and is never sent to the browser. The function rate-limits each visitor, keeps only the last 12 turns, and caches the system prompt. Without a key, unknown questions get a friendly fallback with suggestions. To use a different server, set `VITE_CHAT_API` to its URL.
+- **Knowledge file:** `api/_knowledge.js` is generated from the config by `scripts/build-knowledge.mjs`. It regenerates on every `npm run build`, and you can run it by hand with `npm run knowledge`.
+
 ## Customization (`src/config/experience.js`)
 
 | What | Where |

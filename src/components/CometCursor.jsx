@@ -118,13 +118,13 @@ export default function CometCursor() {
       ctx.stroke();
       ctx.fillStyle = `rgba(255,248,230,${alpha})`;
       ctx.beginPath();
-      ctx.arc(0, 0, s * 0.55, 0, Math.PI * 2);
+      ctx.arc(0, 0, Math.max(s * 0.55, 0), 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     };
 
     const frame = (now) => {
-      const dt = Math.min((now - last) / 1000, 0.05);
+      const dt = Math.min(Math.max((now - last) / 1000, 0), 0.05); // never negative (rAF time can precede setup)
       last = now;
 
       // Ease the head toward the pointer; ease the trail toward the head.

@@ -3,3 +3,6 @@ dist
 .vite
 *.log
 .DS_Store
+
+# Full-size gallery photos (web versions live in src/assets/gallery)
+gallery-originals

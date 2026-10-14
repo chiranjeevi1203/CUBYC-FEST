@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import Frame from './ui/Frame';
+import { CAMPUS_PHOTOS } from '../config/gallery';
 
 /**
  * Past-fest moments. Each tile is procedural SVG art so the site ships with no
@@ -217,18 +218,23 @@ function GalleryTile({ item, uid, duplicate, soft }) {
 }
 
 /** Slow, seamless right-to-left drift: two identical sets, translated by -50%. */
+/** What the site shows: the campus photos if any were added, else the illustrations. */
+export const GALLERY_ITEMS = CAMPUS_PHOTOS.length ? CAMPUS_PHOTOS : GALLERY;
+
 function Gallery({ quality }) {
-  const soft = quality !== 'low';
+  // Illustrations sit soft until hovered; real photos are shown sharp.
+  const photos = CAMPUS_PHOTOS.length > 0;
+  const soft = quality !== 'low' && !photos;
   return (
     <section id="gallery" aria-label="Moments from past fests" className="relative scroll-mt-28 py-16 sm:py-24">
       <p data-reveal className="mb-8 text-center font-mono text-[0.65rem] tracking-[0.4em] text-gold-300/70 uppercase">
         Moments from past orbits
       </p>
-      <div data-reveal className="gallery">
+      <div data-reveal className={`gallery ${photos ? 'gallery--photos' : ''}`}>
         <div className="gallery__track">
           {[0, 1].map((set) =>
-            GALLERY.map((item, i) => (
-              <GalleryTile key={`${set}-${item.title}`} item={item} uid={`g${set}-${i}`} duplicate={set === 1} soft={soft} />
+            GALLERY_ITEMS.map((item, i) => (
+              <GalleryTile key={`${set}-${i}`} item={item} uid={`g${set}-${i}`} duplicate={set === 1} soft={soft} />
             )),
           )}
         </div>

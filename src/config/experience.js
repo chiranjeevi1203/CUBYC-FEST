@@ -37,29 +37,24 @@ export const EVENT = {
 /* -------------------------------------------------------------------------- */
 
 export const TIMELINE = {
-  duration: 6,
-  // 1 = canonical 6.0s. 0.8 = slower, 1.25 = faster.
+  duration: 8,
+  // 1 = canonical 8.0s. 0.8 = slower, 1.25 = faster.
   timeScale: 1,
   // prefers-reduced-motion: no warp, galaxy → solar system crossfade.
   reducedDuration: 1.2,
-  phases: { GALAXY: 0, WARP: 1.5, ARRIVAL: 3.5, CAPTURE: 4.8, HANDOFF: 6 },
-  // [time, numeral] — the countdown is looked up from timeline time, never a timer.
-  countTicks: [
-    [0, 6],
-    [0.75, 5],
-    [1.5, 4],
-    [2.5, 3],
-    [3.5, 2],
-    [4.8, 1],
-    [5.6, 0],
-  ],
-  // [time, microcopy]
+  // GALAXY: slow drift toward the galaxy · WARP: the sudden jump to lightspeed ·
+  // ARRIVAL: dropping out of lightspeed, the Sun first · CAPTURE: planets + hero framing.
+  phases: { GALAXY: 0, WARP: 3, ARRIVAL: 4.7, CAPTURE: 6.4, HANDOFF: 8 },
+  // [time, microcopy, stage letter shown on the journey dash]
   copy: [
-    [0, 'Locating the Milky Way'],
-    [1.5, 'Warp drive engaged — traversing the cosmos'],
-    [3.5, 'Solar system detected'],
-    [4.8, 'Welcome aboard'],
+    [0, 'Locating the Milky Way', 'G'],
+    [1.7, 'Plotting a course to Sol', 'G'],
+    [3, 'Lightspeed engaged', 'C'],
+    [4.7, 'Solar system detected', 'S'],
+    [6.4, 'Welcome aboard', 'S'],
   ],
+  // The journey dash reads distance to the Sun from the Galactic Centre (≈26,000 ly).
+  journeyLy: 26000,
 };
 
 /* -------------------------------------------------------------------------- */
@@ -67,10 +62,6 @@ export const TIMELINE = {
 /* -------------------------------------------------------------------------- */
 
 export const PALETTE = {
-  // Galaxy (REF-1): warm core → blue rim
-  galaxyInside: '#ffb489',
-  galaxyOutside: '#638dff',
-  galaxyCore: '#ffe6c4',
   // Nebula billboards (REF-2): indigo / violet / warm gold
   nebula: ['#3a2c9a', '#6b4fd8', '#d9a24a', '#2b4fb3', '#8a5ad8'],
   // Warp streaks: mostly white-blue, rare gold
@@ -95,17 +86,29 @@ export const STAR_COLORS = ['#ffffff', '#ffffff', '#d6e2ff', '#bfcfff', '#ffe9c4
 /* -------------------------------------------------------------------------- */
 
 export const GALAXY = {
-  count: { high: 30000, low: 10000 },
-  branches: 5,
+  count: { high: 52000, low: 18000 },
+  dustRatio: 0.15, // dust sprites per star
+  dustOpacity: 0.78,
+  arms: 2,
+  wind: 3.0, // how tightly the arms wind (radians per log-radius)
   radius: 60,
-  spin: 1.15, // how tightly the arms wind
-  randomness: 0.3,
-  randomnessPower: 2.6,
-  thickness: 0.16,
   position: [0, 0, 0],
-  rotation: [0.95, 0, 0.35],
-  rotationSpeed: 0.09, // rad/s at the core once spinning
-  portraitScale: 0.62,
+  // Tilted like a classic spiral seen at ~60°: the disc's long axis runs lower-left → upper-right.
+  inclination: 0.42,
+  screenAngle: 0.72,
+  rotationSpeed: 0.07, // rad/s at the core once spinning
+  portraitScale: 0.72,
+  colors: {
+    core: '#fff0d2', // creamy-gold nucleus
+    inner: '#aebfdc', // pale steel-blue inner disc
+    arm: '#3d6cff', // saturated arm blue
+    rim: '#6f97ff',
+    knot: '#c4dcff', // bright blue-white star-forming knots
+    warm: '#ffc98f',
+    haze: '#9fb6e6',
+    dust: '#120804', // dust lanes
+    dustEdge: '#3b1d12',
+  },
 };
 
 export const SOLAR = {
@@ -118,8 +121,11 @@ export const CAMERA = {
   baseFov: 60,
   warpFov: 78,
   portraitFovBoost: 8,
-  start: { pos: [0, 34, 165], look: [0, 0, 0] },
-  cruise: { pos: [0, 26, 128] },
+  // The galaxy opening: a slow drift from start → cruise, then the jump.
+  // Seen from further back on a long lens (galaxyFov), so the disc keeps its shape.
+  start: { pos: [0, 16, 228], look: [0, 0, 0] },
+  cruise: { pos: [0, 10, 168] },
+  galaxyFov: 40,
   // Where the warp ends, measured back from the sun along +Z.
   arrivalDistance: 72,
   arrivalHeight: 12,

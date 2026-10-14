@@ -8,15 +8,15 @@ import { BRAND } from '../../config/experience';
 
 /**
  * Site links. `id` is the landing section (scroll-spy), `href` where the link goes.
- * Gallery opens its own page (#/gallery); the rest are landing sections.
+ * Events, Gallery, Schedule and Rules open their own pages (#/events, #/gallery, #/schedule, #/rules); the rest are landing sections.
  */
 export const NAV_LINKS = [
   { label: 'Home', id: 'home' },
-  { label: 'Events', id: 'events' },
+  { label: 'Events', id: 'events', href: '#/events' },
   { label: 'About', id: 'about' },
   { label: 'Gallery', id: 'gallery', href: '#/gallery' },
-  { label: 'Schedule', id: 'schedule' },
-  { label: 'Rules', id: 'rules' },
+  { label: 'Schedule', id: 'schedule', href: '#/schedule' },
+  { label: 'Rules', id: 'rules', href: '#/rules' },
 ];
 export const MENU_LINKS = [...NAV_LINKS, { label: 'Contact', id: 'contact' }];
 const hrefOf = (l) => l.href ?? `#${l.id}`;

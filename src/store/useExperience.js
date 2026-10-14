@@ -25,7 +25,7 @@ export function createSceneState() {
     pointer: { x: 0, y: 0 }, // smoothed pointer, written by CameraRig
     galaxy: { opacity: 0, assembly: 0, flash: 0, spin: 0 },
     planets: PLANETS.map(() => ({ v: 0 })),
-    cam: { px, py, pz, lx, ly, lz, fov: CAMERA.baseFov, bank: 0, fit: 0 },
+    cam: { px, py, pz, lx, ly, lz, fov: CAMERA.galaxyFov, bank: 0, fit: 0 },
   };
 }
 
@@ -56,13 +56,22 @@ export const useExperience = create((set) => ({
   deptEvent: null,
   // true once a full-screen page (a department, the gallery) covers the landing → the main canvas can pause.
   deptCovered: false,
-  // The campus gallery page (#/gallery).
+  // The campus gallery page (#/gallery) and the schedule page (#/schedule).
   galleryOpen: false,
+  scheduleOpen: false,
+  rulesOpen: false,
+  eventsOpen: false,
+  // The CUBYC Comms chatbot overlay.
+  chatOpen: false,
 
   setPhase: (phase) => set((state) => (state.phase === phase ? state : { phase })),
   setFocus: (focus) => set((state) => (state.focus === focus ? state : { focus })),
   setRoute: ({ dept = null, view = 'orbit', event = null }) => set({ dept, deptView: dept ? view : 'orbit', deptEvent: dept ? event : null }),
   setGalleryOpen: (galleryOpen) => set((state) => (state.galleryOpen === galleryOpen ? state : { galleryOpen })),
+  setChatOpen: (chatOpen) => set((state) => (state.chatOpen === chatOpen ? state : { chatOpen })),
+  setEventsOpen: (eventsOpen) => set((state) => (state.eventsOpen === eventsOpen ? state : { eventsOpen })),
+  setRulesOpen: (rulesOpen) => set((state) => (state.rulesOpen === rulesOpen ? state : { rulesOpen })),
+  setScheduleOpen: (scheduleOpen) => set((state) => (state.scheduleOpen === scheduleOpen ? state : { scheduleOpen })),
   setDeptCovered: (deptCovered) => set((state) => (state.deptCovered === deptCovered ? state : { deptCovered })),
   setCanvasReady: () => set({ canvasReady: true }),
   finishLoader: () => set({ hudMounted: false, phase: PHASES.LANDING_IDLE }),

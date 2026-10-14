@@ -74,13 +74,12 @@ export const BACKGROUND_FRAG = /* glsl */ `${HEADER}
     vec3 col = vec3(0.008, 0.01, 0.024);
     // Violet / indigo nebula, like the landing sky.
     float neb = fbm(sky * 2.2);
-    col += mix(vec3(0.05, 0.03, 0.12), vec3(0.02, 0.05, 0.12), sky.x * 0.5) * smoothstep(0.35, 0.85, neb) * 1.3;
+    col += mix(vec3(0.01, 0.025, 0.08), vec3(0.02, 0.04, 0.12), sky.x * 0.5) * smoothstep(0.4, 0.9, neb) * 1.1;
     // Stars (three depths).
     float s = starLayer(sky, 140.0, 1.0) + starLayer(sky, 260.0, 7.0) * 0.7 + starLayer(sky, 520.0, 13.0) * 0.45;
-    col += vec3(1.0, 0.96, 0.9) * s;
+    col += mix(vec3(0.75, 0.86, 1.0), vec3(1.0, 0.98, 0.95), hash(floor(sky * 140.0))) * s;
     // Warm light spilling from the disk around the hole.
-    col += vec3(1.0, 0.66, 0.32) * exp(-max(r - 1.0, 0.0) * 0.9) * 0.07 * uIntro;
-    col += vec3(1.0, 0.7, 0.4) * exp(-p.y * p.y * 5.0) * exp(-abs(p.x) * 0.2) * 0.03 * uIntro;
+    col += vec3(0.18, 0.45, 1.0) * exp(-max(r - 1.0, 0.0) * 0.8) * 0.09 * uIntro;
     // Vignette.
     vec2 v = frag / uRes - 0.5;
     col *= 1.0 - dot(v, v) * 1.1;
@@ -94,13 +93,13 @@ export const HOLE_FRAG = /* glsl */ `${HEADER}
   const float RIN = 3.0;      // innermost stable circular orbit
   const float B = 2.598;      // critical impact parameter = shadow radius
   const float D = 30.0;       // camera distance
-  const float INCL = 0.12;    // camera elevation above the disk plane (rad)
+  const float INCL = 0.14;    // camera elevation above the disk plane (rad)
 
   vec3 blackbody(float t) {
-    vec3 c1 = vec3(0.35, 0.08, 0.02);
-    vec3 c2 = vec3(0.92, 0.38, 0.1);
-    vec3 c3 = vec3(1.0, 0.72, 0.38);
-    vec3 c4 = vec3(1.0, 0.92, 0.78);
+    vec3 c1 = vec3(0.02, 0.06, 0.32);
+    vec3 c2 = vec3(0.08, 0.34, 1.0);
+    vec3 c3 = vec3(0.42, 0.76, 1.0);
+    vec3 c4 = vec3(0.9, 0.97, 1.0);
     if (t < 0.45) return mix(c1, c2, t / 0.45);
     if (t < 0.9) return mix(c2, c3, (t - 0.45) / 0.45);
     return mix(c3, c4, clamp((t - 0.9) / 0.6, 0.0, 1.0));
@@ -108,6 +107,9 @@ export const HOLE_FRAG = /* glsl */ `${HEADER}
 
   void main() {
     vec2 p = (gl_FragCoord.xy - uCenter) / uR; // in shadow radii
+    // Tilt the whole picture so the disk runs low-left → high-right.
+    const float TILT = 0.3;
+    p = vec2(cos(TILT) * p.x + sin(TILT) * p.y, -sin(TILT) * p.x + cos(TILT) * p.y);
     float rout = 15.0 * uSpread;
     // Outside anything the disk (or its lensed images) can reach: fully transparent.
     vec2 reach = p / vec2(rout / B + 0.6, 3.1);
@@ -155,7 +157,7 @@ export const HOLE_FRAG = /* glsl */ `${HEADER}
           float fil = noise(vec2(rr * 7.0 + turb * 2.5, a2 * 1.4)) * 0.65 + noise(vec2(rr * 17.0, a2 * 2.6 + 3.0)) * 0.35;
           fil = smoothstep(0.15, 0.95, fil);
           // Fine-scale clumps and lanes (visible now that the disk renders at full resolution).
-          float micro = noise(vec2(rr * 38.0, a2 * 6.0)) * 0.6 + noise(vec2(rr * 80.0, a2 * 11.0 + 5.0)) * 0.4;
+          float micro = noise(vec2(rr * 38.0, a2 * 6.0)) * 0.5 + noise(vec2(rr * 80.0, a2 * 11.0 + 5.0)) * 0.3 + noise(vec2(rr * 150.0, a2 * 18.0 + 9.0)) * 0.2;
           fil *= 0.7 + 0.45 * micro;
           float x = RIN / rr;
           float temp = pow(x, 0.75) * pow(max(1.0 - sqrt(x), 0.0), 0.25) * 2.4;
@@ -182,7 +184,8 @@ export const HOLE_FRAG = /* glsl */ `${HEADER}
     if (!escaped && T > 0.02 && length(pos) < 8.0) captured = true;
 
     float alpha = captured ? 1.0 : 1.0 - T;
-    col = 1.0 - exp(-col * 1.35);
+    col += vec3(0.1, 0.32, 0.9) * (1.0 - T) * 0.12;
+    col = 1.0 - exp(-col * 1.45);
     // Keep the hues rich after tone mapping (no washed-out grey).
     float lum = dot(col, vec3(0.299, 0.587, 0.114));
     col = mix(vec3(lum), col, 1.25);
@@ -331,7 +334,7 @@ const PHOTO_FRAG = /* glsl */ `
     c = mix(c, gold, clamp(outer * (0.55 + 0.45 * uHot) + inner * (0.22 + 0.3 * uHot), 0.0, 1.0));
     c *= 1.0 + uHot * 0.12;
     // Light climbing out of the well is redshifted and dimmed.
-    c = mix(c, c * vec3(1.0, 0.42, 0.18), vRed * 0.85) * (1.0 - vRed * 0.55);
+    c = mix(c, c * vec3(0.32, 0.55, 1.0), vRed * 0.85) * (1.0 - vRed * 0.55);
     float a = uAlpha * (1.0 - smoothstep(0.75, 1.0, vRed));
     gl_FragColor = vec4(c * a, a);
   }

@@ -1,29 +1,28 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import BrandLogo from './BrandLogo';
-import CountdownRing, { ARC_CIRCUMFERENCE, RING_CENTER } from './CountdownRing';
+import JourneyDash from './JourneyDash';
 import { BRAND, TIMELINE, prefersReducedMotion } from '../../config/experience';
 import { buildMasterTimeline } from '../../lib/timeline';
 import { useExperience } from '../../store/useExperience';
 
 /**
  * DOM overlay for the FPV loader. It builds and owns the GSAP master timeline,
- * which outlives this component by a beat: after the 6.0s hand-off the same
- * timeline finishes revealing the landing hero over the live canvas.
+ * which outlives this component by a beat: after the hand-off the same timeline
+ * finishes revealing the landing hero over the live canvas. The journey dash
+ * (bottom-left) reads 0 → 100% as we travel from the galaxy to the Sun.
  */
 export default function LoaderHUD({ landingRef }) {
   const canvasReady = useExperience((s) => s.canvasReady);
   const setPhase = useExperience((s) => s.setPhase);
   const finishLoader = useExperience((s) => s.finishLoader);
 
-  const [count, setCount] = useState(TIMELINE.countTicks[0][1]);
   const [copyIndex, setCopyIndex] = useState(0);
   const [skipping, setSkipping] = useState(false);
 
   const rootRef = useRef(null);
-  const ringWrapRef = useRef(null);
-  const arcRef = useRef(null);
-  const cometRef = useRef(null);
+  const dashRef = useRef(null);
+  const dashApi = useRef(null);
   const endCardRef = useRef(null);
   const veilRef = useRef(null);
   const tlRef = useRef(null);
@@ -50,18 +49,14 @@ export default function LoaderHUD({ landingRef }) {
       scene: useExperience.getState().scene,
       hud: {
         chrome: Array.from(rootRef.current.querySelectorAll('[data-hud]')),
-        ringWrap: ringWrapRef.current,
-        progressArc: arcRef.current,
-        comet: cometRef.current,
-        center: RING_CENTER,
-        circumference: ARC_CIRCUMFERENCE,
+        dash: dashRef.current,
+        update: (frame) => dashApi.current?.update(frame),
         endCard: endCardRef.current,
         veil: veilRef.current,
       },
       landing,
       reveals: landing ? Array.from(landing.querySelectorAll('[data-reveal]')) : [],
       onPhase: setPhase,
-      onCount: setCount,
       onCopy: setCopyIndex,
       onHandoff: handleHandoff,
       reducedMotion: prefersReducedMotion(),
@@ -135,31 +130,15 @@ export default function LoaderHUD({ landingRef }) {
         </h2>
       </div>
 
-      {/* Lower-centre: orbital countdown + phase microcopy */}
-      <div
-        ref={ringWrapRef}
-        className="absolute inset-x-0 bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+5rem))] flex flex-col items-center gap-4 px-4 opacity-0 sm:bottom-[9svh]"
-      >
-        <CountdownRing count={count} cometRef={cometRef} arcRef={arcRef} />
-        <div className="relative h-5 w-full max-w-xl">
-          {TIMELINE.copy.map(([, line], i) => (
-            <p
-              key={line}
-              aria-hidden="true"
-              className={`hud-copy absolute inset-x-0 text-center font-mono text-[0.58rem] tracking-[0.38em] text-white/85 uppercase sm:text-[0.66rem] ${
-                i === copyIndex ? 'is-active' : ''
-              }`}
-            >
-              {line}
-            </p>
-          ))}
-        </div>
+      {/* Bottom-left: the journey dash (0 → 100% to the Sun) */}
+      <div className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] right-[max(1rem,env(safe-area-inset-right))] sm:right-auto sm:bottom-8 sm:left-8 sm:w-[min(34rem,calc(100vw-4rem))]">
+        <JourneyDash ref={dashRef} apiRef={dashApi} copyIndex={copyIndex} />
       </div>
 
       {/* Bottom-right: skip */}
       <div
         data-hud
-        className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] opacity-0 sm:bottom-8 sm:right-8"
+        className="absolute top-[max(1.4rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))] opacity-0 sm:top-auto sm:bottom-8 sm:right-8"
       >
         <button
           type="button"
@@ -176,7 +155,7 @@ export default function LoaderHUD({ landingRef }) {
 
       {/* Screen-reader status */}
       <p className="sr-only" role="status" aria-live="polite" aria-label={copyLine}>
-        {copyLine}. T minus {count}.
+        {copyLine}.
       </p>
     </div>
   );

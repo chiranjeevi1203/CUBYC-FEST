@@ -3,8 +3,7 @@ import gsap from 'gsap';
 import SiteNav from '../ui/SiteNav';
 import Frame from '../ui/Frame';
 import Star from '../ui/Star';
-import { Media } from '../Gallery';
-import { GALLERY_PHOTOS } from '../../config/gallery';
+import { GALLERY_ITEMS as GALLERY_PHOTOS, Media } from '../Gallery';
 import { BRAND, prefersReducedMotion } from '../../config/experience';
 import { BACKGROUND_FRAG, HOLE_FRAG, createPhotoLayer, createShaderLayer } from '../../lib/blackHole';
 import { useExperience } from '../../store/useExperience';
@@ -20,10 +19,22 @@ import { useExperience } from '../../store/useExperience';
 const EINSTEIN = 1.45; // Einstein radius of the photo lens, in shadow radii
 const TEX_W = 640;
 const TEX_H = 460;
-const PER_SIDE = 3;
+const TOTAL_PHOTOS = GALLERY_PHOTOS.length;
+// Never show more photos at once than there are, so a photo is never on screen twice.
+const PER_SIDE = Math.max(1, Math.min(3, Math.floor(TOTAL_PHOTOS / 2)));
 const SLOTS = PER_SIDE * 2;
 const SECONDS_PER_SLOT = 4.4;
 const TOTAL = GALLERY_PHOTOS.length;
+/**
+ * Arrival order. Photos arrive alternately from the left and the right, so the list
+ * (already alternating departments) is re-paired — A B · B A · A B … — so that each
+ * stream alternates departments too, and no photo is ever on screen twice.
+ */
+const ORDER = Array.from({ length: TOTAL }, (_, i) => {
+  const pair = Math.floor(i / 2);
+  const j = pair % 2 === 1 ? (i % 2 === 0 ? i + 1 : i - 1) : i;
+  return j < TOTAL ? j : i;
+});
 
 const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
 const smooth = (a, b, x) => {
@@ -304,7 +315,7 @@ function GalleryView({ open, onGone }) {
           const u = (f.t + i + side * 0.5) / PER_SIDE;
           const cycle = Math.floor(u);
           const p = u - cycle;
-          const img = mod((cycle * PER_SIDE + i) * 2 + side, TOTAL);
+          const img = ORDER[mod((cycle * PER_SIDE + i) * 2 + side, TOTAL)];
           if (imgs.current[slot] !== img) {
             imgs.current[slot] = img;
             changed = true;
@@ -322,7 +333,7 @@ function GalleryView({ open, onGone }) {
             tidal: (L.portrait ? 1.4 : 2.2) * Math.pow(q.tau, 2.4),
             alpha: q.o * f.intro,
             hot: hs,
-            secondary: 0.6,
+            secondary: 0,
             tau: q.tau,
           });
         }

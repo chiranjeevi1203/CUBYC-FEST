@@ -117,7 +117,7 @@ export default function LandingPage({ landingRef }) {
   const setFocus = useExperience((s) => s.setFocus);
   // A department page covers the landing: hide it (keeps its scroll position).
   const covered = useExperience((s) => s.deptCovered);
-  const inDept = useExperience((s) => s.dept !== null || s.galleryOpen);
+  const inDept = useExperience((s) => s.dept !== null || s.galleryOpen || s.scheduleOpen || s.rulesOpen || s.eventsOpen);
   const cosmosRef = useRef(null);
 
   // Darken the live scene as the reader scrolls past the hero (one write per frame, max).

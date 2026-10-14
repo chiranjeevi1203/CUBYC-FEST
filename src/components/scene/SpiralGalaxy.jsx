@@ -2,132 +2,226 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Billboard } from '@react-three/drei';
 import * as THREE from 'three';
-import { GALAXY, PALETTE, mulberry32 } from '../../config/experience';
+import { GALAXY, mulberry32 } from '../../config/experience';
 import { getScene } from '../../store/useExperience';
 import { galaxyShader, radialGlowShader } from '../../lib/shaders';
 import { useShaderMaterial } from '../../lib/useShaderMaterial';
 
 /**
- * Procedural milky-way disc: logarithmic-ish spiral arms, a thick central bulge,
- * warm core → blue rim. Every particle also carries a scattered "halo" position;
- * the uAssembly uniform morphs halo → disc for the opening "galaxy pop".
+ * The opening galaxy (after a classic tilted spiral): a creamy-gold core inside a
+ * pale steel-blue inner disc, two tightly wound flocculent arms of blue stars
+ * studded with bright blue-white knots, and dark dust lanes tracing the inner
+ * edge of each arm. Every particle also carries a scattered "halo" position; the
+ * uAssembly uniform gathers halo → disc as the galaxy first appears.
  */
-function buildGalaxy(count) {
-  const rand = mulberry32(2027);
-  const { radius: R, branches, spin, randomness, randomnessPower, thickness } = GALAXY;
-  const positions = new Float32Array(count * 3);
-  const scatter = new Float32Array(count * 3);
-  const colors = new Float32Array(count * 3);
-  const sizes = new Float32Array(count);
-  const delays = new Float32Array(count);
 
-  const inside = new THREE.Color(PALETTE.galaxyInside);
-  const outside = new THREE.Color(PALETTE.galaxyOutside);
-  const core = new THREE.Color(PALETTE.galaxyCore);
+const C = GALAXY.colors;
+
+/** Arm angle (radians) at radius fraction t ∈ [0, 1]. */
+const armAngle = (t, arm) => (arm / GALAXY.arms) * Math.PI * 2 + Math.log(1 + t * 9) * GALAXY.wind;
+
+function makeGeometry(n, boundR) {
+  const g = new THREE.BufferGeometry();
+  const attr = {
+    position: new Float32Array(n * 3),
+    aScatter: new Float32Array(n * 3),
+    aColor: new Float32Array(n * 3),
+    aSize: new Float32Array(n),
+    aDelay: new Float32Array(n),
+  };
+  return {
+    g,
+    attr,
+    finish() {
+      g.setAttribute('position', new THREE.BufferAttribute(attr.position, 3));
+      g.setAttribute('aScatter', new THREE.BufferAttribute(attr.aScatter, 3));
+      g.setAttribute('aColor', new THREE.BufferAttribute(attr.aColor, 3));
+      g.setAttribute('aSize', new THREE.BufferAttribute(attr.aSize, 1));
+      g.setAttribute('aDelay', new THREE.BufferAttribute(attr.aDelay, 1));
+      // Bounding sphere must cover the halo, or the disc is culled mid-assembly.
+      g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), boundR);
+      return g;
+    },
+  };
+}
+
+function buildStars(count) {
+  const rand = mulberry32(2027);
+  const R = GALAXY.radius;
+  const { g, attr, finish } = makeGeometry(count, R * 3.4);
+  const gauss = () => (rand() + rand() + rand() - 1.5) / 1.5; // ≈ normal, −1…1
+
+  const core = new THREE.Color(C.core);
+  const inner = new THREE.Color(C.inner);
+  const arm = new THREE.Color(C.arm);
+  const rim = new THREE.Color(C.rim);
+  const knot = new THREE.Color(C.knot);
+  const warm = new THREE.Color(C.warm);
   const c = new THREE.Color();
-  const signed = () => (rand() < 0.5 ? -1 : 1);
 
   for (let i = 0; i < count; i++) {
     const i3 = i * 3;
-    const bulge = rand() < 0.1;
+    const kind = rand();
     let x;
     let y;
     let z;
     let t;
+    let size = 0.55 + Math.pow(rand(), 3) * 1.9;
+    let bright = 0.75 + rand() * 0.55;
 
-    if (bulge) {
-      // Spherical-ish central bulge
-      const r = Math.pow(rand(), 2.2) * R * 0.16;
+    if (kind < 0.14) {
+      // Central bulge: dense, warm, slightly flattened
+      const r = Math.pow(rand(), 2.2) * R * 0.22;
       const u = rand() * 2 - 1;
       const th = rand() * Math.PI * 2;
       const s = Math.sqrt(1 - u * u);
       x = s * Math.cos(th) * r;
-      y = u * r * 0.7;
+      y = u * r * 0.55;
       z = s * Math.sin(th) * r;
       t = r / R;
-    } else {
-      const r = Math.pow(rand(), 1.5) * R;
-      const branchAngle = ((i % branches) / branches) * Math.PI * 2;
-      const spinAngle = (r / R) * spin * Math.PI * 2;
-      const spread = randomness * r;
-      const rx = Math.pow(rand(), randomnessPower) * signed() * spread;
-      const ry = Math.pow(rand(), randomnessPower) * signed() * spread * thickness * 2.2 * (1 - (r / R) * 0.6);
-      const rz = Math.pow(rand(), randomnessPower) * signed() * spread;
-      x = Math.cos(branchAngle + spinAngle) * r + rx;
-      y = ry;
-      z = Math.sin(branchAngle + spinAngle) * r + rz;
+      c.copy(core).lerp(inner, Math.min(t / 0.2, 1) * 0.55);
+      size += t < 0.05 ? 0.9 : 0.3;
+      bright *= 1.15;
+    } else if (kind < 0.44) {
+      // Smooth disc between the arms (the bright pale inner oval, thinning outward)
+      const r = Math.pow(rand(), 1.7) * R * 0.92;
+      const th = rand() * Math.PI * 2;
+      x = Math.cos(th) * r;
+      z = Math.sin(th) * r;
+      y = gauss() * R * 0.022;
       t = r / R;
+      c.copy(inner).lerp(rim, Math.min(t * 1.3, 1));
+      bright *= 0.62;
+      // Every few disc stars is a soft glow sprite: a smooth, luminous inner oval
+      if (rand() < 0.25) {
+        size = 3.5 + rand() * 4;
+        bright = 0.12 + (1 - t) * 0.12;
+      }
+    } else {
+      // Two flocculent arms; ~8% of their stars bunch into bright knots
+      const a = Math.floor(rand() * GALAXY.arms);
+      t = 0.14 + Math.pow(rand(), 0.8) * 0.86;
+      const r = t * R;
+      const spread = (0.06 + t * 0.11) * R;
+      const ang = armAngle(t, a) + gauss() * 0.22;
+      // Fragments: offset whole clumps off the arm so the arms look torn, not ruled
+      const frag = Math.sin(t * 37 + a * 2.1) * 0.5 + Math.sin(t * 71 + a) * 0.25;
+      x = Math.cos(ang) * r + gauss() * spread + frag * spread * 0.6;
+      z = Math.sin(ang) * r + gauss() * spread;
+      y = gauss() * R * 0.018 * (1.2 - t * 0.6);
+      c.copy(arm).lerp(rim, Math.min(Math.max((t - 0.35) * 1.6, 0), 1));
+      if (t < 0.28) c.lerp(inner, (0.28 - t) / 0.28);
+      if (kind < 0.58) {
+        // Arm haze: big, faint sprites that melt the arm stars into glowing blue cloud
+        x += gauss() * spread * 0.6;
+        z += gauss() * spread * 0.6;
+        size = 5 + rand() * 6.5;
+        bright = 0.1 + rand() * 0.07;
+      } else if (rand() < 0.08) {
+        c.copy(knot);
+        size += 1.1 + rand() * 1.8;
+        bright *= 1.35;
+      } else if (rand() < 0.012) {
+        // Rare warm field stars caught in the arms
+        c.copy(warm);
+        size += 0.8;
+      }
     }
 
-    positions[i3] = x;
-    positions[i3 + 1] = y;
-    positions[i3 + 2] = z;
+    attr.position[i3] = x;
+    attr.position[i3 + 1] = y;
+    attr.position[i3 + 2] = z;
 
     // Scattered halo start: a loose shell around the disc
-    const hr = R * (1.6 + rand() * 1.6);
+    const hr = R * (1.5 + rand() * 1.5);
     const hu = rand() * 2 - 1;
     const hth = rand() * Math.PI * 2;
     const hs = Math.sqrt(1 - hu * hu);
-    scatter[i3] = hs * Math.cos(hth) * hr;
-    scatter[i3 + 1] = hu * hr * 0.8;
-    scatter[i3 + 2] = hs * Math.sin(hth) * hr;
+    attr.aScatter[i3] = hs * Math.cos(hth) * hr;
+    attr.aScatter[i3 + 1] = hu * hr * 0.8;
+    attr.aScatter[i3 + 2] = hs * Math.sin(hth) * hr;
 
-    c.copy(inside).lerp(outside, Math.min(t * 1.15, 1));
-    if (t < 0.12) c.lerp(core, 1 - t / 0.12);
-    const brightness = 0.8 + rand() * 0.6;
-    colors[i3] = c.r * brightness;
-    colors[i3 + 1] = c.g * brightness;
-    colors[i3 + 2] = c.b * brightness;
-
-    sizes[i] = 0.6 + Math.pow(rand(), 3) * 2.4 + (t < 0.1 ? 0.6 : 0);
+    attr.aColor[i3] = c.r * bright;
+    attr.aColor[i3 + 1] = c.g * bright;
+    attr.aColor[i3 + 2] = c.b * bright;
+    attr.aSize[i] = size;
     // Core particles land first, rim particles last
-    delays[i] = Math.min(t * 0.25 + rand() * 0.1, 0.35);
+    attr.aDelay[i] = Math.min(t * 0.25 + rand() * 0.1, 0.35);
   }
+  return finish();
+}
 
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  g.setAttribute('aScatter', new THREE.BufferAttribute(scatter, 3));
-  g.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
-  g.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
-  g.setAttribute('aDelay', new THREE.BufferAttribute(delays, 1));
-  // Bounding sphere must cover the halo, or the disc is culled mid-assembly.
-  g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), R * 3.4);
-  return g;
+/** Dark dust lanes: soft, larger sprites hugging the inner (trailing) edge of each arm. */
+function buildDust(count) {
+  const rand = mulberry32(611);
+  const R = GALAXY.radius;
+  const { attr, finish } = makeGeometry(count, R * 3.4);
+  const gauss = () => (rand() + rand() + rand() - 1.5) / 1.5;
+  const dark = new THREE.Color(C.dust);
+  const rust = new THREE.Color(C.dustEdge);
+  const c = new THREE.Color();
+
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const a = Math.floor(rand() * GALAXY.arms);
+    const t = 0.1 + Math.pow(rand(), 1.15) * 0.6;
+    const r = t * R * 0.97;
+    const ang = armAngle(t, a) - 0.26 + gauss() * 0.08;
+    const spread = (0.014 + t * 0.035) * R;
+    attr.position[i3] = Math.cos(ang) * r + gauss() * spread;
+    attr.position[i3 + 1] = gauss() * R * 0.008;
+    attr.position[i3 + 2] = Math.sin(ang) * r + gauss() * spread;
+    attr.aScatter[i3] = attr.position[i3] * 2.6;
+    attr.aScatter[i3 + 1] = (rand() - 0.5) * R;
+    attr.aScatter[i3 + 2] = attr.position[i3 + 2] * 2.6;
+    c.copy(dark).lerp(rust, rand() * 0.5);
+    attr.aColor[i3] = c.r;
+    attr.aColor[i3 + 1] = c.g;
+    attr.aColor[i3 + 2] = c.b;
+    attr.aSize[i] = 2.2 + rand() * 3.2;
+    attr.aDelay[i] = 0.12 + t * 0.25;
+  }
+  return finish();
 }
 
 export default function SpiralGalaxy({ quality }) {
   const group = useRef(null);
-  const glowMesh = useRef(null);
+  const coreMesh = useRef(null);
   const rotation = useRef(0);
   const size = useThree((s) => s.size);
   const count = quality === 'low' ? GALAXY.count.low : GALAXY.count.high;
 
-  const geometry = useMemo(() => buildGalaxy(count), [count]);
-  useEffect(() => () => geometry.dispose(), [geometry]);
+  const stars = useMemo(() => buildStars(count), [count]);
+  const dust = useMemo(() => buildDust(Math.round(count * GALAXY.dustRatio)), [count]);
+  useEffect(
+    () => () => {
+      stars.dispose();
+      dust.dispose();
+    },
+    [stars, dust],
+  );
 
   const uniforms = useMemo(
-    () => ({
-      uAssembly: { value: 0 },
-      uRotation: { value: 0 },
-      uOpacity: { value: 0 },
-      uSize: { value: 105 },
-      uPixelRatio: { value: 1 },
-    }),
+    () => ({ uAssembly: { value: 0 }, uRotation: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: 150 }, uPixelRatio: { value: 1 } }),
     [],
   );
-  const material = useShaderMaterial(galaxyShader, uniforms, {
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-  });
+  const material = useShaderMaterial(galaxyShader, uniforms, { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
 
-  const glowUniforms = useMemo(
-    () => ({ uColor: { value: new THREE.Color(PALETTE.galaxyCore) }, uIntensity: { value: 0 } }),
+  // Dust darkens what is behind it (normal blending), so it is drawn after the stars.
+  const dustUniforms = useMemo(
+    () => ({ uAssembly: { value: 0 }, uRotation: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: 150 }, uPixelRatio: { value: 1 } }),
     [],
   );
-  const glowMaterial = useShaderMaterial(radialGlowShader, glowUniforms, {
+  const dustMaterial = useShaderMaterial(galaxyShader, dustUniforms, { transparent: true, depthWrite: false, blending: THREE.NormalBlending });
+
+  // Warm core bloom (camera-facing) and the pale inner-disc haze (lies in the disc plane).
+  const coreUniforms = useMemo(() => ({ uColor: { value: new THREE.Color(C.core) }, uIntensity: { value: 0 } }), []);
+  const coreMaterial = useShaderMaterial(radialGlowShader, coreUniforms, { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  const hazeUniforms = useMemo(() => ({ uColor: { value: new THREE.Color(C.haze) }, uIntensity: { value: 0 } }), []);
+  const hazeMaterial = useShaderMaterial(radialGlowShader, hazeUniforms, {
     transparent: true,
     depthWrite: false,
+    side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
   });
 
@@ -137,23 +231,38 @@ export default function SpiralGalaxy({ quality }) {
     group.current.visible = visible;
     if (!visible) return;
     rotation.current += delta * GALAXY.rotationSpeed * g.spin;
-    uniforms.uAssembly.value = g.assembly;
-    uniforms.uRotation.value = rotation.current;
+    const pr = gl.getPixelRatio();
+    for (const u of [uniforms, dustUniforms]) {
+      u.uAssembly.value = g.assembly;
+      u.uRotation.value = rotation.current;
+      u.uPixelRatio.value = pr;
+    }
     uniforms.uOpacity.value = g.opacity;
-    uniforms.uPixelRatio.value = gl.getPixelRatio();
-    glowUniforms.uIntensity.value = g.opacity * (0.16 * g.assembly + g.flash * 1.2);
-    glowMesh.current.scale.setScalar(1 + g.flash * 0.5);
+    dustUniforms.uOpacity.value = g.opacity * GALAXY.dustOpacity * g.assembly;
+    coreUniforms.uIntensity.value = g.opacity * (0.5 * g.assembly + g.flash * 1.1);
+    hazeUniforms.uIntensity.value = g.opacity * 0.5 * g.assembly;
+    coreMesh.current.scale.setScalar(1 + g.flash * 0.4);
 
     const portrait = size.width < size.height;
     group.current.scale.setScalar(portrait ? GALAXY.portraitScale : 1);
   });
 
+  const R = GALAXY.radius;
   return (
     <group ref={group} position={GALAXY.position}>
-      <points geometry={geometry} material={material} rotation={GALAXY.rotation} />
+      {/* Screen angle (outer) × inclination (inner): the disc runs lower-left → upper-right. */}
+      <group rotation={[0, 0, GALAXY.screenAngle]}>
+        <group rotation={[GALAXY.inclination, 0, 0]}>
+          <mesh material={hazeMaterial} rotation={[-Math.PI / 2, 0, 0]} renderOrder={1}>
+            <planeGeometry args={[R * 1.25, R * 1.25]} />
+          </mesh>
+          <points geometry={stars} material={material} renderOrder={2} />
+          <points geometry={dust} material={dustMaterial} renderOrder={3} />
+        </group>
+      </group>
       <Billboard>
-        <mesh ref={glowMesh} material={glowMaterial}>
-          <planeGeometry args={[GALAXY.radius * 0.7, GALAXY.radius * 0.7]} />
+        <mesh ref={coreMesh} material={coreMaterial} renderOrder={4}>
+          <planeGeometry args={[R * 0.7, R * 0.7]} />
         </mesh>
       </Billboard>
     </group>

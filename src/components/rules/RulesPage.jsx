@@ -119,6 +119,8 @@ function RulesView({ open, onGone }) {
   state.current.throttle = throttle;
   state.current.shieldOn = shields;
   state.current.autopilot = autopilot;
+  // The rules hologram opens on its own once the bridge is up (openHolo is defined below).
+  const openRef = useRef(null);
 
   /* ---------- enter / exit ---------- */
   useLayoutEffect(() => {
@@ -135,8 +137,12 @@ function RulesView({ open, onGone }) {
       .timeline()
       .to(root, { autoAlpha: 1, duration: reduced ? 0.2 : 0.7, ease: 'power2.out', onComplete: () => setCovered(true) })
       .to(state.current, { intro: 1, duration: reduced ? 0.2 : 1.6, ease: 'power2.out' }, 0.1)
-      .to(head, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'expo.out', stagger: 0.08 }, 0.3)
-      .to(screens, { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out', stagger: 0.1 }, 0.45);
+      // Rules are shown by default: the hologram unfolds straight away. The heading and
+      // console screens stay hidden until the visitor closes it (closeHolo boots them up).
+      .set(headRef.current, { autoAlpha: 0 }, 0.45)
+      .set(head, { autoAlpha: 1, y: 0 }, 0.45)
+      .set(screens, { clearProps: 'transform' }, 0.45)
+      .call(() => openRef.current?.(), null, reduced ? 0.2 : 0.5);
     return () => tl.kill();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -258,6 +264,8 @@ function RulesView({ open, onGone }) {
       .to(screens, { filter: 'brightness(1)', duration: 0.5 * d, stagger: 0.06, clearProps: 'filter,transform' }, '<0.1')
       .to(headRef.current, { autoAlpha: 1, y: 0, duration: 0.6 * d }, '<');
   }, [busy, reduced]);
+
+  openRef.current = openHolo;
 
   /* ---------- keyboard, section tabs ---------- */
   const leave = () => {
@@ -482,7 +490,7 @@ function RulesView({ open, onGone }) {
             </section>
           ))}
           <p className="pb-2 pt-6 text-center font-mono text-[0.55rem] tracking-[0.3em] text-white/40 uppercase">
-            Event-specific rules are on each department&apos;s event pages
+            Event-specific rules are on each domain&apos;s event pages
           </p>
         </div>
       </article>

@@ -30,7 +30,7 @@ const DEPT_CODES = {
   eng: 'English & Cultural Studies',
   sbm: 'Management',
   mgmt: 'Management',
-  dps: 'DPS',
+  dps: 'Professional Studies',
   swo: 'Cultural Events',
   cult: 'Cultural Events',
   campus: 'Campus',

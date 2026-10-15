@@ -419,7 +419,7 @@ export default function DepartmentView() {
               <span className="dept-chip">
                 <span className="dept-chip__dot" aria-hidden="true" />
                 {d.hub
-                  ? `${pad(DEPT_ORDER.length)} departments · ${pad(EVENT_COUNT)} events`
+                  ? `${pad(DEPT_ORDER.length)} domains · ${pad(EVENT_COUNT)} events`
                   : `${pad(d.events.length)} event${d.events.length === 1 ? '' : 's'}`}
               </span>
             </div>
@@ -509,7 +509,7 @@ export default function DepartmentView() {
             <span className="sm:hidden">{inEvents ? 'Back' : 'Orbit'}</span>
           </button>
 
-          <nav aria-label="Departments" className={`dept-dots hidden items-center gap-2 md:flex ${inEvents ? 'is-muted' : ''}`}>
+          <nav aria-label="Domains" className={`dept-dots hidden items-center gap-2 md:flex ${inEvents ? 'is-muted' : ''}`}>
             {ORDER.map((k) => (
               <button
                 key={k}

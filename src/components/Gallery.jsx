@@ -1,6 +1,9 @@
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import Frame from './ui/Frame';
+import BlackHoleButton from './ui/BlackHoleButton';
+import Star from './ui/Star';
 import { CAMPUS_PHOTOS } from '../config/gallery';
+import { prefersReducedMotion } from '../config/experience';
 
 /**
  * Past-fest moments. Each tile is procedural SVG art so the site ships with no
@@ -194,50 +197,217 @@ export function Media({ item, uid }) {
   );
 }
 
-function GalleryTile({ item, uid, duplicate, soft }) {
-  return (
-    <figure className="gallery__item" data-cursor="hover" aria-hidden={duplicate || undefined}>
-      <Frame size="sm" star={false} className="gallery__frame" />
-      <div className="gallery__media">
-        <Media item={item} uid={`${uid}-a`} />
-        {/* Pre-blurred copy; hover fades it out, so only opacity animates. */}
-        {soft && (
-          <div className="gallery__blur">
-            <Media item={item} uid={`${uid}-b`} />
-          </div>
-        )}
-        <div className="gallery__shade" />
-      </div>
-      <figcaption className="gallery__caption">
-        <span className="font-display text-base leading-none font-bold tracking-[0.1em] text-white uppercase">{item.title}</span>
-        <span className="font-mono text-[0.55rem] tracking-[0.3em] text-gold-300/90 uppercase">{item.caption}</span>
-      </figcaption>
-      <span className="gallery__glow" aria-hidden="true" />
-    </figure>
-  );
-}
-
-/** Slow, seamless right-to-left drift: two identical sets, translated by -50%. */
 /** What the site shows: the campus photos if any were added, else the illustrations. */
 export const GALLERY_ITEMS = CAMPUS_PHOTOS.length ? CAMPUS_PHOTOS : GALLERY;
 
+const GALLERY_HREF = '#/gallery';
+const COPIES = 4; // each row repeats its set so it always overfills the screen while it slides
+const AUTO_SPEED = 26; // px/s the rows glide on their own
+const SCROLL_FACTOR = 0.55; // px of extra travel per px scrolled
+
+// The two layers: front (larger, nearer) and back (smaller, further). The photo
+// list alternates departments, so taking them in pairs (0,3 | 1,2 | 4,7 | 5,6 …)
+// keeps each row alternating departments too.
+const ROWS = [
+  { key: 'front', items: GALLERY_ITEMS.filter((_, i) => i % 4 === 0 || i % 4 === 3) },
+  { key: 'back', items: GALLERY_ITEMS.filter((_, i) => i % 4 === 1 || i % 4 === 2) },
+];
+
+function Tile({ item, uid, hidden, soft }) {
+  return (
+    <a
+      href={GALLERY_HREF}
+      className="pgal__tile"
+      data-cursor="hover"
+      aria-label={hidden ? undefined : `${item.title} — open the gallery`}
+      aria-hidden={hidden || undefined}
+      tabIndex={hidden ? -1 : undefined}
+    >
+      <Frame size="sm" star={false} className="pgal__frame" />
+      <span className="pgal__media">
+        <span className="pgal__img">
+          <Media item={item} uid={`${uid}-a`} />
+        </span>
+        {soft && (
+          <span className="pgal__blur">
+            <Media item={item} uid={`${uid}-b`} />
+          </span>
+        )}
+        <span className="pgal__shade" />
+      </span>
+      <span className="pgal__caption">
+        <span className="font-display text-sm leading-none font-bold tracking-[0.1em] text-white uppercase sm:text-base">{item.title}</span>
+        <span className="hidden font-mono text-[0.52rem] tracking-[0.3em] text-gold-300/90 uppercase sm:block">{item.caption}</span>
+      </span>
+      <span className="pgal__open" aria-hidden="true">
+        <svg viewBox="0 0 20 20" className="h-3.5 w-3.5">
+          <path d="M6 14 14 6M8 6h6v6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      <span className="pgal__glow" aria-hidden="true" />
+    </a>
+  );
+}
+
+/**
+ * "Moments from past orbits": a full-screen section with two rows of campus photos
+ * that glide in opposite directions (front row left, back row right). Scrolling
+ * pushes them further apart, scrolling back pulls them back, and each photo also
+ * drifts inside its frame for depth. Every photo, and the "Travel back in
+ * time" button, opens the black-hole gallery page.
+ */
 function Gallery({ quality }) {
   // Illustrations sit soft until hovered; real photos are shown sharp.
   const photos = CAMPUS_PHOTOS.length > 0;
   const soft = quality !== 'low' && !photos;
+  const stageRef = useRef(null);
+  const rowRefs = useRef([]);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    const rows = rowRefs.current.filter(Boolean);
+    if (!stage || !rows.length) return undefined;
+
+    const reduced = prefersReducedMotion();
+    let raf = 0;
+    let visible = false;
+    let last = 0;
+    let travel = 0; // px each row has moved (auto drift + scroll), grows forever and wraps per set
+    let scroll = window.scrollY; // smoothed scroll position
+    let speed = 1; // eases down while the pointer is over the photos
+    let hovering = false;
+    let sets = rows.map(() => 0);
+
+    const measure = () => {
+      // Width of one set of photos (the row holds COPIES identical sets).
+      sets = rows.map((row) => row.scrollWidth / COPIES);
+    };
+
+    // Size the tiles so the whole section (heading, both rows, button) fills
+    // exactly one screen: whatever height the rest leaves, split across the rows.
+    const section = stage.closest('section');
+    let lastFit = '';
+    const fit = () => {
+      const vh = window.innerHeight;
+      for (let pass = 0; pass < 2; pass++) {
+        const rowsH = rows.reduce((n, r) => n + r.offsetHeight, 0);
+        const other = section.offsetHeight - rowsH;
+        const h = Math.min(Math.max((vh - other) / 2, 112), 340);
+        const v = `${h.toFixed(1)}px`;
+        if (v === lastFit) break;
+        lastFit = v;
+        section.style.setProperty('--tile-h', v);
+      }
+      measure();
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    document.fonts?.ready.then(fit);
+
+    const apply = () => {
+      const r = stage.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = Math.min(Math.max((vh - r.top) / (vh + r.height), 0), 1); // section progress through the screen
+      rows.forEach((row, i) => {
+        const w = sets[i];
+        if (!w) return;
+        const o = ((travel % w) + w) % w;
+        // Front row runs left, back row runs right; both stay inside [-2w, -w] so the screen is always covered.
+        const x = i === 0 ? -w - o : -2 * w + o;
+        row.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
+        row.style.setProperty('--drift', `${((p - 0.5) * (i === 0 ? -34 : 34)).toFixed(1)}px`);
+      });
+    };
+
+    const tick = (now) => {
+      const dt = Math.min(Math.max((now - last) / 1000, 0), 0.1);
+      last = now;
+      speed += ((hovering ? 0.12 : 1) - speed) * (1 - Math.exp(-dt * 4));
+      const before = scroll;
+      scroll += (window.scrollY - scroll) * (1 - Math.exp(-dt * 6));
+      // Steady glide + the scroll pushing the rows further apart (scrolling up pulls them back).
+      travel += AUTO_SPEED * speed * dt + (scroll - before) * SCROLL_FACTOR;
+      apply();
+      raf = visible ? requestAnimationFrame(tick) : 0;
+    };
+
+    measure();
+    apply();
+    if (reduced) {
+      const onResize = () => {
+        measure();
+        apply();
+      };
+      window.addEventListener('resize', onResize);
+      return () => {
+        window.removeEventListener('resize', onResize);
+        window.removeEventListener('resize', fit);
+      };
+    }
+
+    // Only animate while the section is near the screen.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && !raf) {
+          last = performance.now();
+          scroll = window.scrollY;
+          raf = requestAnimationFrame(tick);
+        }
+      },
+      { rootMargin: '150px 0px' },
+    );
+    io.observe(stage);
+    const onEnter = () => (hovering = true);
+    const onLeave = () => (hovering = false);
+    stage.addEventListener('pointerenter', onEnter);
+    stage.addEventListener('pointerleave', onLeave);
+    const ro = new ResizeObserver(measure);
+    rows.forEach((row) => ro.observe(row));
+
+    return () => {
+      window.removeEventListener('resize', fit);
+      io.disconnect();
+      ro.disconnect();
+      stage.removeEventListener('pointerenter', onEnter);
+      stage.removeEventListener('pointerleave', onLeave);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <section id="gallery" aria-label="Moments from past fests" className="relative scroll-mt-28 py-16 sm:py-24">
-      <p data-reveal className="mb-8 text-center font-mono text-[0.65rem] tracking-[0.4em] text-gold-300/70 uppercase">
-        Moments from past orbits
-      </p>
-      <div data-reveal className={`gallery ${photos ? 'gallery--photos' : ''}`}>
-        <div className="gallery__track">
-          {[0, 1].map((set) =>
-            GALLERY_ITEMS.map((item, i) => (
-              <GalleryTile key={`${set}-${i}`} item={item} uid={`g${set}-${i}`} duplicate={set === 1} soft={soft} />
-            )),
-          )}
-        </div>
+    <section id="gallery" aria-label="Moments from past fests" className="pgal relative">
+      <div data-reveal className="pgal__head flex flex-col items-center gap-3 px-5 text-center sm:gap-4">
+        <p className="inline-flex items-center gap-3 font-mono text-[0.65rem] tracking-[0.4em] text-gold-300/80 uppercase">
+          <Star className="h-2 w-2 text-gold-400/70" />
+          Moments from past orbits
+          <Star className="h-2 w-2 text-gold-400/70" />
+        </p>
+        <h2 className="max-w-3xl font-display text-3xl font-bold leading-tight tracking-[0.05em] uppercase sm:text-5xl">Light from earlier days</h2>
+        <p className="max-w-xl text-sm leading-relaxed text-white/60 sm:text-base">
+          Every photograph is light that left long ago. Tap any moment to step through the event horizon into the full gallery.
+        </p>
+      </div>
+
+      <div ref={stageRef} data-reveal className={`pgal__stage ${photos ? 'pgal--photos' : ''}`}>
+        {ROWS.map((row, r) => (
+          <div key={row.key} ref={(el) => (rowRefs.current[r] = el)} className={`pgal__row pgal__row--${row.key}`}>
+            {Array.from({ length: COPIES }, (_, set) =>
+              row.items.map((item, i) => (
+                <Tile key={`${set}-${i}`} item={item} uid={`p${r}-${set}-${i}`} hidden={set !== 1} soft={soft} />
+              )),
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div data-reveal className="pgal__foot flex justify-center px-5">
+        <BlackHoleButton
+          href={GALLERY_HREF}
+          label="Travel back in time"
+          cta="Explore past moments"
+          ariaLabel="Travel back in time: open the gallery"
+        />
       </div>
     </section>
   );

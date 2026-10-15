@@ -9,6 +9,7 @@ import GalleryPage from './components/gallery/GalleryPage';
 import SchedulePage from './components/schedule/SchedulePage';
 import RulesPage from './components/rules/RulesPage';
 import EventsPage from './components/eventsPage/EventsPage';
+import AboutPage from './components/about/AboutPage';
 import ChatBot from './components/chat/ChatBot';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
@@ -23,6 +24,7 @@ import { parseHash, syncFromLocation } from './lib/deptRoute';
  *   <SchedulePage/> the two-day flight plan along the Milky Way — #/schedule
  *   <RulesPage/>    the spacecraft bridge; rules on a hologram — #/rules
  *   <EventsPage/>   all 27 events as a fan of glass cards — #/events
+ *   <AboutPage/>    the campus floating in space + the dignitaries — #/about
  *   <ChatBot/>      CUBYC Comms: floating freighter (every page) → chat overlay
  *   <LoaderHUD/>    DOM overlay that owns the GSAP master timeline; removed at hand-off
  *   <CometCursor/>  pointer layer (fine pointers only)
@@ -53,11 +55,12 @@ export default function App() {
   useEffect(() => {
     if (!live) return undefined;
     const sync = () => {
-      const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen } = useExperience.getState();
+      const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen, setAboutOpen } = useExperience.getState();
       setEventsOpen(window.location.hash === '#/events');
       setGalleryOpen(window.location.hash === '#/gallery');
       setScheduleOpen(window.location.hash === '#/schedule');
       setRulesOpen(window.location.hash === '#/rules');
+      setAboutOpen(window.location.hash === '#/about');
     };
     sync();
     window.addEventListener('hashchange', sync);
@@ -78,6 +81,7 @@ export default function App() {
       <SchedulePage />
       <RulesPage />
       <EventsPage />
+      <AboutPage />
       <ChatBot />
       {hudMounted && <LoaderHUD landingRef={landingRef} />}
       <CometCursor />

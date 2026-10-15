@@ -1,9 +1,13 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { DEPARTMENTS, eventSlug } from '../../config/departments';
-import { BODY_BY_KEY, prefersReducedMotion } from '../../config/experience';
+import { BODY_BY_KEY, EVENT, prefersReducedMotion } from '../../config/experience';
+import { ALL_EVENTS } from '../../config/allEvents';
+import { scheduleFor } from '../../config/schedule';
+import { navigate } from '../../lib/deptRoute';
 import Star from '../ui/Star';
 import Frame from '../ui/Frame';
+import Constellation from '../ui/Constellation';
 
 /** 'Label: body' → { label, lines, bullets }. Lines beginning with '- ' become bullets. */
 function parseRule(text) {
@@ -20,325 +24,530 @@ function parseRule(text) {
 
 const formatPhone = (p) => (p.length === 10 ? `${p.slice(0, 5)} ${p.slice(5)}` : p);
 const pad = (n) => String(n).padStart(2, '0');
+const unique = (list) => [...new Set(list)];
+const NODE = 58; // dial node size (px)
 
-function Person({ role, name, phone }) {
-  return (
-    <div className="holo-person" data-holo-line>
-      <span className="font-mono text-[0.55rem] tracking-[0.3em] text-gold-200/60 uppercase">{role}</span>
-      <span className="mt-1 block font-display text-[0.95rem] font-bold tracking-[0.04em] text-[#f6f1e7]">{name}</span>
-      {phone && (
-        <a href={`tel:+91${phone}`} className="mt-1 inline-flex items-center gap-2 font-mono text-[0.72rem] tracking-[0.14em] text-gold-200/90 transition hover:text-white">
-          <svg viewBox="0 0 20 20" className="h-3 w-3" aria-hidden="true">
-            <path
-              d="M6.6 3.5 8.3 7 6.8 8.4a9.6 9.6 0 0 0 4.8 4.8l1.4-1.5 3.5 1.7-.6 2.7c-.1.5-.6.9-1.1.9A13 13 0 0 1 2.9 4.1c0-.5.4-1 .9-1.1l2.8-.5Z"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinejoin="round"
-            />
-          </svg>
-          +91 {formatPhone(phone)}
-        </a>
-      )}
-    </div>
-  );
-}
+const ICONS = {
+  team: 'M7 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z M13.5 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M2.5 16c0-2.6 2-4.5 4.5-4.5s4.5 1.9 4.5 4.5 M12 12c2.3 0 5.5 1.2 5.5 4',
+  date: 'M3.5 5h13v11.5h-13Z M3.5 8.5h13 M7 3v3.5 M13 3v3.5',
+  time: 'M10 3.5a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13Z M10 6.5V10l2.5 1.6',
+  venue: 'M10 17s-5.5-5-5.5-9a5.5 5.5 0 0 1 11 0c0 4-5.5 9-5.5 9Z M10 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
+  dept: 'M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14Z M3.5 10h13 M10 3c2 2 2.8 4.4 2.8 7S12 15 10 17c-2-2-2.8-4.4-2.8-7S8 5 10 3Z',
+  faculty: 'M10 4 2.5 7.5 10 11l7.5-3.5Z M5.5 9v3.6c1.2 1.4 2.8 2 4.5 2s3.3-.6 4.5-2V9',
+  student: 'M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M4 17c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5',
+};
 
-/** Slowly turning HUD reticle in the hologram's corner. */
-function Reticle() {
-  const ticks = Array.from({ length: 24 }, (_, i) => i);
+function Icon({ name, className = 'h-4 w-4' }) {
   return (
-    <svg viewBox="0 0 64 64" className="holo-reticle" aria-hidden="true">
-      <g className="holo-reticle__spin">
-        <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" strokeWidth="0.6" strokeDasharray="2 3" opacity="0.6" />
-        {ticks.map((i) => (
-          <line key={i} x1="32" y1="3" x2="32" y2={i % 6 === 0 ? 8 : 5.5} stroke="currentColor" strokeWidth="0.8" transform={`rotate(${i * 15} 32 32)`} />
-        ))}
-      </g>
-      <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.8" />
-      <path d="M32 13a19 19 0 0 1 19 19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="32" cy="32" r="9" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.7" />
-      <circle cx="32" cy="32" r="2.4" fill="currentColor" />
+    <svg viewBox="0 0 20 20" className={className} aria-hidden="true">
+      <path d={ICONS[name]} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-/** Etched gold circuit traces on the deck's face. */
-function Circuits() {
-  return (
-    <svg className="holo-deck__circuits" viewBox="0 0 1000 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <g fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M0 96h120l22-22h96l14 14h84" />
-        <path d="M0 108h180l18-18h60" />
-        <path d="M40 120V86l16-16h70" />
-        <path d="M1000 96H880l-22-22h-96l-14 14h-84" />
-        <path d="M1000 108H820l-18-18h-60" />
-        <path d="M960 120V86l-16-16H874" />
-        <path d="M300 120v-14l14-14h60l10-10h232l10 10h60l14 14v14" />
-        <path d="M420 120v-8h160v8" />
-        <path d="M230 50h70l12 12h56" />
-        <path d="M770 50h-70l-12 12h-56" />
-      </g>
-      <g fill="currentColor">
-        {[
-          [120, 96], [238, 74], [336, 88], [258, 90], [126, 70], [880, 96], [762, 74], [664, 88], [742, 90], [874, 70],
-          [384, 82], [616, 82], [300, 50], [700, 50], [368, 62], [632, 62],
-        ].map(([x, y]) => (
-          <circle key={`${x}-${y}`} cx={x} cy={y} r="3" />
+/** The title as words of individually animated letters (words never break apart). */
+function SplitTitle({ text }) {
+  return text.split(' ').map((word, w, words) => (
+    <Fragment key={`${word}-${w}`}>
+      <span className="edk-word">
+        {[...word].map((ch, i) => (
+          <span key={i} className="edk-char">
+            {ch}
+          </span>
         ))}
-      </g>
-    </svg>
+      </span>
+      {w < words.length - 1 && ' '}
+    </Fragment>
+  ));
+}
+
+/**
+ * Register: opens the registration form (EVENT.registerUrl) in a new tab, or —
+ * until that link is set — returns to the landing page's registration section.
+ */
+function RegisterButton({ event, wide = false }) {
+  const go = () => {
+    if (EVENT.registerUrl) {
+      window.open(EVENT.registerUrl, '_blank', 'noopener');
+      return;
+    }
+    navigate(null);
+    window.setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 900);
+  };
+  return (
+    <button type="button" onClick={go} className={`edk-register ${wide ? 'edk-register--wide' : ''}`} data-ev-anim aria-label={`Register for ${event.name}`}>
+      <span className="edk-register__gem" aria-hidden="true">
+        <svg viewBox="0 0 20 20" className="h-4 w-4">
+          <path d="M10 1.5 12 8l6.5 2-6.5 2-2 6.5L8 12l-6.5-2L8 8Z" fill="currentColor" />
+        </svg>
+      </span>
+      <span className="edk-register__text">
+        <b>Register</b>
+        <small>{event.format}</small>
+      </span>
+      <span className="edk-register__arrow" aria-hidden="true">
+        <svg viewBox="0 0 20 20" className="h-4 w-4">
+          <path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      <span className="edk-register__sheen" aria-hidden="true" />
+    </button>
   );
 }
 
 /**
- * Inside a world: a holographic event deck.
- * The department's events are stacked as chamfered tabs on the left (a row on
- * phones); a light rail glides to the selected tab and a beam links it to the
- * glass hologram, which powers off and back on with each new brief. A slim
- * projector deck stays docked at the bottom of the screen.
+ * The orbit dial: the department's events ride a great ring at the left edge of
+ * the screen (an arc across the top on phones). The selected event swings to the
+ * front; the wheel, a swipe, the arrow keys or the ▲▼ keys turn the ring.
+ */
+function OrbitDial({ events, index, onSelect }) {
+  const rootRef = useRef(null);
+  const ringRef = useRef(null);
+  const nodes = useRef([]);
+  const rot = useRef({ v: index });
+  const geo = useRef(null);
+  const count = events.length;
+  const go = (i) => onSelect(events[(i + count) % count].slug);
+
+  const place = () => {
+    const g = geo.current;
+    if (!g) return;
+    const v = rot.current.v;
+    events.forEach((_, i) => {
+      const el = nodes.current[i];
+      if (!el) return;
+      const d = i - v;
+      const a = g.base + d * g.step;
+      const x = g.cx + g.R * Math.cos(a);
+      const y = g.cy + g.R * Math.sin(a);
+      const dist = Math.abs(d);
+      const vis = Math.max(0, 1 - dist / g.reach);
+      el.style.transform = `translate3d(${(x - NODE / 2).toFixed(1)}px, ${(y - NODE / 2).toFixed(1)}px, 0) scale(${(1 - Math.min(dist, 3) * 0.11).toFixed(3)})`;
+      el.style.opacity = vis.toFixed(3);
+      el.style.visibility = vis < 0.02 ? 'hidden' : 'visible';
+      el.style.setProperty('--focus', Math.max(0, 1 - dist).toFixed(3));
+    });
+    ringRef.current?.style.setProperty('--spin', `${(-v * g.step * 57.2958).toFixed(2)}deg`);
+  };
+
+  const layout = () => {
+    const el = rootRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    const wide = window.matchMedia('(min-width: 1024px)').matches;
+    let g;
+    if (wide) {
+      const R = Math.max(Math.min(h * 0.46, 380), 220);
+      g = { R, cx: -R * 0.5, cy: h / 2, base: 0, step: Math.min(0.36, 82 / R), reach: 4.4 };
+    } else {
+      const R = Math.max(w * 1.25, 480);
+      g = { R, cx: w / 2, cy: R + NODE * 0.85, base: -Math.PI / 2, step: 78 / R, reach: 3.4 };
+    }
+    geo.current = g;
+    const ring = ringRef.current;
+    if (ring) {
+      ring.style.left = `${g.cx - g.R}px`;
+      ring.style.top = `${g.cy - g.R}px`;
+      ring.style.width = ring.style.height = `${g.R * 2}px`;
+    }
+    // A small diamond on the inside of the ring marks the front.
+    const ptr = el.querySelector('.odial__pointer');
+    if (ptr) {
+      const r = g.R - NODE * 0.95;
+      ptr.style.left = `${g.cx + r * Math.cos(g.base)}px`;
+      ptr.style.top = `${g.cy + r * Math.sin(g.base)}px`;
+    }
+    place();
+  };
+
+  useLayoutEffect(() => {
+    layout();
+    const ro = new ResizeObserver(layout);
+    ro.observe(rootRef.current);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Turn the ring to the selected event.
+  useEffect(() => {
+    const d = prefersReducedMotion() ? 0 : 1.05;
+    gsap.to(rot.current, { v: index, duration: d, ease: 'expo.out', onUpdate: place, overwrite: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
+
+  // The wheel turns the ring one event per notch (throttled); a swipe does the same on touch.
+  useEffect(() => {
+    const el = rootRef.current;
+    let acc = 0;
+    let last = 0;
+    const onWheel = (e) => {
+      e.preventDefault();
+      acc += Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      const now = performance.now();
+      if (Math.abs(acc) < 40 || now - last < 260) return;
+      last = now;
+      go(index + Math.sign(acc));
+      acc = 0;
+    };
+    let start = null;
+    const onDown = (e) => (start = { x: e.clientX, y: e.clientY });
+    const onUp = (e) => {
+      if (!start) return;
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
+      start = null;
+      const wide = geo.current?.base === 0;
+      const delta = wide ? dy : dx;
+      if (Math.abs(delta) > 36) go(index - Math.sign(delta));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    el.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointerup', onUp);
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      el.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointerup', onUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, events]);
+
+  const onKey = (e) => {
+    if (['ArrowDown', 'ArrowRight'].includes(e.key)) go(index + 1);
+    else if (['ArrowUp', 'ArrowLeft'].includes(e.key)) go(index - 1);
+    else return;
+    e.preventDefault();
+  };
+
+  // Keep keyboard focus on the front node as the ring turns.
+  useEffect(() => {
+    if (rootRef.current?.contains(document.activeElement)) nodes.current[index]?.querySelector('button')?.focus({ preventScroll: true });
+  }, [index]);
+
+  return (
+    <nav ref={rootRef} className="odial" aria-label="Events" data-cursor="hover">
+      <div ref={ringRef} className="odial__ring" aria-hidden="true">
+        <svg viewBox="0 0 200 200" className="odial__ring-svg">
+          <circle cx="100" cy="100" r="99.4" className="odial__orbit" />
+          <circle cx="100" cy="100" r="92" className="odial__orbit odial__orbit--dash" />
+          <circle cx="100" cy="100" r="84" className="odial__orbit odial__orbit--faint" />
+          <g className="odial__ticks">
+            {Array.from({ length: 120 }, (_, i) => (
+              <line key={i} x1="100" y1="2.5" x2="100" y2={i % 10 === 0 ? 7 : 4.6} transform={`rotate(${i * 3} 100 100)`} />
+            ))}
+          </g>
+          <g className="odial__gems">
+            {Array.from({ length: 8 }, (_, i) => (
+              <path key={i} d="M100 89.5 101.8 92 100 94.5 98.2 92Z" transform={`rotate(${i * 45 + 22.5} 100 100)`} />
+            ))}
+          </g>
+        </svg>
+      </div>
+      <span className="odial__pointer" aria-hidden="true" />
+
+      <ul className="odial__nodes">
+        {events.map((e, i) => (
+          <li key={e.slug} ref={(el) => (nodes.current[i] = el)} className={`odial__node ${i === index ? 'is-front' : ''}`}>
+            <button
+              type="button"
+              onClick={() => go(i)}
+              onKeyDown={onKey}
+              tabIndex={i === index ? 0 : -1}
+              aria-current={i === index ? 'true' : undefined}
+              aria-label={`${pad(i + 1)} · ${e.name}`}
+              className="odial__btn"
+            >
+              <span className="odial__halo" aria-hidden="true" />
+              <span className="odial__num">{pad(i + 1)}</span>
+            </button>
+            <span className="odial__label" aria-hidden="true">
+              <b>{e.name}</b>
+              <small>{e.format}</small>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="odial__keys">
+        <button type="button" onClick={() => go(index - 1)} aria-label="Previous event" className="odial__key">
+          <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden="true">
+            <path d="m5 12.5 5-5 5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <span className="odial__count">
+          <b>{pad(index + 1)}</b> / {pad(count)}
+        </span>
+        <button type="button" onClick={() => go(index + 1)} aria-label="Next event" className="odial__key">
+          <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden="true">
+            <path d="m5 7.5 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+  );
+}
+
+/**
+ * Inside a world: the events deck. The orbit dial sits at the far left; the
+ * selected event's brief is a glass panel on the right — title, an emblem with
+ * the event's constellation, every detail (team, date, time, venue, department,
+ * coordinators), the full rules and Register. Switching events sweeps a band of
+ * light across the glass while the old brief slips out and the new one assembles.
  */
 export default function EventsPanel({ deptKey, selected, onSelect }) {
   const dept = DEPARTMENTS[deptKey];
   const body = BODY_BY_KEY[deptKey];
   const events = useMemo(() => dept.events.map((e) => ({ ...e, slug: eventSlug(e.name) })), [dept]);
   const index = Math.max(0, events.findIndex((e) => e.slug === selected));
-  // The brief on the hologram lags the selection by one power cycle.
+  // The brief lags the selection by one transition.
   const [shown, setShown] = useState(index);
   const event = events[shown];
   const rules = useMemo(() => event.rules.map(parseRule), [event]);
-  const screenRef = useRef(null);
-  const beamRef = useRef(null);
-  const power = useRef(null);
+  const meta = useMemo(() => ALL_EVENTS.find((e) => e.dept === deptKey && e.slug === event.slug), [deptKey, event]);
+  const slots = useMemo(() => scheduleFor(event.name, dept.events.map((e) => e.name)), [event, dept]);
+  const panelRef = useRef(null);
+  const sweepRef = useRef(null);
+  const tl = useRef(null);
   const first = useRef(true);
-  const tabsRef = useRef(null);
-  const railRef = useRef(null);
-  const linkRef = useRef(null);
   const place = deptKey === 'moon' ? 'the Moon' : deptKey === 'station' ? 'the Space Station' : body.name;
+  const world = place.replace(/^the /, 'The ');
 
-  // Collapse toward the middle of whatever part of the hologram is on screen.
-  const originFor = (el) => {
-    const rect = el.getBoundingClientRect();
-    const oy = Math.min(Math.max(window.innerHeight * 0.42 - rect.top, 60), Math.max(rect.height - 60, 60));
-    return `50% ${oy}px`;
-  };
+  const tiles = [
+    { icon: 'team', label: 'Team', value: event.format, sub: meta?.solo ? 'Solo entry' : 'Register as a team' },
+    {
+      icon: 'date',
+      label: 'Date',
+      value: slots.length ? unique(slots.map((s) => s.date)).join(' & ') : EVENT.dateLabel,
+      sub: slots.length ? unique(slots.map((s) => s.day)).join(' & ') : 'Day announced with the final schedule',
+    },
+    {
+      icon: 'time',
+      label: 'Time',
+      value: slots.length ? slots.map((s) => s.time).join(' · ') : 'To be announced',
+      sub: slots.length ? slots.map((s) => s.title).join(' · ') : 'Reporting 15 minutes before',
+    },
+    {
+      icon: 'venue',
+      label: 'Venue',
+      value: slots.length ? unique(slots.map((s) => s.venue)).join(' · ') : 'Christ University',
+      sub: slots.length ? 'Christ University · Yeshwanthpur Campus' : 'Yeshwanthpur Campus · room announced soon',
+    },
+    { icon: 'dept', label: 'Domain', value: dept.name, sub: `${world} · ${dept.org ?? 'CUBYC — Fest’2027'}` },
+  ];
 
-  // Selection changed → power the hologram off, then swap the brief.
+  // Selection changed → the old brief slips out under a sweep of light, then swap.
   useEffect(() => {
     if (index === shown) return undefined;
-    const el = screenRef.current;
-    power.current?.kill();
+    const el = panelRef.current;
+    tl.current?.kill();
     if (prefersReducedMotion() || !el) {
       setShown(index);
       return undefined;
     }
-    gsap.set(el, { transformOrigin: originFor(el) });
-    power.current = gsap
+    const parts = el.querySelectorAll('[data-ev-anim]');
+    tl.current = gsap
       .timeline({ onComplete: () => setShown(index) })
-      .to(el, { filter: 'brightness(1.9)', duration: 0.07, ease: 'none' })
-      .to(el, { scaleY: 0.008, duration: 0.2, ease: 'power3.in' })
-      .to(el, { scaleX: 0, opacity: 0, duration: 0.14, ease: 'power2.in' })
-      .to(beamRef.current, { opacity: 0.15, duration: 0.2 }, 0)
-      .fromTo(linkRef.current, { opacity: 1, scaleX: 1 }, { opacity: 0.25, scaleX: 0.35, duration: 0.35, ease: 'power2.in' }, 0);
+      .to(parts, { autoAlpha: 0, x: -28, filter: 'blur(6px)', duration: 0.28, stagger: 0.012, ease: 'power2.in' }, 0)
+      .to(el.querySelector('.edk-seal'), { rotate: 90, scale: 0.7, autoAlpha: 0, duration: 0.32, ease: 'power2.in' }, 0)
+      .fromTo(sweepRef.current, { xPercent: -120, autoAlpha: 1 }, { xPercent: 20, duration: 0.34, ease: 'power2.in' }, 0);
     return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
 
-  // New brief in place → bring the hologram to the top of it, then power on.
+  // New brief in place → assemble it: letters rise, tiles cascade, the seal spins in.
   useLayoutEffect(() => {
-    const el = screenRef.current;
-    if (first.current || !el) {
-      first.current = false;
-      return;
+    const el = panelRef.current;
+    if (!el) return;
+    const intro = first.current;
+    first.current = false;
+    if (!intro) {
+      const scroller = el.closest('.dept-events');
+      const top = el.getBoundingClientRect().top;
+      if (scroller && (top < 0 || top > window.innerHeight * 0.6)) scroller.scrollTo({ top: scroller.scrollTop + top - 120, behavior: 'smooth' });
     }
-    const scroller = el.closest('.dept-events');
-    const top = el.getBoundingClientRect().top;
-    if (scroller && (top < 0 || top > window.innerHeight * 0.5)) scroller.scrollTop += top - 96;
     if (prefersReducedMotion()) return;
-    gsap.set(el, { transformOrigin: originFor(el) });
-    const lines = Array.from(el.querySelectorAll('[data-holo-line]')).slice(0, 14);
-    power.current = gsap
-      .timeline()
-      .fromTo(el, { scaleX: 0, scaleY: 0.008, opacity: 1, filter: 'brightness(2.2)' }, { scaleX: 1, duration: 0.2, ease: 'power2.out' })
-      .to(el, { scaleY: 1, duration: 0.55, ease: 'expo.out' })
-      .to(el, { keyframes: { opacity: [1, 0.55, 1, 0.8, 1] }, duration: 0.32, ease: 'none' }, '<')
-      .to(el, { filter: 'brightness(1)', duration: 0.6, ease: 'power2.out' }, '<0.1')
-      .fromTo(lines, { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: 0.45, stagger: 0.035, ease: 'power2.out' }, '<0.05')
-      .fromTo(beamRef.current, { opacity: 1 }, { opacity: 0.45, duration: 1.2, ease: 'power2.out' }, 0)
-      .fromTo(linkRef.current, { opacity: 1, scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: 'power3.out' }, 0)
-      .to(linkRef.current, { opacity: 0.7, duration: 0.8 }, 0.3)
-      .set(el, { clearProps: 'filter,transform,opacity' })
-      .set(lines, { clearProps: 'opacity,visibility,transform' });
+    const chars = el.querySelectorAll('.edk-char');
+    const parts = el.querySelectorAll('[data-ev-anim]');
+    tl.current = gsap
+      .timeline({ delay: intro ? 0.35 : 0 })
+      .fromTo(sweepRef.current, { xPercent: intro ? -120 : 20, autoAlpha: 1 }, { xPercent: 140, autoAlpha: 0, duration: 0.8, ease: 'power2.out' }, 0)
+      .fromTo(el.querySelector('.edk-seal'), { rotate: -140, scale: 0.55, autoAlpha: 0 }, { rotate: 0, scale: 1, autoAlpha: 1, duration: 1.1, ease: 'expo.out' }, 0.05)
+      .fromTo(chars, { yPercent: 110, autoAlpha: 0, rotate: 8 }, { yPercent: 0, autoAlpha: 1, rotate: 0, duration: 0.7, stagger: 0.018, ease: 'expo.out' }, 0.08)
+      .fromTo(parts, { autoAlpha: 0, x: 0, y: 18, filter: 'blur(6px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.65, stagger: 0.035, ease: 'expo.out' }, 0.14)
+      .set([...parts, el.querySelector('.edk-seal')], { clearProps: 'opacity,visibility,transform,filter' })
+      .set(chars, { clearProps: 'opacity,visibility,transform' });
   }, [shown]);
 
-  useEffect(() => () => power.current?.kill(), []);
+  useEffect(() => () => tl.current?.kill(), []);
 
-  // Light rail glides to the selected tab; the link beam meets the hologram at its height.
-  const placeRail = (animate) => {
-    const list = tabsRef.current;
-    const tab = list?.querySelectorAll('.holo-tab')[index];
-    if (!tab) return;
-    const vertical = window.matchMedia('(min-width: 1024px)').matches;
-    const d = animate && !prefersReducedMotion() ? 0.6 : 0;
-    // Measured from layout boxes (offsetTop is unreliable: the active tab's glowing
-    // wrapper becomes its offsetParent).
-    const lr = list.getBoundingClientRect();
-    const tr = tab.getBoundingClientRect();
-    const top = tr.top - lr.top + list.scrollTop;
-    const left = tr.left - lr.left + list.scrollLeft;
-    const box = vertical
-      ? { x: 0, y: top, width: 3, height: tr.height }
-      : { x: left, y: list.offsetHeight - 3, width: tr.width, height: 3 };
-    gsap.to(railRef.current, { ...box, duration: d, ease: 'expo.out', overwrite: true });
-    if (vertical) gsap.to(linkRef.current, { y: top + tr.height / 2, duration: d, ease: 'expo.out', overwrite: true });
-    else list.scrollTo({ left: left - list.clientWidth / 2 + tr.width / 2, behavior: d ? 'smooth' : 'auto' });
-  };
-  useLayoutEffect(() => {
-    placeRail(!first.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index]);
-  useEffect(() => {
-    const onResize = () => placeRail(false);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index]);
-
-  // Tabs slide in one after another when the deck first comes up.
-  useLayoutEffect(() => {
-    if (prefersReducedMotion() || !tabsRef.current) return;
-    gsap.fromTo(
-      tabsRef.current.querySelectorAll('.holo-tab'),
-      { autoAlpha: 0, x: -24 },
-      { autoAlpha: 1, x: 0, duration: 0.7, ease: 'expo.out', stagger: 0.07, delay: 0.25, clearProps: 'opacity,visibility,transform' },
-    );
-  }, []);
+  const nextEvent = events[(index + 1) % events.length];
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-5xl flex-col px-4 pt-24 sm:px-8 sm:pt-28">
-      <header className="flex flex-col items-center text-center">
-        <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/85 uppercase">
-          <Star className="h-2 w-2 text-gold-400/70" />
-          Inside {place}
-          <Star className="h-2 w-2 text-gold-400/70" />
-        </p>
-        <h2 className="title-cosmic mt-4 font-display text-[clamp(2rem,6.4vw,4rem)] font-bold leading-[1.02] tracking-[0.08em] uppercase">{dept.name}</h2>
-        <p className="mt-3 font-mono text-[0.62rem] tracking-[0.3em] text-white/55 uppercase">
-          {dept.org ?? 'Department'} · {pad(events.length)} event{events.length === 1 ? '' : 's'}
-        </p>
-      </header>
+    <div className="edk-stage">
+      <OrbitDial events={events} index={index} onSelect={onSelect} />
 
-      {/* ------------------------------------------------------------ */}
-      {/*  The hologram                                                  */}
-      {/* ------------------------------------------------------------ */}
-      <div className="holo-layout mt-10 sm:mt-12">
-      {/* ------------------------------------------------------------ */}
-      {/*  Event tabs (left; a scrolling row on phones)                 */}
-      {/* ------------------------------------------------------------ */}
-      <nav className="holo-tabs" aria-label={`${dept.name} events`}>
-        <ul ref={tabsRef} className="holo-tabs__list">
-          {events.map((e, i) => (
-            <li key={e.slug} style={{ '--tone': events.length > 1 ? i / (events.length - 1) : 0 }}>
-              <button
-                type="button"
-                onClick={() => onSelect(e.slug)}
-                aria-current={i === index ? 'true' : undefined}
-                className={`holo-tab ${i === index ? 'is-active' : ''}`}
-              >
-                <span className="holo-tab__num">{pad(i + 1)}</span>
-                <span className="flex min-w-0 flex-col items-start text-left">
-                  <span className="holo-tab__name">{e.name}</span>
-                  <span className="holo-tab__meta">{e.format}</span>
-                </span>
-              </button>
-            </li>
-          ))}
-          <li ref={railRef} className="holo-tabs__rail" aria-hidden="true" />
-        </ul>
-        <span ref={linkRef} className="holo-tabs__link" aria-hidden="true" />
-      </nav>
+      <div className="edk-main">
+        <header className="edk-head">
+          <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/85 uppercase">
+            <Star className="h-2 w-2 text-gold-400/70" />
+            Inside {place}
+            <Star className="h-2 w-2 text-gold-400/70" />
+          </p>
+          <h2 className="title-cosmic mt-3 font-display text-[clamp(1.6rem,4.4vw,3rem)] font-bold leading-[1.04] tracking-[0.08em] uppercase">{dept.name}</h2>
+          <p className="mt-2 font-mono text-[0.6rem] tracking-[0.3em] text-white/55 uppercase">
+            {dept.org ?? 'Domain'} · {pad(events.length)} event{events.length === 1 ? '' : 's'}
+          </p>
+        </header>
 
-      <article ref={screenRef} className="holo-screen" aria-live="polite">
-        <Frame size="lg" className="holo-frame" />
-
-        <div className="holo-screen__hud" data-holo-line>
-          <span className="inline-flex items-center gap-2.5">
-            <span className="holo-led" aria-hidden="true" />
-            Event {pad(shown + 1)} / {pad(events.length)}
+        <article ref={panelRef} className="edk-panel" aria-live="polite">
+          <Frame size="lg" className="edk-frame" />
+          <span ref={sweepRef} className="edk-sweep" aria-hidden="true" />
+          <span className="edk-watermark" aria-hidden="true">
+            {pad(shown + 1)}
           </span>
-          <span className="hidden sm:inline">{dept.short} · Holo-deck</span>
-        </div>
 
-        <div className="relative flex items-start justify-between gap-6">
-          <div className="min-w-0">
-            <span className="holo-chip" data-holo-line>
-              <span className="holo-led" aria-hidden="true" />
-              {event.format}
+          <div className="edk-hud" data-ev-anim>
+            <span className="inline-flex items-center gap-2.5">
+              <span className="edk-led" aria-hidden="true" />
+              Event {pad(shown + 1)} / {pad(events.length)}
             </span>
-            <h3 className="holo-title mt-5" data-holo-line>
-              {event.name}
-            </h3>
-            <p className="mt-3 max-w-2xl text-[0.98rem] leading-relaxed text-gold-200/85" data-holo-line>
-              {event.summary}
-            </p>
+            <span className="hidden sm:inline">
+              {dept.short} · {world}
+            </span>
           </div>
-          <Reticle />
-        </div>
 
-        {(event.faculty || event.student) && (
-          <div className="relative mt-7 grid gap-3 sm:grid-cols-2">
-            {event.faculty && <Person role="Faculty in-charge" name={event.faculty} />}
-            {event.student && <Person role="Student in-charge" name={event.student.name} phone={event.student.phone} />}
-          </div>
-        )}
-
-        <div className="relative mt-9 flex items-center gap-4" data-holo-line>
-          <h4 className="font-mono text-[0.62rem] tracking-[0.36em] text-gold-300/85 uppercase">Format &amp; rules</h4>
-          <span className="h-px flex-1 bg-linear-to-r from-gold-400/45 to-transparent" aria-hidden="true" />
-        </div>
-        <ol className="relative mt-3">
-          {rules.map((r, i) => (
-            <li key={i} className="holo-rule" data-holo-line>
-              <span className="holo-rule__num">{pad(i + 1)}</span>
-              <div className="min-w-0 text-[0.92rem] leading-relaxed text-white/75">
-                {r.label && <p className="mb-1 font-display text-[0.8rem] font-bold tracking-[0.12em] text-[#f6f1e7] uppercase">{r.label}</p>}
-                {r.lines.map((line) => (
-                  <p key={line}>{line}</p>
+          <div className="edk-hero">
+            <div className="edk-seal" aria-hidden="true">
+              <svg viewBox="0 0 120 120" className="edk-seal__rings">
+                <circle cx="60" cy="60" r="58" className="edk-seal__o" />
+                <circle cx="60" cy="60" r="52" className="edk-seal__o edk-seal__o--dash" />
+                <circle cx="60" cy="60" r="38" className="edk-seal__o edk-seal__o--faint" />
+                {Array.from({ length: 4 }, (_, i) => (
+                  <path key={i} d="M60 0.5 62.5 4 60 7.5 57.5 4Z" className="edk-seal__gem" transform={`rotate(${i * 90} 60 60)`} />
                 ))}
-                {r.bullets.length > 0 && (
-                  <ul className="mt-2 space-y-1.5">
-                    {r.bullets.map((b) => (
-                      <li key={b} className="flex gap-3">
-                        <Star className="mt-[0.45em] h-1.5 w-1.5 shrink-0 text-gold-400/70" />
-                        <span>{b}</span>
-                      </li>
-                    ))}
-                  </ul>
+              </svg>
+              {meta?.constellation && <Constellation data={meta.constellation} className="edk-seal__stars" />}
+              <span className="edk-seal__name">{meta?.constellation?.name}</span>
+            </div>
+
+            <div className="min-w-0">
+              <p className="edk-kicker" data-ev-anim>
+                <span className="edk-kicker__gem" aria-hidden="true" />
+                {event.format}
+                <span className="edk-kicker__gem" aria-hidden="true" />
+                {meta && <span className="text-white/45">No. {pad(meta.no)} of {ALL_EVENTS.length}</span>}
+              </p>
+              <h3 className="edk-title">
+                <SplitTitle key={event.slug} text={event.name} />
+              </h3>
+              <div className="edk-ornament" data-ev-anim aria-hidden="true">
+                <span />
+                <i />
+                <span />
+              </div>
+              <p className="edk-summary" data-ev-anim>
+                {event.summary}
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <RegisterButton event={event} />
+                <span className="font-mono text-[0.55rem] tracking-[0.28em] text-white/40 uppercase" data-ev-anim>
+                  {EVENT.dateLabel}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Every detail */}
+          <dl className="edk-tiles">
+            {tiles.map((t) => (
+              <div key={t.label} className="edk-tile" data-ev-anim>
+                <span className="edk-tile__icon">
+                  <Icon name={t.icon} />
+                </span>
+                <div className="min-w-0">
+                  <dt>{t.label}</dt>
+                  <dd>{t.value}</dd>
+                  <dd className="edk-tile__sub">{t.sub}</dd>
+                </div>
+              </div>
+            ))}
+            {event.faculty && (
+              <div className="edk-tile" data-ev-anim>
+                <span className="edk-tile__icon">
+                  <Icon name="faculty" />
+                </span>
+                <div className="min-w-0">
+                  <dt>Faculty in-charge</dt>
+                  <dd>{event.faculty}</dd>
+                  <dd className="edk-tile__sub">{dept.name}</dd>
+                </div>
+              </div>
+            )}
+            <div className="edk-tile" data-ev-anim>
+              <span className="edk-tile__icon">
+                <Icon name="student" />
+              </span>
+              <div className="min-w-0">
+                <dt>Student in-charge</dt>
+                <dd>{event.student?.name ?? 'To be announced'}</dd>
+                {event.student?.phone ? (
+                  <dd>
+                    <a href={`tel:+91${event.student.phone}`} className="edk-tile__phone">
+                      +91 {formatPhone(event.student.phone)}
+                    </a>
+                  </dd>
+                ) : (
+                  <dd className="edk-tile__sub">Contact shared before the fest</dd>
                 )}
               </div>
-            </li>
-          ))}
-        </ol>
-      </article>
+            </div>
+          </dl>
 
-      </div>
+          {/* Rules */}
+          <div className="edk-section" data-ev-anim>
+            <span className="edk-kicker__gem" aria-hidden="true" />
+            <h4>Format &amp; rules</h4>
+            <span className="edk-section__line" aria-hidden="true" />
+            <span className="font-mono text-[0.55rem] tracking-[0.26em] text-white/40 uppercase">{pad(rules.length)} clauses</span>
+          </div>
+          <ol className="edk-rules">
+            {rules.map((r, i) => (
+              <li key={i} className="edk-rule" data-ev-anim>
+                <span className="edk-rule__num">{pad(i + 1)}</span>
+                <div className="min-w-0 text-[0.92rem] leading-relaxed text-white/75">
+                  {r.label && <p className="mb-1 font-display text-[0.78rem] font-bold tracking-[0.12em] text-[#f6f1e7] uppercase">{r.label}</p>}
+                  {r.lines.map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
+                  {r.bullets.length > 0 && (
+                    <ul className="mt-2 space-y-1.5">
+                      {r.bullets.map((b) => (
+                        <li key={b} className="flex gap-3">
+                          <Star className="mt-[0.45em] h-1.5 w-1.5 shrink-0 text-gold-400/70" />
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
 
-      {/* ------------------------------------------------------------ */}
-      {/*  The projector deck (docked to the bottom of the screen)      */}
-      {/* ------------------------------------------------------------ */}
-      <div className="holo-deck" aria-hidden="true">
-        <span ref={beamRef} className="holo-deck__beam" />
-        <div className="holo-deck__body">
-          <Circuits />
-          <span className="holo-deck__emitter" />
-          <p className="holo-deck__status">
-            <span className="holo-led" />
-            Projecting <span className="text-[#f6f1e7]">{event.name}</span>
-            <span className="hidden sm:inline">
-              · {pad(shown + 1)} / {pad(events.length)}
-            </span>
-          </p>
-        </div>
+          {/* Footer: register again, or move on */}
+          <div className="edk-foot" data-ev-anim>
+            <RegisterButton event={event} wide />
+            {events.length > 1 && (
+              <button type="button" className="edk-next" onClick={() => onSelect(nextEvent.slug)}>
+                <span className="font-mono text-[0.52rem] tracking-[0.3em] text-white/45 uppercase">Next event</span>
+                <span className="font-display text-[0.78rem] font-bold tracking-[0.12em] text-[#f6f1e7] uppercase">{nextEvent.name}</span>
+                <svg viewBox="0 0 20 20" className="edk-next__arrow h-4 w-4" aria-hidden="true">
+                  <path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </article>
       </div>
     </div>
   );

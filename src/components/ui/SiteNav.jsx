@@ -13,7 +13,7 @@ import { BRAND } from '../../config/experience';
 export const NAV_LINKS = [
   { label: 'Home', id: 'home' },
   { label: 'Events', id: 'events', href: '#/events' },
-  { label: 'About', id: 'about' },
+  { label: 'About', id: 'about', href: '#/about' },
   { label: 'Gallery', id: 'gallery', href: '#/gallery' },
   { label: 'Schedule', id: 'schedule', href: '#/schedule' },
   { label: 'Rules', id: 'rules', href: '#/rules' },

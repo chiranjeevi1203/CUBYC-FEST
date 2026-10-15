@@ -25,7 +25,7 @@ export const DEPARTMENTS = {
     facultyLabel: 'Host',
     faculty: 'Christ University · Yeshwanthpur Campus',
     tagline: 'Christ University Yeshwanthpur Campus',
-    intro: 'The star every world orbits. Our first flagship fest brings ten departments and one orbital stage together for two days of competition, culture and ambition.',
+    intro: 'The star every world orbits. Our flagship fest brings ten domains and one orbital stage together for two days of competition, culture and ambition.',
     events: [],
   },
 
@@ -35,7 +35,7 @@ export const DEPARTMENTS = {
     org: 'Conducted by SWO',
     facultyLabel: 'Coordinating office',
     faculty: 'SWO',
-    tagline: 'The orbital stage — music, dance and theatre.',
+    tagline: 'Let every talent light up the stage.',
     intro: 'Every world tunes in to the station. Six cultural events: two Battles of Bands, Indian group dance, street play, mime and solo dance.',
     events: [
       {
@@ -136,7 +136,7 @@ export const DEPARTMENTS = {
     name: 'Economics',
     short: 'ECO',
     faculty: 'Dr. Sajitha A',
-    tagline: 'Markets, money and pop culture at orbital speed.',
+    tagline: 'Turn knowledge into economic power.',
     intro: 'The fastest world in the system. Trade a live mock-stock floor and take on a pop-culture quiz where every answer hides an economic idea.',
     events: [
       {
@@ -182,7 +182,7 @@ export const DEPARTMENTS = {
     name: 'Psychology',
     short: 'PSY',
     faculty: 'Dr. Athira OS',
-    tagline: 'Minds, motives and mysteries.',
+    tagline: 'Understand what makes us human.',
     intro: 'The brightest world hides the deepest secrets. Solve a campus-wide case, then draw, act and decode your way through the human mind.',
     events: [
       {
@@ -227,23 +227,21 @@ export const DEPARTMENTS = {
     name: 'Computer Science',
     short: 'CS',
     faculty: 'Dr. Kokilavani T & Dr. Stephen R',
-    tagline: 'Code, compete, capture the flag.',
+    tagline: 'Create what the world has never seen.',
     intro: 'The world that runs on signal. Esports on the big screen, a three-hour Capture the Flag and a six-hour AI prompt war.',
     events: [
       {
         name: 'Cybertronian Wars (Gaming)',
-        format: 'Valorant 5 (+1) · BGMI 4',
+        format: 'Valorant · Squad of 5 (+1)',
         faculty: 'Dr. Kokilavani T & Dr. Stephen R',
         student: { name: 'Aarav Chawla', phone: '9617345111' },
-        summary: 'BGMI and Valorant custom rooms, with the finals streamed on the big screen.',
+        summary: 'Valorant custom rooms, with the finals streamed on the big screen.',
         rules: [
-          'Team size: Squad of 5 (+1 substitute) for Valorant and squad of 4 for BGMI.',
-          'Game titles: BGMI and Valorant. For both games, participants bring their own phone and laptop.',
-          'Devices: Phone for BGMI (your own, fully charged — no tablets, emulators, triggers or external controllers). Laptop for Valorant (your own laptop and charger).',
+          'Team size: Squad of 5 (+1 substitute).',
+          'Game title: Valorant.',
+          'Devices: Bring your own laptop and charger.',
           'Format: Prelims of 2 matches. The top 8 teams play 3 final matches in custom rooms created by the organisers.',
-          'Points: Placement — 1st 10, 2nd 6, 3rd 5, 4th 4, 5th 3, 6th 2, 7th–8th 1. Each finish/kill earns 1 point.',
-          'Fair play: Hacks, scripts, teaming with other squads or account sharing lead to disqualification. No re-match for individual disconnects; a re-match only if a server issue hits most teams.',
-          'Tie-break: Total finishes, then best placement in the last match.',
+          'Fair play: Hacks, scripts or account sharing lead to disqualification. No re-match for individual disconnects; a re-match only if a server issue hits most teams.',
           'Crowd element: Final matches are streamed on the big screen.',
           'General: All general rules of the fest apply.',
         ],
@@ -334,7 +332,7 @@ export const DEPARTMENTS = {
     name: 'Commerce',
     short: 'COM',
     faculty: 'Dr. Sudha E',
-    tagline: 'Leadership forged under pressure.',
+    tagline: 'Build success through every decision.',
     intro: 'The red planet tests nerve. A sustainability-driven hunt for the best manager and a four-round HR challenge across two days.',
     events: [
       {
@@ -377,7 +375,7 @@ export const DEPARTMENTS = {
     name: 'Media Studies',
     short: 'MEDIA',
     faculty: 'Dr. Julia Oinam',
-    tagline: 'Stories made in six hours flat.',
+    tagline: 'Stories That Travel Beyond Worlds.',
     intro: 'The giant that pulls every story into orbit. Shoot a film on campus in six hours, then find the imposter hiding in your team.',
     events: [
       {
@@ -425,7 +423,7 @@ export const DEPARTMENTS = {
     name: 'English & Cultural Studies',
     short: 'ENG',
     faculty: 'Dr. Rima Bhattacharya',
-    tagline: 'Characters on trial, timelines on the line.',
+    tagline: 'Where Words Create Worlds.',
     intro: 'The ringed world of stories. Argue literature in a mock high court, then convince the Time Keeper whether a character should return or remain.',
     events: [
       {
@@ -468,7 +466,7 @@ export const DEPARTMENTS = {
     name: 'Management',
     short: 'SBM',
     faculty: null,
-    tagline: 'Pitch it, meme it, escape it, capture it.',
+    tagline: 'Great leaders create new possibilities.',
     intro: 'The world tilted toward the future. Four events, from an overnight startup challenge to an outdoor game of capture the assets.',
     events: [
       {
@@ -512,7 +510,7 @@ export const DEPARTMENTS = {
         rules: [
           'Team size: Each team consists of 2 members.',
           'Overview: A management-themed puzzle challenge — solve clues, crack codes and complete a mission in limited time, testing logic, observation, communication and teamwork.',
-          "Theme — The Missing CEO: A company's CEO disappears just before an important deal. Uncover what happened by solving clues tied to different departments; the final clues lead to a code that unlocks the exit.",
+          "Theme — The Missing CEO: A company's CEO disappears just before an important deal. Uncover what happened by solving clues tied to different domains; the final clues lead to a code that unlocks the exit.",
           'Puzzle stages: The Locked Briefcase (a business riddle), The Finance File (spot the wrong figure), The Marketing Mystery (decode a brand clue), The HR Investigation (find the person connected to the mystery) and The Final Unlock (combine every clue for the final code).',
           'Time: A maximum of 20 minutes per team.',
           "Hints: A maximum of 2 hints per team. Each hint adds a 2-minute penalty to the team's final time.",
@@ -545,11 +543,11 @@ export const DEPARTMENTS = {
   },
 
   neptune: {
-    name: 'DPS',
-    short: 'DPS',
+    name: 'Professional Studies',
+    short: 'Professional Studies',
     faculty: 'Dr. Deon Bablu Thomas',
-    tagline: 'Persuade, debate, survive.',
-    intro: 'The far edge of the system, where only the persuasive survive. Talk your way onto the last parachute, then lead your department in the Clash of Councils.',
+    tagline: 'Let confidence lead every word.',
+    intro: 'The far edge of the system, where only the persuasive survive. Talk your way onto the last parachute, then lead your domain in the Clash of Councils.',
     events: [
       {
         name: 'Air Crash',
@@ -569,13 +567,13 @@ export const DEPARTMENTS = {
       {
         name: 'Clash of Councils',
         format: 'Team of 5–8',
-        summary: 'Departments go head-to-head across team events for the overall championship.',
+        summary: 'Domains go head-to-head across team events for the overall championship.',
         rules: [
-          'Eligibility: Open to students from departments or campus factions approved by the organisers. Team size: 5–8. Each department nominates a team captain.',
+          'Eligibility: Open to students from domains or campus factions approved by the organisers. Team size: 5–8. Each domain nominates a team captain.',
           'Registration: Register before the deadline, carry a valid university ID and meet the event-specific eligibility and team-size criteria. Changes to registered participants need prior approval.',
           'Format: Multiple team events under the Clash of Councils programme. Schedules, venues, participant limits and event-specific rules are announced in advance.',
           'Points: Awarded by final position in each event — First 10, Second 7, Third 5, Fourth 3, Fifth 2, Sixth 1. Bonus or spirit points are announced in advance.',
-          'Champion: The department with the highest cumulative score is the overall champion.',
+          'Champion: The domain with the highest cumulative score is the overall champion.',
           'Attendance: Report at least 15 minutes before your scheduled event. Late arrivals, absences or withdrawals may mean forfeiture or disqualification.',
           'Code of conduct: Maintain discipline, sportsmanship and respect. Cheating, harassment, discrimination, abusive language and deliberate disruption are prohibited and may bring warnings, point deductions, forfeiture or disqualification.',
           "Judging: Criteria are announced before each event. Judges' decisions are final, subject to review for scoring errors or procedural irregularities. Complaints go promptly from the team captain to the event coordinator.",

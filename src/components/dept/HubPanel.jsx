@@ -14,7 +14,7 @@ const worldOf = (k) => (k === 'moon' ? 'The Moon' : BODY_BY_KEY[k].name);
 export default function HubPanel({ onOpen }) {
   const hub = DEPARTMENTS.sun;
   const stats = [
-    { value: pad(DEPT_ORDER.length), label: 'Departments' },
+    { value: pad(DEPT_ORDER.length), label: 'Domains' },
     { value: pad(EVENT_COUNT), label: 'Events' },
     { value: '02', label: 'Days' },
   ];
@@ -48,7 +48,7 @@ export default function HubPanel({ onOpen }) {
       </header>
 
       <div className="mt-12 flex items-center gap-4 sm:mt-14">
-        <h3 className="font-mono text-[0.62rem] tracking-[0.36em] text-gold-300/85 uppercase">Every world · Every department</h3>
+        <h3 className="font-mono text-[0.62rem] tracking-[0.36em] text-gold-300/85 uppercase">Every world · Every domain</h3>
         <span className="h-px flex-1 bg-linear-to-r from-gold-400/40 to-transparent" aria-hidden="true" />
       </div>
 

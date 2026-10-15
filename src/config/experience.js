@@ -17,10 +17,22 @@ export const BRAND = {
   fest: 'CUBYC',
   edition: "FEST'2027",
   title: "CUBYC — FEST'2027",
-  subline: 'Our 1st Flagship Annual Fest',
+  subline: 'The Flagship Annual Fest',
+  // The line under the hero title.
+  heroTag: 'Two Days · Ten Worlds · One Orbit',
   heroTitle: ['CUBYC', 'FEST'],
-  tagline: 'Ten departments. One orbit. The cosmos comes to campus.',
+  tagline: 'Ten domains. One orbit. The cosmos comes to campus.',
 };
+
+/**
+ * Official social accounts for the footer. Paste each profile URL into `href`;
+ * until then the icon shows as "coming soon".
+ */
+export const SOCIAL = [
+  { key: 'instagram', label: 'Instagram', href: '' },
+  { key: 'linkedin', label: 'LinkedIn', href: '' },
+  { key: 'youtube', label: 'YouTube', href: '' },
+];
 
 /** Event dates (IST). The landing-page countdown targets `start`. */
 export const EVENT = {
@@ -30,6 +42,9 @@ export const EVENT = {
   days: ['Thu · 04 Feb 2027', 'Fri · 05 Feb 2027'],
   // The "days" moon waxes from new (this date) to full on fest day.
   countdownFrom: '2026-10-01T00:00:00+05:30',
+  // Registration form link (e.g. a Google Form). Until it's set, Register buttons on
+  // the event pages lead to the landing page's registration section.
+  registerUrl: '',
 };
 
 /* -------------------------------------------------------------------------- */

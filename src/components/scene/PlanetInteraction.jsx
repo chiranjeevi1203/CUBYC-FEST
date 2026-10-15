@@ -12,7 +12,7 @@ const CLICK_MS = 650;
 /** Is the landing page live (interactions only make sense after the loader)? */
 const isLive = () => {
   const s = useExperience.getState();
-  return s.phase === PHASES.LANDING_IDLE && !s.dept && !s.galleryOpen && !s.scheduleOpen && !s.rulesOpen && !s.eventsOpen && !s.chatOpen;
+  return s.phase === PHASES.LANDING_IDLE && !s.dept && !s.galleryOpen && !s.scheduleOpen && !s.rulesOpen && !s.eventsOpen && !s.aboutOpen && !s.chatOpen;
 };
 /**
  * Planets / sun only respond inside the "Explore" section. In the hero the

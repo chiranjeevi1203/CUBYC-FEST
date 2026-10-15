@@ -76,7 +76,7 @@ const EVENT_ALIASES = {
   'plot-twist-pop-culture-quiz': ['pop culture', 'plot twist', 'quiz'],
   'case-404': ['case 404', 'detective', 'mystery', 'investigation', 'crime', 'murder', 'clue'],
   'crack-the-psyche': ['crack the psyche', 'charades', 'dumb charades', 'pictionary', 'psyche'],
-  'cybertronian-wars-gaming': ['cybertronian', 'gaming', 'esports', 'e sports', 'valorant', 'bgmi', 'pubg', 'games'],
+  'cybertronian-wars-gaming': ['cybertronian', 'gaming', 'esports', 'e sports', 'valorant', 'games'],
   'transwarp-protocol-capture-the-flag': ['transwarp', 'capture the flag', 'ctf', 'hacking', 'cybersecurity', 'cyber security'],
   'prime-prompt-ai-prompt-wars': ['prime prompt', 'prompt wars', 'prompt engineering', 'prompting', 'prompt', 'chatgpt'],
   monomatics: ['monomatics', 'monopoly'],
@@ -275,7 +275,7 @@ function deptEvents(key) {
 function listDepartments() {
   return {
     text: [
-      `**${FEST.deptCount} departments, ${FEST.eventCount} events:**`,
+      `**${FEST.deptCount} domains, ${FEST.eventCount} events:**`,
       ...DEPT_ORDER.filter((k) => !DEPARTMENTS[k].hub).map((k) => `• **${DEPARTMENTS[k].name}** — ${DEPARTMENTS[k].events.length} event${DEPARTMENTS[k].events.length === 1 ? '' : 's'}`),
     ].join('\n'),
     links: [{ label: 'Browse all events', href: '#/events' }],
@@ -351,13 +351,13 @@ export function createBrain() {
 
     // Small talk.
     if (q.tokens.length <= 4 && has(q, ['hi', 'hello', 'hey', 'hii', 'hiii', 'heyy', 'yo', 'hola', 'namaste', 'good morning', 'good afternoon', 'good evening', 'sup'])) {
-      return ok({ text: `Hey there! I'm **CUBYC Comms**, your guide to ${FEST.title}. Ask me about events, departments, rules, the schedule or registration.`, chips: SUGGESTIONS.slice(0, 4) });
+      return ok({ text: `Hey there! I'm **CUBYC Comms**, your guide to ${FEST.title}. Ask me about events, domains, rules, the schedule or registration.`, chips: SUGGESTIONS.slice(0, 4) });
     }
     if (has(q, ['thanks', 'thank you', 'thank', 'thx', 'ty', 'tysm', 'cool', 'great', 'awesome', 'nice'])) return ok({ text: 'Anytime! Anything else you’d like to know?', chips: SUGGESTIONS.slice(1, 4) });
     if (has(q, ['bye', 'goodbye', 'see you', 'cya', 'later'])) return ok({ text: 'Clear skies! See you in orbit. 🚀' });
     if (has(q, ['who are you', 'what are you', 'your name', 'what can you do', 'help', 'how to use', 'what do you know'])) {
       return ok({
-        text: `I'm **CUBYC Comms**, the fest's guide. I can tell you about:\n• all ${FEST.eventCount} events — rules, team size, contacts\n• the ${FEST.deptCount} departments\n• dates, venue and registration\n• the schedule and general rules`,
+        text: `I'm **CUBYC Comms**, the fest's guide. I can tell you about:\n• all ${FEST.eventCount} events — rules, team size, contacts\n• the ${FEST.deptCount} domains\n• dates, venue and registration\n• the schedule and general rules`,
         chips: SUGGESTIONS,
       });
     }
@@ -438,24 +438,24 @@ Follow this website for updates.`, chips: ['How do I register?', 'General rules'
     }
     if (has(q, ['rule', 'rules', 'regulation', 'regulations', 'id card', 'phone', 'phones', 'mobile', 'late', 'reporting', 'disqualified', 'disqualification', 'conduct', 'judges', 'allowed', 'dress code', 'plagiarism'])) return ok(rulesAnswer(q));
     if (has(q, ['events', 'event', 'competitions', 'competition', 'activities', 'what can i participate'])) return ok(listEvents(() => true, 'All events'));
-    if (has(q, ['department', 'departments', 'dept', 'depts', 'planets', 'worlds'])) return ok(listDepartments());
+    if (has(q, ['domain', 'domains', 'department', 'departments', 'dept', 'depts', 'planets', 'worlds'])) return ok(listDepartments());
     if (has(q, ['gallery', 'photos', 'pictures', 'pics', 'images', 'memories'])) return ok({ text: 'The Gallery has moments from our campus — drawn into a black hole!', links: [{ label: 'Open the Gallery', href: '#/gallery' }] });
     if (has(q, ['cubyc', 'about the fest', 'what is this', 'what is the fest', 'about fest', 'flagship', 'christ university', 'christ'])) {
       return ok({
-        text: `**${FEST.title}** is ${FEST.subline.toLowerCase().replace(/^our /, 'the ')} of ${FEST.university}, ${FEST.campus} — ${FEST.deptCount} departments and ${FEST.eventCount} events across two days, ${FEST.dateLabel}.`,
+        text: `**${FEST.title}** is ${FEST.subline.toLowerCase().replace(/^our /, 'the ')} of ${FEST.university}, ${FEST.campus} — ${FEST.deptCount} domains and ${FEST.eventCount} events across two days, ${FEST.dateLabel}.`,
         chips: ['List all events', 'When is the fest?', 'How do I register?'],
       });
     }
     if (has(q, ['contact', 'organisers', 'organizers', 'helpline', 'email', 'reach you', 'queries', 'support'])) {
       return ok({
-        text: 'Each event lists its faculty and student in-charge — just ask, e.g. "contact for the meme battle". Department faculty in-charges are on each department page.',
+        text: 'Each event lists its faculty and student in-charge — just ask, e.g. "contact for the meme battle". Domain faculty in-charges are on each domain page.',
         links: [{ label: 'Browse events', href: '#/events' }],
       });
     }
 
     // Not sure — the UI may ask the AI, else this is shown.
     return {
-      text: "I'm not sure about that one yet. I know the fest's events, departments, rules, schedule and registration — try one of these:",
+      text: "I'm not sure about that one yet. I know the fest's events, domains, rules, schedule and registration — try one of these:",
       links: [{ label: 'Browse events', href: '#/events' }],
       chips: SUGGESTIONS.slice(0, 4),
       confident: false,

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import BrandLogo from '../components/hud/BrandLogo';
 import Gallery from '../components/Gallery';
+import ScheduleTeaser from '../components/schedule/ScheduleTeaser';
+import RulesTeaser from '../components/rules/RulesTeaser';
 import FestMark from '../components/ui/FestMark';
 import EventCountdown from '../components/ui/EventCountdown';
 import SolarButton from '../components/ui/SolarButton';
@@ -8,6 +9,7 @@ import Star from '../components/ui/Star';
 import BodyIcon from '../components/ui/BodyIcon';
 import Frame from '../components/ui/Frame';
 import SiteNav, { MENU_LINKS } from '../components/ui/SiteNav';
+import SiteFooter from '../components/ui/SiteFooter';
 import { BRAND, EVENT, BODY_BY_KEY } from '../config/experience';
 import { DEPARTMENTS, DEPT_ORDER, EVENT_COUNT } from '../config/departments';
 import { PHASES, useExperience } from '../store/useExperience';
@@ -29,35 +31,11 @@ const EVENTS = DEPT_ORDER.map((key) => ({
 }));
 
 // Programme outline for the two days (detailed timings to be announced).
-const SCHEDULE = [
-  {
-    day: 'Day 01',
-    date: EVENT.days[0],
-    title: 'Ignition',
-    items: ['Opening ceremony', '6-Hour Filmithon · theme reveal at 9:00 AM', 'Preliminary rounds across departments', 'Best Manager & Percepta · Day 1 rounds'],
-  },
-  {
-    day: 'Day 02',
-    date: EVENT.days[1],
-    title: 'Escape Velocity',
-    items: ['Best Manager · stage final', 'Percepta · HR Shark Tank', 'Department finals', 'Closing ceremony'],
-  },
-];
-
 const STATS = [
   { value: '02', label: 'Days in orbit' },
-  { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Departments' },
+  { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Domains' },
   { value: String(EVENT_COUNT).padStart(2, '0'), label: 'Events' },
-  { value: '1st', label: 'Edition' },
-];
-
-// Placeholder rules — replace with the official rulebook.
-const RULES = [
-  'A valid college ID card is mandatory for entry on both days.',
-  'Registrations are confirmed only after the official form is completed.',
-  'Event-specific rules are announced on each event page and are final.',
-  'Participants must arrive at their venue 15 minutes before reporting time.',
-  'Respectful conduct is expected at all times; the organisers’ decision is final.',
+  { value: "'27", label: 'Edition' },
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -117,7 +95,7 @@ export default function LandingPage({ landingRef }) {
   const setFocus = useExperience((s) => s.setFocus);
   // A department page covers the landing: hide it (keeps its scroll position).
   const covered = useExperience((s) => s.deptCovered);
-  const inDept = useExperience((s) => s.dept !== null || s.galleryOpen || s.scheduleOpen || s.rulesOpen || s.eventsOpen);
+  const inDept = useExperience((s) => s.dept !== null || s.galleryOpen || s.scheduleOpen || s.rulesOpen || s.eventsOpen || s.aboutOpen);
   const cosmosRef = useRef(null);
 
   // Darken the live scene as the reader scrolls past the hero (one write per frame, max).
@@ -211,10 +189,13 @@ export default function LandingPage({ landingRef }) {
           {/* Soft navy/violet pool behind the copy keeps it legible over the live system. */}
           <div className="hero-shade pointer-events-none absolute inset-x-[4%] inset-y-[18%] -z-10" aria-hidden="true" />
 
-          <p data-reveal className="font-mono text-[0.56rem] leading-relaxed tracking-[0.34em] text-white/65 uppercase sm:text-[0.7rem] sm:tracking-[0.42em]">
-            <span className="block sm:inline">{BRAND.universityFull}</span>
+          <p data-reveal className="hero-affil font-mono text-[0.56rem] leading-relaxed tracking-[0.34em] uppercase sm:text-[0.7rem] sm:tracking-[0.42em]">
+            <span className="hero-affil__sheen" aria-hidden="true" />
+            <Star className="hero-affil__star hidden h-2 w-2 text-gold-400 sm:block" />
+            <span className="block text-white/90 sm:inline">{BRAND.universityFull}</span>
             <span className="mx-3 hidden text-gold-400/80 sm:inline">·</span>
-            <span className="block whitespace-nowrap text-gold-200/90 sm:inline">{BRAND.campus}</span>
+            <span className="block whitespace-nowrap text-gold-200 sm:inline">{BRAND.campus}</span>
+            <Star className="hero-affil__star hidden h-2 w-2 text-gold-400 sm:block" />
           </p>
 
           <h1 data-reveal className="relative isolate mt-6 sm:mt-8">
@@ -226,7 +207,7 @@ export default function LandingPage({ landingRef }) {
 
           <p data-reveal className="mt-5 inline-flex items-center gap-2.5 font-display text-[0.6rem] font-medium whitespace-nowrap tracking-[0.2em] text-white/85 uppercase sm:mt-6 sm:gap-4 sm:text-sm sm:tracking-[0.38em]">
             <Star className="h-2 w-2 text-gold-400" />
-            {BRAND.subline}
+            {BRAND.heroTag}
             <Star className="h-2 w-2 text-gold-400" />
           </p>
 
@@ -269,7 +250,7 @@ export default function LandingPage({ landingRef }) {
           id="cosmos"
           ref={cosmosRef}
           data-orbit-touch
-          aria-label="Explore the solar system: click a planet or the sun to learn about its department"
+          aria-label="Explore the solar system: click a planet or the sun to learn about its domain"
           className="cosmos-section relative h-[300svh]"
         >
           <h2 className="sr-only">Explore the {BRAND.fest} solar system</h2>
@@ -280,7 +261,7 @@ export default function LandingPage({ landingRef }) {
               <button type="button" onClick={() => setFocus(0)} className="explore-pill pointer-events-auto lg:hidden">
                 <span className="explore-pill__beacon" aria-hidden="true" />
                 <span className="flex flex-col items-start leading-tight">
-                  <span className="font-display text-[0.66rem] font-bold tracking-[0.24em] uppercase">Explore Departments</span>
+                  <span className="font-display text-[0.66rem] font-bold tracking-[0.24em] uppercase">Explore Domains</span>
                   <span className="mt-1 text-[0.52rem] tracking-[0.26em] text-gold-200/80 uppercase">Tap any planet</span>
                 </span>
                 <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 text-gold-200" aria-hidden="true">
@@ -289,7 +270,7 @@ export default function LandingPage({ landingRef }) {
               </button>
 
               {/* Desktop: glass panel on the right */}
-              <aside className="explore-panel pointer-events-auto hidden lg:flex" aria-label="Explore departments">
+              <aside className="explore-panel pointer-events-auto hidden lg:flex" aria-label="Explore domains">
                 <Frame size="sm" />
                 <p className="flex items-center gap-3 text-[0.6rem] font-bold tracking-[0.34em] text-gold-200/90 uppercase">
                   <span className="explore-pill__beacon" aria-hidden="true" />
@@ -298,11 +279,11 @@ export default function LandingPage({ landingRef }) {
                 <h3 className="mt-4 font-display text-[1.45rem] leading-[1.05] font-bold tracking-[0.08em] text-[#f6f1e7] uppercase">
                   Explore
                   <br />
-                  Departments
+                  Domains
                 </h3>
                 <span className="explore-panel__rule" aria-hidden="true" />
                 <p className="text-[0.86rem] leading-relaxed text-white/65">
-                  Every planet is a department. Choose a world to fly to it and discover its events.
+                  Every planet is a domain. Choose a world to fly to it and discover its events.
                 </p>
                 <ul className="mt-5 space-y-2.5 text-[0.62rem] font-bold tracking-[0.22em] text-white/55 uppercase">
                   <li className="flex items-center gap-3">
@@ -343,8 +324,8 @@ export default function LandingPage({ landingRef }) {
 
         {/* Events */}
         <section id="events" className="relative mx-auto max-w-7xl scroll-mt-28 px-5 py-24 sm:px-8 sm:py-32">
-          <SectionHeading eyebrow={`Events · ${DEPT_ORDER.length} Departments · ${EVENT_COUNT} Events`}>
-            Every world is a <span className="text-gold-gradient">department of events</span>
+          <SectionHeading eyebrow={`Events · ${DEPT_ORDER.length} Domains · ${EVENT_COUNT} Events`}>
+            Every world is a <span className="text-gold-gradient">domain of events</span>
           </SectionHeading>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {EVENTS.map((e, i) => (
@@ -382,16 +363,16 @@ export default function LandingPage({ landingRef }) {
         {/* About */}
         <section id="about" className="relative mx-auto max-w-6xl scroll-mt-28 px-5 pb-24 sm:px-8 sm:pb-32">
           <SectionHeading eyebrow="About the fest">
-            Our <span className="text-gold-gradient">first orbit</span>
+            One fest, <span className="text-gold-gradient">one orbit</span>
           </SectionHeading>
           <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr]">
             <div className="space-y-5 text-center text-base leading-relaxed text-white/65 sm:text-lg lg:text-left">
               <p>
-                {BRAND.fest} is the 1st flagship annual fest of {BRAND.universityFull}, {BRAND.campus} — two days where
+                {BRAND.fest} is the flagship annual fest of {BRAND.universityFull}, {BRAND.campus} — two days where
                 code, culture, art and ambition share one sky.
               </p>
               <p>
-                {DEPT_ORDER.length} departments, {EVENT_COUNT} events, one gravitational pull. Find your world, gather your crew and launch with us on{' '}
+                {DEPT_ORDER.length} domains, {EVENT_COUNT} events, one gravitational pull. Find your world, gather your crew and launch with us on{' '}
                 {EVENT.dateLabel}.
               </p>
             </div>
@@ -413,50 +394,13 @@ export default function LandingPage({ landingRef }) {
         {/* Schedule */}
         <section id="schedule" className="relative mx-auto max-w-5xl scroll-mt-28 px-5 py-24 sm:px-8 sm:py-32">
           <SectionHeading eyebrow={`Flight plan · ${EVENT.dateLabel}`}>Two days in orbit</SectionHeading>
-          <ol className="grid gap-4 md:grid-cols-2">
-            {SCHEDULE.map((d, i) => (
-              <li key={d.day}>
-                <div className="glass group relative h-full rounded-3xl p-7 transition duration-500 hover:border-gold-400/30" data-cursor="hover">
-                  <Frame />
-                  <div className="mb-5 flex items-center gap-4">
-                    <span className="grid h-12 w-12 place-items-center rounded-full border border-gold-400/40 font-display text-base text-gold-200">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="flex flex-col">
-                      <span className="font-mono text-[0.62rem] tracking-[0.3em] text-white/45 uppercase">{d.day}</span>
-                      <span className="font-mono text-[0.68rem] tracking-[0.24em] text-gold-200/90 uppercase">{d.date}</span>
-                    </span>
-                  </div>
-                  <h3 className="text-gold-gradient font-display text-2xl font-bold tracking-[0.08em] uppercase">{d.title}</h3>
-                  <ul className="mt-5 space-y-2.5 text-sm text-white/65">
-                    {d.items.map((item) => (
-                      <li key={item} className="flex items-center gap-3">
-                        <Star className="h-2 w-2 text-gold-400/70" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <ScheduleTeaser />
         </section>
 
         {/* Rules & regulations */}
-        <section id="rules" className="relative mx-auto max-w-4xl scroll-mt-28 px-5 pb-24 sm:px-8 sm:pb-32">
+        <section id="rules" className="relative mx-auto max-w-5xl scroll-mt-28 px-5 pb-24 sm:px-8 sm:pb-32">
           <SectionHeading eyebrow="Mission protocol">Rules &amp; regulations</SectionHeading>
-          <div className="relative">
-          <Frame />
-          <ol className="glass divide-y divide-white/5 rounded-3xl px-6 sm:px-10">
-            {RULES.map((r, i) => (
-              <li key={r} className="flex items-start gap-5 py-5 text-left text-white/70">
-                <span className="mt-0.5 font-display text-sm font-semibold text-gold-300">{String(i + 1).padStart(2, '0')}</span>
-                <span className="leading-relaxed">{r}</span>
-              </li>
-            ))}
-          </ol>
-          </div>
-          <p className="mt-5 text-center font-mono text-[0.6rem] tracking-[0.3em] text-white/40 uppercase">Full rulebook will be published soon</p>
+          <RulesTeaser />
         </section>
 
         {/* Contact / registration */}
@@ -481,15 +425,7 @@ export default function LandingPage({ landingRef }) {
         </section>
       </main>
 
-      <footer className="relative mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/5 px-5 py-10 text-center font-mono text-[0.6rem] tracking-[0.3em] text-white/40 uppercase sm:flex-row sm:px-8 sm:text-left">
-        <span className="flex items-center gap-3">
-          <FestMark className="h-6" />© 2027 {BRAND.fest} · {BRAND.campus}
-        </span>
-        <span className="flex items-center gap-3">
-          <BrandLogo className="h-6" title={BRAND.universityFull} />
-          {BRAND.universityFull}
-        </span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

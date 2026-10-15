@@ -475,7 +475,7 @@ function EventsView({ open, onGone }) {
 
   const L = layout.current;
   const current = list[active];
-  const deptLabel = dept === 'all' ? 'All departments' : DEPARTMENTS[dept].name;
+  const deptLabel = dept === 'all' ? 'All domains' : DEPARTMENTS[dept].name;
   const filtered = dept !== 'all' || format !== 'all';
 
   return (
@@ -581,7 +581,7 @@ function EventsView({ open, onGone }) {
                     </button>
                   ))}
                 </div>
-                <p className="ev-brief__label mt-4">Department</p>
+                <p className="ev-brief__label mt-4">Domain</p>
                 <ul className="ev-filter__list">
                   {['all', ...DEPT_ORDER].map((k) => {
                     const n = deptCount(k);
@@ -589,7 +589,7 @@ function EventsView({ open, onGone }) {
                       <li key={k} className={k === 'all' ? 'col-span-2' : ''}>
                         <button type="button" className={`ev-filter__opt ${dept === k ? 'is-on' : ''}`} onClick={() => setDept(k)} disabled={n === 0 && dept !== k}>
                           {k === 'all' ? <Star className="h-2.5 w-2.5 shrink-0 text-gold-400/80" /> : <BodyIcon bodyKey={k} className="w-4 shrink-0" />}
-                          <span className="min-w-0 flex-1 truncate text-left">{k === 'all' ? 'All departments' : DEPARTMENTS[k].name}</span>
+                          <span className="min-w-0 flex-1 truncate text-left">{k === 'all' ? 'All domains' : DEPARTMENTS[k].name}</span>
                           <span className="ev-filter__n">{n}</span>
                         </button>
                       </li>

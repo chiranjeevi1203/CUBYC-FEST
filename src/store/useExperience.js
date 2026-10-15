@@ -60,6 +60,7 @@ export const useExperience = create((set) => ({
   galleryOpen: false,
   scheduleOpen: false,
   rulesOpen: false,
+  aboutOpen: false,
   eventsOpen: false,
   // The CUBYC Comms chatbot overlay.
   chatOpen: false,
@@ -71,6 +72,7 @@ export const useExperience = create((set) => ({
   setChatOpen: (chatOpen) => set((state) => (state.chatOpen === chatOpen ? state : { chatOpen })),
   setEventsOpen: (eventsOpen) => set((state) => (state.eventsOpen === eventsOpen ? state : { eventsOpen })),
   setRulesOpen: (rulesOpen) => set((state) => (state.rulesOpen === rulesOpen ? state : { rulesOpen })),
+  setAboutOpen: (aboutOpen) => set((state) => (state.aboutOpen === aboutOpen ? state : { aboutOpen })),
   setScheduleOpen: (scheduleOpen) => set((state) => (state.scheduleOpen === scheduleOpen ? state : { scheduleOpen })),
   setDeptCovered: (deptCovered) => set((state) => (state.deptCovered === deptCovered ? state : { deptCovered })),
   setCanvasReady: () => set({ canvasReady: true }),

@@ -32,13 +32,13 @@ export function buildKnowledge() {
   const lines = [];
   lines.push(`FEST: ${FEST.title} — ${FEST.subline}, ${FEST.university}, ${FEST.campus}.`);
   lines.push(`DATES: ${FEST.dateLabel} (${FEST.days.join(', ')}). Starts ${FEST.start}, ends ${FEST.end} (IST).`);
-  lines.push(`SCALE: ${FEST.deptCount} departments, ${FEST.eventCount} events.`);
+  lines.push(`SCALE: ${FEST.deptCount} domains, ${FEST.eventCount} events.`);
   lines.push('REGISTRATION: Registrations open soon; the official form will be announced on the website. A valid college ID is mandatory.');
   lines.push('');
-  lines.push('DEPARTMENTS AND EVENTS:');
+  lines.push('DOMAINS AND EVENTS (always say "domain", never "department"):');
   for (const key of DEPT_ORDER) {
     const d = DEPARTMENTS[key];
-    lines.push(`\n## ${d.name} (${d.short})${d.faculty ? ` — ${d.facultyLabel ?? 'Faculty in-charge'}: ${d.faculty}` : ''}`);
+    lines.push(`\n## ${d.name}${d.short !== d.name ? ` (${d.short})` : ''}${d.faculty ? ` — ${d.facultyLabel ?? 'Faculty in-charge'}: ${d.faculty}` : ''}`);
     lines.push(d.intro);
     for (const e of d.events) {
       const people = [e.faculty && `faculty in-charge ${e.faculty}`, e.student && `student in-charge ${e.student.name} (+91 ${e.student.phone})`].filter(Boolean).join('; ');
@@ -55,6 +55,6 @@ export function buildKnowledge() {
   for (const s of RULE_SECTIONS) {
     lines.push(`${s.title}: ${s.rules.map(plain).join(' ')}`);
   }
-  lines.push('\nWEBSITE PAGES: Home (#home), Events (#/events), each department (#/dept/<key>), Gallery (#/gallery), Schedule (#/schedule), Rules (#/rules).');
+  lines.push('\nWEBSITE PAGES: Home (#home), Events (#/events), each domain (#/dept/<key>), Gallery (#/gallery), Schedule (#/schedule), Rules (#/rules), About the campus, with the dignitaries and organising team (#/about).');
   return lines.join('\n');
 }

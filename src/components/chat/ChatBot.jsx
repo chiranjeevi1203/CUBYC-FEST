@@ -30,7 +30,8 @@ const NAV = [
   { label: 'Schedule', href: '#/schedule', icon: 'M4 5h12v11H4Z M4 9h12 M7 3v4 M13 3v4' },
   { label: 'Gallery', href: '#/gallery', icon: 'M3 5h14v10H3Z M6 12l3-3 3 3 2-2 3 3' },
   { label: 'Rules', href: '#/rules', icon: 'M6 3h8v14H6Z M8 7h4 M8 10h4 M8 13h3' },
-  { label: 'Departments', href: '#cosmos', icon: 'M10 10m-6 0a6 6 0 1 0 12 0a6 6 0 1 0-12 0 M4 10h12' },
+  { label: 'Domains', href: '#cosmos', icon: 'M10 10m-6 0a6 6 0 1 0 12 0a6 6 0 1 0-12 0 M4 10h12' },
+  { label: 'About', href: '#/about', icon: 'M3 17h14 M5 17V8l5-4 5 4v9 M8 17v-4h4v4' },
 ];
 const SOUND_KEY = 'cubyc-comms-sound';
 
@@ -112,9 +113,6 @@ function Message({ m, onLink, onChip, last }) {
 
 export default function ChatBot() {
   const hudMounted = useExperience((s) => s.hudMounted);
-  const dept = useExperience((s) => s.dept);
-  const deptView = useExperience((s) => s.deptView);
-  const rulesOpen = useExperience((s) => s.rulesOpen);
   const setChatOpen = useExperience((s) => s.setChatOpen);
   const reduced = prefersReducedMotion();
 
@@ -168,6 +166,13 @@ export default function ChatBot() {
     setOpen(true);
     setChatOpen(true);
   };
+
+  // Other parts of the site (e.g. the footer's FAQs link) can open the chat.
+  useEffect(() => {
+    const onOpen = () => openChat();
+    window.addEventListener('cubyc:open-chat', onOpen);
+    return () => window.removeEventListener('cubyc:open-chat', onOpen);
+  });
 
   // Laser volley → the hologram powers on where it lands, over the page.
   useLayoutEffect(() => {
@@ -345,6 +350,7 @@ export default function ChatBot() {
         s.setGalleryOpen(false);
         s.setScheduleOpen(false);
         s.setRulesOpen(false);
+        s.setAboutOpen(false);
         s.setEventsOpen(false);
         navigate({ dept: l.dept, view: l.event ? 'events' : 'orbit', event: l.event ?? null });
       } else if (l.href) {
@@ -359,8 +365,6 @@ export default function ChatBot() {
     brain.context.dept = null;
   };
 
-  // Lift the launcher above controls that sit in the bottom-right on some pages.
-  const lift = rulesOpen ? 'rules' : dept ? (deptView === 'events' ? 'deck' : 'dept') : 'none';
 
   if (hudMounted) return null;
 
@@ -371,7 +375,6 @@ export default function ChatBot() {
         ref={launcherRef}
         type="button"
         className={`comms-launcher ${open ? 'is-hidden' : ''}`}
-        data-lift={lift}
         onClick={openChat}
         aria-label="Open CUBYC Comms — ask a question"
         aria-haspopup="dialog"

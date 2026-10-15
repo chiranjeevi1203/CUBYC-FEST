@@ -1,8 +1,9 @@
 /**
  * The view out of the bridge window on the rules page: a full-screen fragment
  * shader (drawn with createShaderLayer from ./blackHole). Stars stream past in
- * depth layers as the craft flies on, faint spiral galaxies and a violet/gold
- * nebula hang in the distance, and the whole sky shifts a touch with uLook.
+ * depth layers as the craft flies on, a teal nebula
+ * with glowing cyan filaments fills the sky behind, and the view shifts a touch
+ * with uLook.
  */
 export const SPACE_FRAG = /* glsl */ `
   precision highp float;
@@ -35,39 +36,56 @@ export const SPACE_FRAG = /* glsl */ `
     return f;
   }
 
-  // A small spiral galaxy: bright core, two wound arms, tilted disk.
-  vec3 galaxy(vec2 p, vec2 c, float size, float tilt, float rot, vec3 tint) {
-    vec2 q = p - c;
-    float ct = cos(rot);
-    float st = sin(rot);
-    q = vec2(ct * q.x - st * q.y, st * q.x + ct * q.y);
-    q.y /= tilt;
-    float r = length(q) / size;
-    if (r > 2.2) return vec3(0.0);
-    float a = atan(q.y, q.x);
-    float arms = 0.5 + 0.5 * cos(2.0 * a - log(r + 0.05) * 4.2);
-    float disk = exp(-r * 2.6) * (0.35 + 0.9 * arms * smoothstep(0.05, 0.4, r));
-    float core = exp(-r * r * 60.0) * 1.3;
-    float dust = noise(q / size * 6.0) * 0.4;
-    return tint * disk * (1.0 - dust * smoothstep(0.1, 0.6, r)) + vec3(1.0, 0.92, 0.8) * core;
-  }
-
   void main() {
     vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
     vec2 view = uv + uLook * 0.035;
-    vec3 col = vec3(0.004, 0.006, 0.016);
+    // Deep blue-teal space, a little lighter across the middle.
+    vec3 col = mix(vec3(0.004, 0.016, 0.026), vec3(0.008, 0.03, 0.045), smoothstep(0.9, 0.0, abs(uv.y + uv.x * 0.35)));
 
-    // Distant nebula and galaxies (almost no parallax).
+    // Teal nebula (almost no parallax): a soft cloud band crossing the sky
+    // diagonally, threaded with bright wispy cyan filaments.
     vec2 sky = view + vec2(uTravel * 0.0015, 0.0);
-    float neb = fbm(sky * 1.6 + 4.0);
-    col += mix(vec3(0.06, 0.03, 0.13), vec3(0.12, 0.08, 0.04), smoothstep(0.4, 0.8, fbm(sky * 0.9 + 20.0))) * smoothstep(0.42, 0.9, neb) * 1.4;
-    col += galaxy(sky, vec2(-0.55, 0.22), 0.11, 0.42, 0.5, vec3(0.75, 0.62, 0.95));
-    col += galaxy(sky, vec2(0.62, 0.3), 0.06, 0.7, -0.8, vec3(0.95, 0.78, 0.55));
-    col += galaxy(sky, vec2(0.18, -0.05), 0.035, 0.35, 1.9, vec3(0.6, 0.7, 1.0)) * 0.8;
+    vec2 w = sky * 1.3 + vec2(fbm(sky * 1.1 + 3.0), fbm(sky * 1.1 + 9.0)) * 0.9; // domain warp
+    float cloud = fbm(w * 1.4 + 2.0);
+    float band = exp(-pow((sky.y + sky.x * 0.55 - 0.05) * 2.1, 2.0));          // the diagonal lane
+    float fil = 1.0 - abs(2.0 * fbm(w * 3.2 + 7.0) - 1.0);                      // ridged filaments
+    fil = pow(fil, 6.0);
+    float dens = smoothstep(0.45, 0.88, cloud) * (0.12 + 0.88 * band);
+    col += vec3(0.015, 0.12, 0.17) * dens * 0.7;
+    col += vec3(0.1, 0.55, 0.75) * fil * dens * 0.85;
+    // Dark dust lanes inside the cloud
+    col *= 1.0 - 0.45 * smoothstep(0.55, 0.8, fbm(w * 2.4 + 15.0)) * dens;
 
-    // Background star dust.
+    // Fine star dust, thicker inside the nebula.
     vec2 g = floor(view * 420.0);
-    col += vec3(0.9, 0.92, 1.0) * step(0.996, hash(g)) * 0.5;
+    float dust = step(0.9965 - dens * 0.008, hash(g));
+    col += vec3(0.75, 0.9, 1.0) * dust * (0.35 + 0.4 * hash(g + 5.0));
+
+    // Bright blue-white stars with soft glows (slow twinkle).
+    for (int k = 0; k < 2; k++) {
+      float sc = 18.0 + float(k) * 13.0;
+      vec2 cp = view * sc + float(k) * 17.0;
+      vec2 id = floor(cp);
+      vec2 f = fract(cp) - 0.5;
+      float h = hash(id + float(k) * 3.7);
+      vec2 o = (vec2(hash(id + 1.3), hash(id + 8.1)) - 0.5) * 0.7;
+      float d = length(f - o);
+      float on = step(0.86, h);
+      float tw = 0.75 + 0.25 * sin(uTime * (1.0 + h * 2.0) + h * 40.0);
+      col += vec3(0.65, 0.88, 1.0) * on * tw * (exp(-d * 60.0) * 1.4 + exp(-d * 14.0) * 0.18);
+    }
+
+    // Two small crescent moons far off in the sky.
+    for (int m = 0; m < 2; m++) {
+      vec2 mc = m == 0 ? vec2(0.62, 0.36) : vec2(-0.72, -0.34);
+      float mr = m == 0 ? 0.018 : 0.012;
+      vec2 q = (sky - mc) / mr;
+      float body = 1.0 - smoothstep(0.92, 1.0, length(q));
+      float lit = 1.0 - smoothstep(0.85, 1.0, length(q - vec2(-0.32, 0.26)));
+      float crescent = body * (1.0 - lit);
+      col = mix(col, vec3(0.02, 0.04, 0.06), body * 0.85);
+      col += vec3(0.75, 0.85, 0.9) * crescent * 0.85;
+    }
 
     // Stars streaming past in depth layers (flying forward).
     for (int i = 0; i < 4; i++) {
@@ -83,7 +101,7 @@ export const SPACE_FRAG = /* glsl */ `
       float size = mix(0.012, 0.045, z);
       float fade = smoothstep(0.0, 0.25, z) * (1.0 - smoothstep(0.85, 1.0, z));
       float star = step(0.82, h) * pow(smoothstep(size, 0.0, d), 2.0) * fade;
-      col += mix(vec3(0.8, 0.88, 1.0), vec3(1.0, 0.9, 0.75), h) * star * 1.4;
+      col += mix(vec3(0.7, 0.88, 1.0), vec3(0.92, 0.97, 1.0), h) * star * 1.4;
     }
 
     // Shield shimmer across the glass.

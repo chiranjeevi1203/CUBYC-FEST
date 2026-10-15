@@ -111,7 +111,7 @@ function FocusCard() {
             onClick={() => navigate({ dept: keyOfFocus(shown), view: 'orbit' })}
             className="inline-flex items-center gap-2 font-display text-[0.66rem] font-medium tracking-[0.24em] text-gold-200 uppercase transition hover:text-white"
           >
-            {isSun ? 'Explore CUBYC' : 'Enter department'} <span aria-hidden="true">→</span>
+            {isSun ? 'Explore CUBYC' : 'Enter domain'} <span aria-hidden="true">→</span>
           </button>
           <div className="flex items-center gap-2">
             <CardButton onClick={() => step(-1)} label="Previous world">

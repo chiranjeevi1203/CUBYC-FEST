@@ -10,11 +10,14 @@ import BodyIcon from '../components/ui/BodyIcon';
 import Frame from '../components/ui/Frame';
 import SiteNav, { MENU_LINKS } from '../components/ui/SiteNav';
 import SiteFooter from '../components/ui/SiteFooter';
+import ContactCard from '../components/contact/ContactCard';
+import { TEAM_SECTIONS } from '../config/team';
 import { BRAND, EVENT, BODY_BY_KEY } from '../config/experience';
 import { DEPARTMENTS, DEPT_ORDER, EVENT_COUNT } from '../config/departments';
 import { PHASES, useExperience } from '../store/useExperience';
 import { interaction } from '../lib/interaction';
 import { navigate } from '../lib/deptRoute';
+import { useViewMore, ViewMoreButton } from '../components/ui/ViewMore';
 
 /* -------------------------------------------------------------------------- */
 /*  Content                                                                   */
@@ -35,7 +38,18 @@ const STATS = [
   { value: '02', label: 'Days in orbit' },
   { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Domains' },
   { value: String(EVENT_COUNT).padStart(2, '0'), label: 'Events' },
-  { value: "'27", label: 'Edition' },
+  { value: '₹10L', label: 'Prize pool', featured: true },
+];
+
+// Student core members: the contacts shown on the landing page (edit in config/team.js).
+const STUDENT_CORE = TEAM_SECTIONS.find((s) => s.key === 'student-core')?.people ?? [];
+
+// The four forces of the fest (About section).
+const PILLARS = [
+  { name: 'Intellect', note: 'Quizzes, cases, code & debate', icon: 'M10 3a5 5 0 0 0-3 9v2h6v-2a5 5 0 0 0-3-9Z M8 17h4' },
+  { name: 'Culturals', note: 'Music, dance, theatre & film', icon: 'M7 15V5l9-2v10 M7 15a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z M16 13a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z' },
+  { name: 'Creativity', note: 'Pitches, memes, prompts & stories', icon: 'M10 2.5l1.8 4.6 4.7.4-3.6 3 1.1 4.7L10 12.6 6 15.2l1.1-4.7-3.6-3 4.7-.4Z' },
+  { name: 'Competition', note: 'Esports, CTF & championships', icon: 'M6 4h8v3a4 4 0 0 1-8 0Z M6 5H3.5a2.5 2.5 0 0 0 2.6 3 M14 5h2.5a2.5 2.5 0 0 1-2.6 3 M10 11v3 M7 16h6' },
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -87,6 +101,8 @@ function SectionHeading({ eyebrow, children }) {
  * marked [data-reveal] are revealed by the GSAP master timeline at hand-off.
  */
 export default function LandingPage({ landingRef }) {
+  const vmDomains = useViewMore(EVENTS.length, 4, 'lg');
+  const vmCore = useViewMore(STUDENT_CORE.length, 3);
   const interactive = useExperience((s) => s.phase === PHASES.LANDING_IDLE);
   const quality = useExperience((s) => s.quality);
   const focused = useExperience((s) => s.focus !== null);
@@ -95,7 +111,7 @@ export default function LandingPage({ landingRef }) {
   const setFocus = useExperience((s) => s.setFocus);
   // A department page covers the landing: hide it (keeps its scroll position).
   const covered = useExperience((s) => s.deptCovered);
-  const inDept = useExperience((s) => s.dept !== null || s.galleryOpen || s.scheduleOpen || s.rulesOpen || s.eventsOpen || s.aboutOpen);
+  const inDept = useExperience((s) => s.dept !== null || s.galleryOpen || s.scheduleOpen || s.rulesOpen || s.eventsOpen || s.aboutOpen || s.contactOpen || s.sponsorsOpen || s.notFound);
   const cosmosRef = useRef(null);
 
   // Darken the live scene as the reader scrolls past the hero (one write per frame, max).
@@ -224,21 +240,13 @@ export default function LandingPage({ landingRef }) {
           </div>
 
           <div data-reveal className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
-            <SolarButton href="#contact">
-              Register Now
-              <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden="true">
-                <path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </SolarButton>
-            <a
-              href="#cosmos"
-              className="btn-ghost inline-flex items-center gap-3 rounded-full px-7 py-[0.95rem] font-display text-[0.72rem] font-medium tracking-[0.24em] text-white/85 uppercase"
-            >
+            <SolarButton href="#contact" royal bare>Register Now</SolarButton>
+            <SolarButton href="#cosmos" variant="ghost" royal>
               Explore
               <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden="true">
                 <path d="m5 8 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </a>
+            </SolarButton>
           </div>
         </section>
 
@@ -329,7 +337,7 @@ export default function LandingPage({ landingRef }) {
           </SectionHeading>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {EVENTS.map((e, i) => (
-              <li key={e.key}>
+              <li key={e.key} className={vmDomains.cls(i)}>
                 <a
                   href={`#/dept/${e.key}`}
                   onClick={(ev) => {
@@ -358,6 +366,7 @@ export default function LandingPage({ landingRef }) {
               </li>
             ))}
           </ul>
+          <ViewMoreButton {...vmDomains} label="All domains" />
         </section>
 
         {/* About */}
@@ -375,16 +384,38 @@ export default function LandingPage({ landingRef }) {
                 {DEPT_ORDER.length} domains, {EVENT_COUNT} events, one gravitational pull. Find your world, gather your crew and launch with us on{' '}
                 {EVENT.dateLabel}.
               </p>
+              <p>
+                From esports arenas and capture-the-flag labs to bands, stages and boardroom pitches, every world hosts its own missions — with
+                a <span className="text-gold-200">₹10 lakh prize pool</span> waiting for the crews who conquer them.
+              </p>
+              <ul className="about-pillars">
+                {PILLARS.map((p) => (
+                  <li key={p.name} className="about-pillar">
+                    <span className="about-pillar__icon" aria-hidden="true">
+                      <svg viewBox="0 0 20 20">
+                        <path d={p.icon} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span className="min-w-0">
+                      <b>{p.name}</b>
+                      <small>{p.note}</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="glass relative grid grid-cols-2 gap-px overflow-hidden rounded-3xl">
               <Frame />
               {STATS.map((s) => (
-                <div key={s.label} className="flex flex-col items-center gap-1 bg-white/[0.01] px-4 py-8 text-center">
+                <div key={s.label} className={`flex flex-col items-center gap-1 bg-white/[0.01] px-4 py-8 text-center ${s.featured ? 'about-prize' : ''}`}>
                   <span className="text-gold-gradient font-display text-4xl font-semibold sm:text-5xl">{s.value}</span>
                   <span className="font-mono text-[0.6rem] tracking-[0.3em] text-white/50 uppercase">{s.label}</span>
                 </div>
               ))}
             </div>
+          </div>
+          <div className="mt-12 flex justify-center">
+            <SolarButton href="#/about" royal>Discover the campus</SolarButton>
           </div>
         </section>
 
@@ -419,7 +450,25 @@ export default function LandingPage({ landingRef }) {
               Registrations for {BRAND.fest} open soon. {EVENT.dateLabel} · {BRAND.campus}.
             </p>
             <div className="relative mt-9 flex justify-center">
-              <SolarButton href="#contact">Register Now</SolarButton>
+              <SolarButton href="#contact" royal bare>Register Now</SolarButton>
+            </div>
+
+            {/* Student core: who to reach */}
+            <div className="relative mt-12 border-t border-white/[0.08] pt-10">
+              <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/80 uppercase">
+                <Star className="h-2 w-2 text-gold-400/70" />
+                Reach the student core
+                <Star className="h-2 w-2 text-gold-400/70" />
+              </p>
+              <ul className="ct-grid ct-grid--landing text-left">
+                {STUDENT_CORE.map((p, i) => (
+                  <ContactCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} compact className={vmCore.cls(i)} />
+                ))}
+              </ul>
+              <ViewMoreButton {...vmCore} />
+              <a href="#/contact" className="mt-7 inline-block font-mono text-[0.6rem] tracking-[0.3em] text-gold-200/80 uppercase transition hover:text-white">
+                All contacts &amp; campus map →
+              </a>
             </div>
           </div>
         </section>

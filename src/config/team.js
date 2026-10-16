@@ -12,87 +12,91 @@ import { DEPARTMENTS, DEPT_ORDER } from './departments';
  */
 const TBA = 'To be announced';
 
-/** Heads of each domain, in planet order. */
-const heads = DEPT_ORDER.filter((k) => !DEPARTMENTS[k].hub && k !== 'station').map((k) => ({
+const fill = (n, role) => Array.from({ length: n }, () => ({ name: TBA, role }));
+
+/** Heads of Departments: one per department (the planets, the Moon and the station). */
+const heads = DEPT_ORDER.filter((k) => !DEPARTMENTS[k].hub).map((k) => ({
   name: TBA,
-  role: `Head · ${DEPARTMENTS[k].name}`,
+  role: `Head of Department · ${DEPARTMENTS[k].name}`,
 }));
 
-/** Each domain's faculty in-charge (from config/departments.js). */
-const domainTeachers = DEPT_ORDER.filter((k) => DEPARTMENTS[k].faculty).flatMap((k) =>
-  DEPARTMENTS[k].faculty
-    .split(/\s*&\s*/)
-    .map((name) => ({ name, role: `Faculty in-charge · ${DEPARTMENTS[k].name}` })),
-);
-
+/**
+ * `cols` = cards per row on wide screens. `plain` drops the ornate card border
+ * (only Dignitaries and Heads keep it). `featured` highlights a section.
+ * Keys are also used by the Contact page (faculty-core, student-committee) and
+ * the landing page (student-core).
+ */
 export const TEAM_SECTIONS = [
   {
     key: 'dignitaries',
     title: 'Dignitaries',
     kicker: 'Guiding stars',
     contact: false,
+    cols: 4,
     people: [
       { name: TBA, role: 'Father · Director' },
       { name: TBA, role: 'Dean' },
       { name: TBA, role: 'Associate Dean' },
+      { name: TBA, role: 'Dignitary' },
     ],
   },
   {
     key: 'heads',
-    title: 'Heads of Domains',
+    title: 'Heads of Departments',
     kicker: 'Keepers of the worlds',
     contact: false,
+    cols: 5,
     people: heads,
   },
   {
     key: 'faculty-core',
-    title: 'Faculty Core Members',
+    title: 'Core Faculty',
     kicker: 'Mission control',
     contact: true,
-    people: [
-      { name: TBA, role: 'Faculty Coordinator' },
-      { name: TBA, role: 'Faculty Coordinator' },
-      { name: TBA, role: 'Faculty Coordinator' },
-    ],
-  },
-  {
-    key: 'domain-teachers',
-    title: 'Domain Core Teachers',
-    kicker: 'Flight crew of every world',
-    contact: true,
-    people: domainTeachers,
+    cols: 6,
+    plain: true,
+    people: fill(6, 'Core Faculty'),
   },
   {
     key: 'student-committee',
-    title: 'Student Core Committee',
+    title: 'Core Students',
     kicker: 'The command deck',
     contact: true,
-    people: [
-      { name: TBA, role: 'Student Convenor' },
-      { name: TBA, role: 'Student Co-Convenor' },
-      { name: TBA, role: 'Secretary' },
-    ],
+    cols: 6,
+    plain: true,
+    people: fill(6, 'Core Student'),
+  },
+  {
+    key: 'faculty-members',
+    title: 'Faculty',
+    kicker: 'Flight crew of every world',
+    contact: true,
+    cols: 6,
+    plain: true,
+    people: fill(6, 'Faculty Member'),
   },
   {
     key: 'student-core',
-    title: 'Student Core Members',
+    title: 'Students',
     kicker: 'Crew on every deck',
     contact: true,
-    people: [
-      { name: TBA, role: 'Core Member' },
-      { name: TBA, role: 'Core Member' },
-      { name: TBA, role: 'Core Member' },
-    ],
+    cols: 6,
+    plain: true,
+    people: fill(6, 'Student Member'),
   },
   {
     key: 'web',
-    title: 'Website Dev Team',
+    title: 'Website Team',
     kicker: 'Builders of this orbit',
     contact: true,
+    cols: 4,
+    plain: true,
+    featured: true,
     people: [
       { name: TBA, role: 'Lead Developer' },
       { name: TBA, role: 'Developer' },
       { name: TBA, role: 'Designer' },
+      { name: TBA, role: 'Developer' },
     ],
   },
 ];

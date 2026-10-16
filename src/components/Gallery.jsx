@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef } from 'react';
 import Frame from './ui/Frame';
-import BlackHoleButton from './ui/BlackHoleButton';
+import SolarButton from './ui/SolarButton';
 import Star from './ui/Star';
 import { CAMPUS_PHOTOS } from '../config/gallery';
 import { prefersReducedMotion } from '../config/experience';
@@ -186,9 +186,9 @@ function Art({ kind, uid }) {
   }
 }
 
-export function Media({ item, uid }) {
+export function Media({ item, uid, eager = false }) {
   if (item.src) {
-    return <img src={item.src} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />;
+    return <img src={item.src} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" className="h-full w-full object-cover" />;
   }
   return (
     <svg viewBox="0 0 400 280" preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden="true">
@@ -203,7 +203,7 @@ export const GALLERY_ITEMS = CAMPUS_PHOTOS.length ? CAMPUS_PHOTOS : GALLERY;
 const GALLERY_HREF = '#/gallery';
 const COPIES = 4; // each row repeats its set so it always overfills the screen while it slides
 const AUTO_SPEED = 26; // px/s the rows glide on their own
-const SCROLL_FACTOR = 0.55; // px of extra travel per px scrolled
+const SCROLL_FACTOR = 0.45; // px of extra travel per px scrolled
 
 // The two layers: front (larger, nearer) and back (smaller, further). The photo
 // list alternates departments, so taking them in pairs (0,3 | 1,2 | 4,7 | 5,6 …)
@@ -226,7 +226,7 @@ function Tile({ item, uid, hidden, soft }) {
       <Frame size="sm" star={false} className="pgal__frame" />
       <span className="pgal__media">
         <span className="pgal__img">
-          <Media item={item} uid={`${uid}-a`} />
+          <Media item={item} uid={`${uid}-a`} eager />
         </span>
         {soft && (
           <span className="pgal__blur">
@@ -292,7 +292,8 @@ function Gallery({ quality }) {
       for (let pass = 0; pass < 2; pass++) {
         const rowsH = rows.reduce((n, r) => n + r.offsetHeight, 0);
         const other = section.offsetHeight - rowsH;
-        const h = Math.min(Math.max((vh - other) / 2, 112), 340);
+        // Photos lead: the section runs a little past one screen (×1.2) so the rows can be big.
+        const h = Math.min(Math.max((vh * 1.2 - other) / 2, 190), 540);
         const v = `${h.toFixed(1)}px`;
         if (v === lastFit) break;
         lastFit = v;
@@ -324,7 +325,7 @@ function Gallery({ quality }) {
       last = now;
       speed += ((hovering ? 0.12 : 1) - speed) * (1 - Math.exp(-dt * 4));
       const before = scroll;
-      scroll += (window.scrollY - scroll) * (1 - Math.exp(-dt * 6));
+      scroll += (window.scrollY - scroll) * (1 - Math.exp(-dt * 3.2)); // eased, so the push glides
       // Steady glide + the scroll pushing the rows further apart (scrolling up pulls them back).
       travel += AUTO_SPEED * speed * dt + (scroll - before) * SCROLL_FACTOR;
       apply();
@@ -402,12 +403,9 @@ function Gallery({ quality }) {
       </div>
 
       <div data-reveal className="pgal__foot flex justify-center px-5">
-        <BlackHoleButton
-          href={GALLERY_HREF}
-          label="Travel back in time"
-          cta="Explore past moments"
-          ariaLabel="Travel back in time: open the gallery"
-        />
+        <SolarButton href={GALLERY_HREF} royal aria-label="Travel to the moments: open the gallery">
+          Travel to the moments
+        </SolarButton>
       </div>
     </section>
   );

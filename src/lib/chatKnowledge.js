@@ -55,6 +55,6 @@ export function buildKnowledge() {
   for (const s of RULE_SECTIONS) {
     lines.push(`${s.title}: ${s.rules.map(plain).join(' ')}`);
   }
-  lines.push('\nWEBSITE PAGES: Home (#home), Events (#/events), each domain (#/dept/<key>), Gallery (#/gallery), Schedule (#/schedule), Rules (#/rules), About the campus, with the dignitaries and organising team (#/about).');
+  lines.push('\nWEBSITE PAGES: Home (#home), Events (#/events), each domain (#/dept/<key>), Gallery (#/gallery), Schedule (#/schedule), Rules (#/rules), About the campus, with the dignitaries and organising team (#/about), Contact: coordinators, student core and the campus map (#/contact), Sponsors (#/sponsors).');
   return lines.join('\n');
 }

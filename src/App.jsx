@@ -10,9 +10,15 @@ import SchedulePage from './components/schedule/SchedulePage';
 import RulesPage from './components/rules/RulesPage';
 import EventsPage from './components/eventsPage/EventsPage';
 import AboutPage from './components/about/AboutPage';
+import ContactPage from './components/contact/ContactPage';
+import SponsorsPage from './components/sponsors/SponsorsPage';
 import ChatBot from './components/chat/ChatBot';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
+import NotFoundPage from './components/system/NotFoundPage';
+
+/** Hash routes that open a page (department routes are checked by parseHash). */
+const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about', '#/contact', '#/sponsors'];
 
 /**
  * Layer stack (bottom → top):
@@ -25,6 +31,9 @@ import { parseHash, syncFromLocation } from './lib/deptRoute';
  *   <RulesPage/>    the spacecraft bridge; rules on a hologram — #/rules
  *   <EventsPage/>   all 27 events as a fan of glass cards — #/events
  *   <AboutPage/>    the campus floating in space + the dignitaries — #/about
+ *   <ContactPage/>  coordinators, student core heads and the campus map — #/contact
+ *   <SponsorsPage/> the sponsor tiers, revealed on scroll — #/sponsors
+ *   <NotFoundPage/> lost in space: any unknown #/… address or path
  *   <ChatBot/>      CUBYC Comms: floating freighter (every page) → chat overlay
  *   <LoaderHUD/>    DOM overlay that owns the GSAP master timeline; removed at hand-off
  *   <CometCursor/>  pointer layer (fine pointers only)
@@ -55,12 +64,19 @@ export default function App() {
   useEffect(() => {
     if (!live) return undefined;
     const sync = () => {
-      const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen, setAboutOpen } = useExperience.getState();
+      const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen, setAboutOpen, setContactOpen, setSponsorsOpen, setNotFound } = useExperience.getState();
       setEventsOpen(window.location.hash === '#/events');
       setGalleryOpen(window.location.hash === '#/gallery');
       setScheduleOpen(window.location.hash === '#/schedule');
       setRulesOpen(window.location.hash === '#/rules');
       setAboutOpen(window.location.hash === '#/about');
+      setContactOpen(window.location.hash === '#/contact');
+      setSponsorsOpen(window.location.hash === '#/sponsors');
+      // Anything else that looks like a page address (or a path other than /) is lost in space.
+      const hash = window.location.hash;
+      const badPath = !['/', '/index.html'].includes(window.location.pathname);
+      const badHash = hash.startsWith('#/') && !PAGE_HASHES.includes(hash) && !parseHash(hash);
+      setNotFound(badPath || badHash);
     };
     sync();
     window.addEventListener('hashchange', sync);
@@ -82,6 +98,9 @@ export default function App() {
       <RulesPage />
       <EventsPage />
       <AboutPage />
+      <ContactPage />
+      <SponsorsPage />
+      <NotFoundPage />
       <ChatBot />
       {hudMounted && <LoaderHUD landingRef={landingRef} />}
       <CometCursor />

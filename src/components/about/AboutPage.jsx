@@ -18,7 +18,7 @@ const STATS = [
   { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Domains' },
   { value: String(EVENT_COUNT).padStart(2, '0'), label: 'Events' },
   { value: '02', label: 'Days in orbit' },
-  { value: "'27", label: 'Edition' },
+  { value: '₹10L', label: 'Prize pool' },
 ];
 
 // About-the-campus copy. Edit freely — keep it to what is true of the campus.
@@ -189,11 +189,11 @@ function AboutView({ open, onGone }) {
                 rootRef.current?.querySelector('[data-team]')?.closest('#dignitaries')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Meet the dignitaries
+              Meet the team
             </SolarButton>
-            <a href="#/events" className="btn-ghost inline-flex items-center gap-3 rounded-full px-7 py-[0.95rem] font-display text-[0.72rem] font-medium tracking-[0.24em] text-white/85 uppercase">
+            <SolarButton href="#/events" variant="ghost">
               Explore the events
-            </a>
+            </SolarButton>
           </div>
         </section>
 

@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
 import BrandLogo from '../hud/BrandLogo';
 import FestMark from './FestMark';
-import Frame from './Frame';
-import SolarButton from './SolarButton';
-import Star from './Star';
 import { BRAND } from '../../config/experience';
 
 /**
  * Site links. `id` is the landing section (scroll-spy), `href` where the link goes.
- * Events, Gallery, Schedule and Rules open their own pages (#/events, #/gallery, #/schedule, #/rules); the rest are landing sections.
+ * Events, About, Gallery, Schedule, Rules, Sponsors and Contact open their own pages; Home is the landing hero.
  */
 export const NAV_LINKS = [
   { label: 'Home', id: 'home' },
@@ -17,91 +14,160 @@ export const NAV_LINKS = [
   { label: 'Gallery', id: 'gallery', href: '#/gallery' },
   { label: 'Schedule', id: 'schedule', href: '#/schedule' },
   { label: 'Rules', id: 'rules', href: '#/rules' },
+  { label: 'Sponsors', id: 'sponsors', href: '#/sponsors' },
+  { label: 'Contact', id: 'contact', href: '#/contact' },
 ];
-export const MENU_LINKS = [...NAV_LINKS, { label: 'Contact', id: 'contact' }];
+export const MENU_LINKS = NAV_LINKS;
 const hrefOf = (l) => l.href ?? `#${l.id}`;
 
-/** The site's top navigation bar (landing page and gallery page). */
+/** Four-pointed star in a ring — the emblem on each menu plate. */
+function PlateStar() {
+  return (
+    <svg viewBox="0 0 24 24" className="nv-plate__star" aria-hidden="true">
+      <circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" strokeWidth="0.9" />
+      <path d="M12 3.5 13.6 10.4 20.5 12 13.6 13.6 12 20.5 10.4 13.6 3.5 12 10.4 10.4Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Faint orbit arcs drawn into the right end of a plate. */
+function PlateOrbits() {
+  return (
+    <svg viewBox="0 0 60 30" className="nv-plate__orbits" aria-hidden="true" preserveAspectRatio="none">
+      <path d="M2 15h30" />
+      <circle cx="44" cy="15" r="11" />
+      <circle cx="44" cy="15" r="6" />
+      <circle cx="55" cy="15" r="1.6" className="is-dot" />
+    </svg>
+  );
+}
+
+/**
+ * The menu button (small screens), after a celestial dial: a blue orb inside two
+ * gold crescents, gold blades radiating from them and a filigree stem below.
+ * Opening turns the dial: the blades sweep round and the crescents close into a ring.
+ */
+function DialButton({ open, onClick }) {
+  return (
+    <button type="button" className={`nv-dial ${open ? 'is-open' : ''}`} onClick={onClick} aria-expanded={open} aria-controls="site-menu" aria-label={open ? 'Close menu' : 'Open menu'}>
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <radialGradient id="nv-orb" cx="38%" cy="32%" r="70%">
+            <stop offset="0" stopColor="#bfe0ff" />
+            <stop offset="0.45" stopColor="#4f86c8" />
+            <stop offset="1" stopColor="#1b355f" />
+          </radialGradient>
+          <linearGradient id="nv-blade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#fff2c8" />
+            <stop offset="0.6" stopColor="#e9b44c" />
+            <stop offset="1" stopColor="#b8772a" />
+          </linearGradient>
+        </defs>
+        {/* Blades radiating from the left half (they sweep round when open) */}
+        <g className="nv-dial__blades">
+          {[150, 180, 210, 120, 240].map((a, i) => (
+            <path key={a} d={`M44 32 L${i < 3 ? 61 : 57} 30.4 L${i < 3 ? 63.5 : 59} 32 L${i < 3 ? 61 : 57} 33.6 Z`} fill="url(#nv-blade)" stroke="#7a4a1a" strokeWidth="0.4" transform={`rotate(${a} 32 32)`} />
+          ))}
+        </g>
+        {/* Two crescents opening to the right */}
+        <g className="nv-dial__arcs" fill="none" strokeLinecap="round">
+          <path className="nv-dial__arc-outer" d="M43.3 20.7 A16 16 0 1 0 43.3 43.3" stroke="#c4542b" strokeWidth="3.2" />
+          <path className="nv-dial__arc-inner" d="M39.8 24.2 A11 11 0 1 0 39.8 39.8" stroke="#f3d9a4" strokeWidth="1.6" />
+        </g>
+        {/* Studs on the crescent */}
+        <g fill="#f7e7c4" className="nv-dial__studs">
+          <circle cx="16" cy="32" r="1.4" />
+          <circle cx="20.7" cy="20.7" r="1.1" />
+          <circle cx="20.7" cy="43.3" r="1.1" />
+        </g>
+        {/* The orb */}
+        <circle cx="32" cy="32" r="7.2" fill="url(#nv-orb)" className="nv-dial__orb" />
+        <circle cx="29.6" cy="29.4" r="2" fill="#ffffff" opacity="0.55" />
+        {/* Close mark over the orb */}
+        <g className="nv-dial__x" stroke="#fff6e0" strokeWidth="1.8" strokeLinecap="round">
+          <path d="M28.6 28.6 35.4 35.4 M35.4 28.6 28.6 35.4" />
+        </g>
+      </svg>
+    </button>
+  );
+}
+
+/** The site's top navigation bar: one line on wide screens; a dial + full menu on small ones. */
 export default function SiteNav({ active, reveal = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Close the menu with Escape.
+  // Escape closes; the page under the open menu doesn't scroll.
   useEffect(() => {
     if (!menuOpen) return undefined;
     const onKey = (e) => e.key === 'Escape' && setMenuOpen(false);
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    document.documentElement.classList.add('nav-open');
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.documentElement.classList.remove('nav-open');
+    };
   }, [menuOpen]);
 
+  // Close if the screen grows past the breakpoint.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1180px)');
+    const onChange = () => mq.matches && setMenuOpen(false);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  const close = () => setMenuOpen(false);
+
   return (
-    <header data-reveal={reveal || undefined} className="nav-bar fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top)]">
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:h-[4.5rem] sm:px-8">
-        <a href="#home" className="flex items-center gap-3" aria-label={`${BRAND.fest} — home`}>
+    <header data-reveal={reveal || undefined} className={`nav-bar nv fixed inset-x-0 top-0 z-40 pt-[env(safe-area-inset-top)] ${menuOpen ? 'is-menu' : ''}`}>
+      <nav className="nv__row" aria-label="Main">
+        <a href="#home" className="nv__brand" aria-label={`${BRAND.fest} — home`} onClick={close}>
           <FestMark className="h-9 sm:h-10" />
           <span className="font-display text-base font-semibold tracking-[0.22em] sm:text-lg">{BRAND.fest}</span>
         </a>
 
-        <ul className="hidden items-center gap-7 lg:flex xl:gap-9">
+        {/* Wide screens: every link on one line */}
+        <ul className="nv__links">
           {NAV_LINKS.map((l) => (
             <li key={l.id}>
-              <a
-                href={hrefOf(l)}
-                aria-current={active === l.id ? 'true' : undefined}
-                className={`nav-link font-display text-[0.74rem] font-bold tracking-[0.18em] uppercase transition-colors ${
-                  active === l.id ? 'is-active text-gold-200' : 'text-white/70 hover:text-white'
-                }`}
-              >
-                {l.label}
+              <a href={hrefOf(l)} aria-current={active === l.id ? 'true' : undefined} className={`nv-plate nv-plate--bar ${active === l.id ? 'is-active' : ''}`}>
+                <PlateStar />
+                <span className="nv-plate__label">{l.label}</span>
               </a>
             </li>
           ))}
         </ul>
 
-        <div className="flex items-center gap-3 sm:gap-5">
-          <button
-            type="button"
-            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/[0.03] text-white/85 transition hover:border-gold-400/60 hover:text-gold-200"
-            aria-expanded={menuOpen}
-            aria-controls="site-menu"
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            onClick={() => setMenuOpen((v) => !v)}
-          >
-            <span className="relative block h-3 w-4">
-              <span className={`absolute left-0 top-0 h-px w-4 bg-current transition ${menuOpen ? 'translate-y-[5.5px] rotate-45' : ''}`} />
-              <span className={`absolute left-0 top-[5.5px] h-px w-4 bg-current transition ${menuOpen ? 'opacity-0' : ''}`} />
-              <span className={`absolute left-0 top-[11px] h-px w-4 bg-current transition ${menuOpen ? '-translate-y-[5.5px] -rotate-45' : ''}`} />
-            </span>
-          </button>
-          <span className="hidden h-8 w-px bg-white/10 sm:block" aria-hidden="true" />
+        <div className="nv__end">
+          <a href="#contact" className="nv-cta" onClick={close}>
+            <span>Register</span>
+          </a>
+          <span className="nv__sep" aria-hidden="true" />
           <BrandLogo className="h-9 sm:h-12" title={BRAND.universityFull} />
+          <DialButton open={menuOpen} onClick={() => setMenuOpen((v) => !v)} />
         </div>
       </nav>
 
-      <div
-        id="site-menu"
-        className={`mx-auto max-w-7xl overflow-hidden px-4 transition-all duration-500 sm:px-8 ${
-          menuOpen ? 'max-h-[34rem] pb-5 opacity-100' : 'pointer-events-none max-h-0 opacity-0'
-        }`}
-      >
-        <div className="glass relative grid gap-2 rounded-3xl p-3 sm:grid-cols-[1fr_auto] sm:items-center sm:p-4">
-          <Frame size="sm" star={false} />
-          <ul className="grid grid-cols-2 gap-1 sm:grid-cols-4">
-            {MENU_LINKS.map((l) => (
-              <li key={l.id}>
-                <a
-                  href={hrefOf(l)}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-2xl px-4 py-3 font-display text-sm tracking-[0.18em] text-white/85 uppercase transition hover:bg-white/5 hover:text-gold-200"
-                >
-                  <Star className="h-2 w-2 text-gold-400/70" />
-                  {l.label}
+      {/* Small screens: the full menu of plates */}
+      <div id="site-menu" className="nv-menu" aria-hidden={!menuOpen} inert={!menuOpen || undefined} onClick={(e) => e.target === e.currentTarget && close()}>
+        <div className="nv-menu__inner">
+          <p className="nv-menu__kicker">
+            <span /> Navigate the orbit <span />
+          </p>
+          <ul className="nv-menu__list">
+            {NAV_LINKS.map((l, i) => (
+              <li key={l.id} style={{ '--i': i }}>
+                <a href={hrefOf(l)} onClick={close} aria-current={active === l.id ? 'true' : undefined} className={`nv-plate nv-plate--menu ${active === l.id ? 'is-active' : ''}`}>
+                  <PlateStar />
+                  <span className="nv-plate__label">{l.label}</span>
+                  <PlateOrbits />
                 </a>
               </li>
             ))}
           </ul>
-          <SolarButton href="#contact" className="justify-center" onClick={() => setMenuOpen(false)}>
-            Register Now
-          </SolarButton>
+          <a href="#contact" className="nv-cta nv-cta--menu" onClick={close} style={{ '--i': NAV_LINKS.length }}>
+            <span>Register</span>
+          </a>
         </div>
       </div>
     </header>

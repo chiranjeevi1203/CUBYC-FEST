@@ -21,6 +21,8 @@ const EXPLORE = [
   { label: 'Gallery', href: '#/gallery' },
   { label: 'Schedule', href: '#/schedule' },
   { label: 'About & Dignitaries', href: '#/about' },
+  { label: 'Sponsors', href: '#/sponsors' },
+  { label: 'Contact & Map', href: '#/contact' },
 ];
 
 const SOCIAL_ICONS = {
@@ -129,7 +131,37 @@ function Station() {
  * giant blurred CUBYC wordmark sits behind it all. The scene follows the pointer
  * gently and only animates while on screen.
  */
-export default function SiteFooter() {
+const MAP_PLACE = 'Christ University Yeshwanthpur Campus, Bengaluru';
+const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(MAP_PLACE)}&z=16&output=embed`;
+const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(MAP_PLACE)}`;
+
+/** The campus map band: the live map in night colours, a gold beacon and a venue plate. */
+function FooterMap() {
+  return (
+    <section className="ft-map" aria-label="Campus map">
+      <div className="ft-map__frame">
+        <iframe title={`Map: ${MAP_PLACE}`} src={MAP_EMBED} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+        <span className="ft-map__veil" aria-hidden="true" />
+        <span className="ft-map__pin" aria-hidden="true" />
+        <div className="ft-map__plate">
+          <p className="ft-map__kicker">
+            <Star className="h-2 w-2 text-gold-400" /> Find the launch pad
+          </p>
+          <p className="ft-map__name">{BRAND.universityFull}</p>
+          <p className="ft-map__addr">{BRAND.campus} · Bengaluru, Karnataka</p>
+          <a href={MAP_DIRECTIONS} target="_blank" rel="noopener noreferrer" className="ft-map__go">
+            Get directions
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M6 14 14 6M8 6h6v6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function SiteFooter({ map = true }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -275,6 +307,8 @@ export default function SiteFooter() {
       </div>
 
       {/* ---------- Ornament + bottom bar ---------- */}
+      {map && <FooterMap />}
+
       <div className="ft-ornament" aria-hidden="true">
         <Cloud className="ft-ornament__cloud" />
         <span className="ft-ornament__line" />

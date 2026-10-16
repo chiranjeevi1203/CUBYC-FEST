@@ -31,7 +31,8 @@ const FORMATS = [
 
 function layoutFor(w, h) {
   const portrait = w < h * 0.85;
-  const cardW = portrait ? clamp(w * 0.52, 168, 230) : clamp(w * 0.15, 190, 250);
+  const short = !portrait && h < 560; // phones held sideways: the fan sits right of the heading
+  const cardW = portrait ? clamp(w * 0.52, 168, 230) : short ? clamp(h * 0.4, 130, 190) : clamp(w * 0.15, 190, 250);
   return {
     w,
     h,
@@ -39,8 +40,9 @@ function layoutFor(w, h) {
     cardW,
     cardH: cardW * 1.38,
     spacing: cardW * (portrait ? 0.9 : 1.04),
-    cx: w * (portrait ? 0.5 : 0.56),
-    cy: h * (portrait ? 0.62 : 0.6),
+    cx: w * (portrait ? 0.5 : short ? 0.64 : 0.56),
+    // Short screens: centred between the nav (~76px) and the control strip (~64px).
+    cy: short ? (76 + h - 64) / 2 : h * (portrait ? 0.62 : 0.6),
     curve: portrait ? 12 : 16,
   };
 }
@@ -215,12 +217,7 @@ function Brief({ e, onClose }) {
             </div>
           </div>
           <div className="mt-7 flex flex-wrap items-center gap-3" data-line>
-            <SolarButton onClick={register}>
-              Register
-              <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden="true">
-                <path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </SolarButton>
+            <SolarButton onClick={register} bare>Register</SolarButton>
             <button type="button" className="ev-ghost" onClick={close}>
               Back to events
             </button>

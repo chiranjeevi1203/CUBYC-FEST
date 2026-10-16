@@ -76,19 +76,8 @@ function RegisterButton({ event, wide = false }) {
   };
   return (
     <button type="button" onClick={go} className={`edk-register ${wide ? 'edk-register--wide' : ''}`} data-ev-anim aria-label={`Register for ${event.name}`}>
-      <span className="edk-register__gem" aria-hidden="true">
-        <svg viewBox="0 0 20 20" className="h-4 w-4">
-          <path d="M10 1.5 12 8l6.5 2-6.5 2-2 6.5L8 12l-6.5-2L8 8Z" fill="currentColor" />
-        </svg>
-      </span>
       <span className="edk-register__text">
         <b>Register</b>
-        <small>{event.format}</small>
-      </span>
-      <span className="edk-register__arrow" aria-hidden="true">
-        <svg viewBox="0 0 20 20" className="h-4 w-4">
-          <path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
       </span>
       <span className="edk-register__sheen" aria-hidden="true" />
     </button>

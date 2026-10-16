@@ -46,15 +46,20 @@ const pad = (n) => String(n).padStart(2, '0');
 
 function layoutFor(w, h) {
   const portrait = w < h * 0.85;
+  const short = !portrait && h < 560; // phones held sideways
   // A small, detailed hole; the photos are the stars of the page.
-  const R = portrait ? Math.max(20, Math.min(w * 0.07, 36)) : Math.max(28, Math.min(Math.min(w, h) * 0.052, 62));
-  const cardW = portrait ? Math.max(150, Math.min(w * 0.5, 230)) : Math.max(220, Math.min(w * 0.23, 360));
+  const R = portrait ? Math.max(20, Math.min(w * 0.07, 36)) : Math.max(short ? 22 : 28, Math.min(Math.min(w, h) * 0.052, 62));
+  const cardW = portrait
+    ? Math.max(150, Math.min(w * 0.6, h * 0.34, 280))
+    : short
+      ? Math.max(130, Math.min(h * 0.4, w * 0.22))
+      : Math.max(220, Math.min(w * 0.23, 360));
   return {
     w,
     h,
     portrait,
     cx: w / 2,
-    cy: h * (portrait ? 0.6 : 0.63),
+    cy: h * (portrait ? 0.6 : short ? 0.64 : 0.63),
     R,
     cardW,
     cardH: cardW * 0.72,
@@ -136,9 +141,31 @@ function Lightbox({ index, onClose, onStep, closeRef }) {
   };
   closeRef.current = close;
 
+  // Swipe sideways to step through the photos (touch and pen).
+  const swipe = useRef(null);
+  const onSwipeStart = (e) => {
+    if (e.pointerType === 'mouse' || (e.target instanceof Element && e.target.closest('button'))) return;
+    swipe.current = { x: e.clientX, y: e.clientY };
+  };
+  const onSwipeEnd = (e) => {
+    const sw = swipe.current;
+    swipe.current = null;
+    if (!sw) return;
+    const dx = e.clientX - sw.x;
+    const dy = e.clientY - sw.y;
+    if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.3) onStep(dx < 0 ? 1 : -1);
+  };
+
   return (
     <div className="bh-lightbox" role="dialog" aria-modal="true" aria-label={item.title} onClick={close}>
-      <figure ref={panel} className="bh-lightbox__panel" onClick={(e) => e.stopPropagation()}>
+      <figure
+        ref={panel}
+        className="bh-lightbox__panel"
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={onSwipeStart}
+        onPointerUp={onSwipeEnd}
+        onPointerCancel={() => (swipe.current = null)}
+      >
         <Frame size="lg" />
         <div ref={media} className="bh-lightbox__media">
           <Media item={item} uid={`lb-${index}`} />
@@ -189,7 +216,7 @@ function GalleryView({ open, onGone }) {
   const hotEase = useRef(Array.from({ length: SLOTS }, () => 0));
   const cards = useRef([]);
   const imgs = useRef(Array.from({ length: SLOTS }, () => -1));
-  const flow = useRef({ t: 0, time: 0, speed: 0, intro: 0, hover: false, paused: false, tweening: false, dragging: false, lightbox: false });
+  const flow = useRef({ t: 0, time: 0, speed: 0, fling: 0, intro: 0, hover: false, paused: false, tweening: false, dragging: false, lightbox: false });
   const layout = useRef(layoutFor(window.innerWidth, window.innerHeight));
   const [slotImgs, setSlotImgs] = useState(() => Array.from({ length: SLOTS }, (_, s) => s % TOTAL));
   const [hot, setHot] = useState(null);
@@ -250,10 +277,13 @@ function GalleryView({ open, onGone }) {
 
   /* ---------- render loop: shaders + photo streams ---------- */
   useEffect(() => {
-    const dpr = Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5);
-    // The ray-traced hole is the expensive layer: render it a little under native resolution.
-    // The hole is small now, so it can render at full sharpness.
-    const holeDpr = Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : 1.5);
+    // Touch devices get a slightly lighter budget so the drift stays smooth on phones;
+    // the soft nebula backdrop renders at 1x there (it has no fine detail to lose).
+    const touch = window.matchMedia?.('(pointer: coarse)').matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, quality === 'low' ? 1 : touch ? 1.35 : 1.5);
+    const bgDpr = touch ? Math.min(dpr, 1) : dpr;
+    // The hole is small, so it can render at full sharpness.
+    const holeDpr = dpr;
     const bg = createShaderLayer(bgRef.current, BACKGROUND_FRAG);
     const photos = createPhotoLayer(photoRef.current);
     const hole = createShaderLayer(holeRef.current, HOLE_FRAG, { alpha: true });
@@ -281,7 +311,7 @@ function GalleryView({ open, onGone }) {
       const w = window.innerWidth;
       const h = window.innerHeight;
       layout.current = layoutFor(w, h);
-      bg?.resize(w, h, dpr);
+      bg?.resize(w, h, bgDpr);
       photos?.resize(w, h, dpr);
       hole?.resize(w, h, holeDpr);
       const L = layout.current;
@@ -303,6 +333,12 @@ function GalleryView({ open, onGone }) {
       const halt = f.hover || f.paused || f.lightbox || f.tweening || f.dragging || reduced;
       f.speed += ((halt ? 0 : 1 / SECONDS_PER_SLOT) - f.speed) * (1 - Math.exp(-dt * 3));
       f.t += f.speed * dt;
+      // A released drag keeps gliding, then settles.
+      if (!f.dragging && f.fling) {
+        f.t += f.fling * dt;
+        f.fling *= Math.exp(-dt * 3.2);
+        if (Math.abs(f.fling) < 0.02) f.fling = 0;
+      }
       f.time += dt;
       const L = layout.current;
 
@@ -345,7 +381,7 @@ function GalleryView({ open, onGone }) {
       const W = L.w * dpr;
       const H = L.h * dpr;
       const u = { uRes: [W, H], uCenter: [L.cx * dpr, (L.h - L.cy) * dpr], uR: L.R * dpr, uTime: f.time, uIntro: f.intro, uSpread: L.spread };
-      bg?.draw(u);
+      bg?.draw({ ...u, uRes: [L.w * bgDpr, L.h * bgDpr], uCenter: [L.cx * bgDpr, (L.h - L.cy) * bgDpr], uR: L.R * bgDpr });
       photos?.draw({ res: [W, H], hole: u.uCenter, R: L.R * dpr, E: L.portrait ? EINSTEIN * 0.72 : EINSTEIN }, draws);
       hole?.draw({ ...u, uRes: [L.w * holeDpr, L.h * holeDpr], uCenter: [L.cx * holeDpr, (L.h - L.cy) * holeDpr], uR: L.R * holeDpr });
       raf = requestAnimationFrame(tick);
@@ -401,33 +437,67 @@ function GalleryView({ open, onGone }) {
     flow.current.t += (e.deltaY + e.deltaX) * 0.0022;
   };
   const drag = useRef(null);
+  const dragged = useRef(false); // a drag that moved swallows the click that follows it
   const onPointerDown = (e) => {
-    if (flow.current.lightbox || (e.target instanceof Element && e.target.closest('a, button, .bh-card'))) return;
-    drag.current = { x: e.clientX };
-    flow.current.dragging = true;
+    if (flow.current.lightbox || e.button > 0) return;
+    if (e.target instanceof Element && e.target.closest('a, button:not(.bh-card), header, nav, .bh-controls')) return;
+    drag.current = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, at: performance.now(), v: 0, moved: false };
+    dragged.current = false;
+    flow.current.fling = 0;
+    // On touch, holding a photo stops it (the mouse does this on hover).
+    if (e.pointerType !== 'mouse' && e.target instanceof Element && e.target.closest('.bh-card')) flow.current.hover = true;
   };
   const onPointerMove = (e) => {
-    if (!drag.current) return;
-    const dx = e.clientX - drag.current.x;
-    drag.current.x = e.clientX;
-    flow.current.t += dx / (layout.current.w * 0.16);
+    const d = drag.current;
+    if (!d) return;
+    if (!d.moved) {
+      if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 8) return;
+      d.moved = true;
+      dragged.current = true;
+      flow.current.dragging = true;
+      gsap.killTweensOf(flow.current, 't');
+      flow.current.tweening = false;
+    }
+    // Sideways drags pull the streams; on tall phones an upward swipe does too.
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    const delta = Math.abs(dx) >= Math.abs(dy) ? dx : layout.current.portrait ? -dy : 0;
+    const now = performance.now();
+    const dt = Math.max((now - d.at) / 1000, 0.001);
+    const dT = delta / (layout.current.w * (layout.current.portrait ? 0.32 : 0.16));
+    flow.current.t += dT;
+    d.v = d.v * 0.6 + (dT / dt) * 0.4;
+    d.x = e.clientX;
+    d.y = e.clientY;
+    d.at = now;
   };
-  const endDrag = () => {
+  const endDrag = (e) => {
+    const d = drag.current;
     drag.current = null;
+    if (!d) return;
+    if (d.moved) {
+      // Fling: a quick release carries on (velocity faded if the finger rested first).
+      const idle = performance.now() - d.at;
+      flow.current.fling = idle > 90 || e?.type === 'pointercancel' ? 0 : Math.max(-6, Math.min(6, d.v));
+    }
     flow.current.dragging = false;
+    if (e?.pointerType && e.pointerType !== 'mouse') {
+      flow.current.hover = false;
+      setHot(null);
+    }
   };
 
   const L = layout.current;
   return (
     <div
       ref={rootRef}
-      className="bh-page fixed inset-0 z-40 overflow-hidden text-[#f4f1ea]"
+      className="bh-page fixed inset-0 z-40 touch-none overflow-hidden text-[#f4f1ea] select-none"
       onWheel={onWheel}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onPointerLeave={endDrag}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && endDrag(e)}
     >
       <canvas ref={bgRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
       <canvas ref={photoRef} className="pointer-events-none absolute inset-0 z-10 h-full w-full" aria-hidden="true" />
@@ -455,15 +525,23 @@ function GalleryView({ open, onGone }) {
               role="listitem"
               className={`bh-card ${hot === slot ? 'is-hot' : ''}`}
               style={{ width: L.cardW, height: L.cardH, visibility: 'hidden' }}
-              onPointerEnter={() => {
+              onPointerEnter={(e) => {
+                if (e.pointerType !== 'mouse') return;
                 flow.current.hover = true;
                 setHot(slot);
               }}
-              onPointerLeave={() => {
+              onPointerLeave={(e) => {
+                if (e.pointerType !== 'mouse') return;
                 flow.current.hover = false;
                 setHot(null);
               }}
-              onClick={() => setLightbox(img)}
+              onClick={() => {
+                if (dragged.current) {
+                  dragged.current = false;
+                  return;
+                }
+                setLightbox(img);
+              }}
               aria-label={`Open photo: ${item.title}`}
             >
               <span className="bh-card__caption">{item.title}</span>
@@ -478,7 +556,7 @@ function GalleryView({ open, onGone }) {
       <SiteNav active="gallery" />
 
       {/* Heading */}
-      <header ref={headRef} className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+5.25rem)] z-30 flex flex-col items-center px-5 text-center sm:top-28">
+      <header ref={headRef} className="bh-head pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+5.25rem)] z-30 flex flex-col items-center px-5 text-center sm:top-28">
         <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/85 uppercase">
           <Star className="h-2 w-2 text-gold-400/70" />
           Event horizon · {BRAND.campus}
@@ -517,7 +595,8 @@ function GalleryView({ open, onGone }) {
         </button>
         <span className="bh-controls__text">
           <span className="text-gold-200">{pad(TOTAL)}</span> moments
-          <span className="hidden sm:inline"> · scroll or drag to pull</span>
+          <span className="bh-hint bh-hint--mouse"> · scroll or drag to pull</span>
+          <span className="bh-hint bh-hint--touch"> · swipe to pull</span>
         </span>
       </div>
 

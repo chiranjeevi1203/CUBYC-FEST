@@ -445,18 +445,3 @@ export function createPhotoLayer(canvas) {
   };
 }
 
-/**
- * The same ray-traced hole in the warm "Interstellar" palette: deep red →
- * orange → peach → white-hot, with a warm glow (used by the landing page's
- * Travel-back-in-time button).
- */
-export const HOLE_FRAG_WARM = HOLE_FRAG.replace(
-  `    vec3 c1 = vec3(0.02, 0.06, 0.32);
-    vec3 c2 = vec3(0.08, 0.34, 1.0);
-    vec3 c3 = vec3(0.42, 0.76, 1.0);
-    vec3 c4 = vec3(0.9, 0.97, 1.0);`,
-  `    vec3 c1 = vec3(0.32, 0.05, 0.03);
-    vec3 c2 = vec3(1.0, 0.36, 0.12);
-    vec3 c3 = vec3(1.0, 0.76, 0.56);
-    vec3 c4 = vec3(1.0, 0.97, 0.93);`,
-).replace('col += vec3(0.1, 0.32, 0.9) * (1.0 - T) * 0.12;', 'col += vec3(0.9, 0.42, 0.22) * (1.0 - T) * 0.12;');

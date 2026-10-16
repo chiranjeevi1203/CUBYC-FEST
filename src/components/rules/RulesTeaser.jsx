@@ -1,9 +1,9 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment } from 'react';
 import Frame from '../ui/Frame';
 import Star from '../ui/Star';
-import ReactorIcon from './ReactorIcon';
+import SolarButton from '../ui/SolarButton';
 import { RULE_COUNT, RULE_SECTIONS } from '../../config/rules';
-import { prefersReducedMotion } from '../../config/experience';
+import { useViewMore, ViewMoreButton } from '../ui/ViewMore';
 
 const RULES_HREF = '#/rules';
 const PER_MODULE = 2; // key rules previewed per section; the rest live on the rules page
@@ -30,11 +30,11 @@ function Highlight({ text }) {
   );
 }
 
-function Module({ section, index }) {
+function Module({ section, index, className = '' }) {
   const shown = section.rules.slice(0, PER_MODULE);
   const more = section.rules.length - shown.length;
   return (
-    <li className={`rlt-mod ${index < 3 ? 'md:col-span-2' : 'md:col-span-3'}`}>
+    <li className={`rlt-mod ${index < 3 ? 'md:col-span-2' : 'md:col-span-3'} ${className}`}>
       <div className="glass group relative flex h-full flex-col rounded-3xl p-6 transition duration-500 hover:border-gold-400/30" data-cursor="hover">
         <Frame />
         <span className="rlt-mod__scan" aria-hidden="true" />
@@ -72,58 +72,9 @@ function Module({ section, index }) {
   );
 }
 
-/**
- * The protocol reactor (ReactorIcon.jsx, flat SVG): its turbine turns and its
- * core pulses; hover spins it up, and a click surges it with a shockwave, then
- * opens the rules page.
- */
-function OrbButton() {
-  const [engaging, setEngaging] = useState(false);
-  const timer = useRef(0);
-  useEffect(() => () => window.clearTimeout(timer.current), []);
-
-  const engage = (e) => {
-    // Modified clicks (new tab etc.) behave like a normal link.
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-    e.preventDefault();
-    if (engaging) return;
-    if (prefersReducedMotion()) {
-      window.location.hash = RULES_HREF;
-      return;
-    }
-    setEngaging(true);
-    timer.current = window.setTimeout(() => {
-      window.location.hash = RULES_HREF;
-      // Ready again when the visitor comes back.
-      timer.current = window.setTimeout(() => setEngaging(false), 500);
-    }, 760);
-  };
-
-  return (
-    <a
-      href={RULES_HREF}
-      onClick={engage}
-      className={`orb ${engaging ? 'is-engaging' : ''}`}
-      data-cursor="hover"
-      aria-label="Open the full rules and regulations"
-    >
-      <span className="orb__stage" aria-hidden="true">
-        <span className="orb__halo" />
-        <span className="orb__shock" />
-        <ReactorIcon className="orb__reactor" />
-      </span>
-      <span className="orb__label">
-        <small>
-          {RULE_COUNT} rules · {RULE_SECTIONS.length} protocols
-        </small>
-        <b>{engaging ? 'Powering up…' : 'Access full protocol'}</b>
-      </span>
-    </a>
-  );
-}
-
 /** Landing-page rules section body (the heading stays in LandingPage). */
 export default function RulesTeaser() {
+  const vm = useViewMore(RULE_SECTIONS.length, 3);
   return (
     <>
       <ul className="mb-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[0.58rem] tracking-[0.3em] text-white/50 uppercase sm:mb-10">
@@ -146,12 +97,15 @@ export default function RulesTeaser() {
 
       <ol className="grid gap-4 md:grid-cols-6">
         {RULE_SECTIONS.map((s, i) => (
-          <Module key={s.key} section={s} index={i} />
+          <Module key={s.key} section={s} index={i} className={vm.cls(i)} />
         ))}
       </ol>
+      <ViewMoreButton {...vm} label="More protocols" />
 
       <div className="mt-10 flex justify-center sm:mt-12">
-        <OrbButton />
+        <SolarButton href={RULES_HREF} royal>
+          Read all {RULE_COUNT} rules
+        </SolarButton>
       </div>
     </>
   );

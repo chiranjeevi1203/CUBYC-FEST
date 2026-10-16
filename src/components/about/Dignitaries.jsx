@@ -2,6 +2,7 @@ import Star from '../ui/Star';
 import { Flourish, OrnateDivider } from './Ornaments';
 import { BRAND } from '../../config/experience';
 import { TEAM_SECTIONS, isTBA } from '../../config/team';
+import { useViewMore, ViewMoreButton } from '../ui/ViewMore';
 
 const pad = (n) => String(n).padStart(2, '0');
 const initials = (name) =>
@@ -27,16 +28,39 @@ const untilt = (e) => {
   e.currentTarget.style.setProperty('--ry', '0deg');
 };
 
+/** One group of the team; phones show the first four cards until "View more". */
+function TeamSection({ s }) {
+  const vm = useViewMore(s.people.length, 4);
+  return (
+    <section data-team={s.key} className={`dg-section ${s.featured ? 'dg-section--featured' : ''} ${s.plain ? 'dg-section--plain' : ''}`} aria-labelledby={`dg-${s.key}`}>
+      <div data-rise className="dg-head">
+        <p className="font-mono text-[0.58rem] tracking-[0.36em] text-gold-300/70 uppercase">{s.kicker}</p>
+        <h3 id={`dg-${s.key}`} className="mt-2 font-display text-2xl font-bold tracking-[0.1em] uppercase sm:text-3xl">
+          {s.title}
+        </h3>
+        <OrnateDivider className="mx-auto mt-3 w-52 text-gold-300/60" />
+        <p className="mt-2 font-mono text-[0.55rem] tracking-[0.3em] text-white/40 uppercase">{pad(s.people.length)} members</p>
+      </div>
+      <ul className="dg-grid" data-cols={s.cols ?? 3}>
+        {s.people.map((p, i) => (
+          <PersonCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} section={s} className={vm.cls(i)} />
+        ))}
+      </ul>
+      <ViewMoreButton {...vm} />
+    </section>
+  );
+}
+
 /**
  * A person as an ornate game card: a gold double frame with filigree corners, a
  * numbered crest at the top, a medallion portrait (photo or initials) with side
  * studs, the name on a plate, the role beneath, contact for crew sections, and
  * rank stars at the foot.
  */
-function PersonCard({ person, index, section }) {
+function PersonCard({ person, index, section, className = '' }) {
   const tba = isTBA(person);
   return (
-    <li className="gcard-wrap" data-rise style={{ '--i': index % 6 }}>
+    <li className={`gcard-wrap ${className}`} data-rise style={{ '--i': index % 6 }}>
       <article className={`gcard ${tba ? 'is-tba' : ''}`} onPointerMove={tilt} onPointerLeave={untilt}>
         <span className="gcard__glow" aria-hidden="true" />
         <span className="gcard__frame" aria-hidden="true" />
@@ -44,9 +68,6 @@ function PersonCard({ person, index, section }) {
         <Flourish className="gcard__c gcard__c--tr" />
         <Flourish className="gcard__c gcard__c--bl" />
         <Flourish className="gcard__c gcard__c--br" />
-        <span className="gcard__crest" aria-hidden="true">
-          {pad(index + 1)}
-        </span>
 
         <div className="gcard__art">
           <span className="gcard__rays" aria-hidden="true" />
@@ -117,15 +138,15 @@ export default function Dignitaries({ scrollerRef }) {
   };
 
   return (
-    <section id="dignitaries" className="mx-auto max-w-6xl scroll-mt-24 px-5 pb-16 pt-[clamp(4rem,9vw,6.5rem)] sm:px-8" aria-labelledby="dg-title">
+    <section id="dignitaries" className="mx-auto max-w-[92rem] scroll-mt-24 px-5 pb-16 pt-[clamp(4rem,9vw,6.5rem)] sm:px-8" aria-labelledby="dg-title">
       <header data-rise className="flex flex-col items-center text-center">
         <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/85 uppercase">
           <Star className="h-2 w-2 text-gold-400/70" />
           The crew behind {BRAND.fest}
           <Star className="h-2 w-2 text-gold-400/70" />
         </p>
-        <h2 id="dg-title" className="title-cosmic mt-4 font-display text-[clamp(2rem,6vw,4rem)] font-bold leading-none tracking-[0.1em] uppercase">
-          Dignitaries
+        <h2 id="dg-title" className="title-cosmic mt-4 font-display text-[clamp(1.8rem,5.4vw,3.6rem)] font-bold leading-[1.05] tracking-[0.08em] uppercase">
+          Meet the faces of the fest
         </h2>
         <span className="mt-5 block">
           <OrnateDivider className="w-64 text-gold-300/70" />
@@ -140,21 +161,7 @@ export default function Dignitaries({ scrollerRef }) {
       </header>
 
       {TEAM_SECTIONS.map((s) => (
-        <section key={s.key} data-team={s.key} className="dg-section" aria-labelledby={`dg-${s.key}`}>
-          <div data-rise className="dg-head">
-            <p className="font-mono text-[0.58rem] tracking-[0.36em] text-gold-300/70 uppercase">{s.kicker}</p>
-            <h3 id={`dg-${s.key}`} className="mt-2 font-display text-2xl font-bold tracking-[0.1em] uppercase sm:text-3xl">
-              {s.title}
-            </h3>
-            <OrnateDivider className="mx-auto mt-3 w-52 text-gold-300/60" />
-            <p className="mt-2 font-mono text-[0.55rem] tracking-[0.3em] text-white/40 uppercase">{pad(s.people.length)} members</p>
-          </div>
-          <ul className="dg-grid">
-            {s.people.map((p, i) => (
-              <PersonCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} section={s} />
-            ))}
-          </ul>
-        </section>
+        <TeamSection key={s.key} s={s} />
       ))}
     </section>
   );

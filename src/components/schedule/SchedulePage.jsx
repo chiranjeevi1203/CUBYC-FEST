@@ -25,7 +25,8 @@ const MAX_STOPS = Math.max(...SCHEDULE_DAYS.map((d) => d.items.length));
 
 function layoutFor(w, h, count) {
   const portrait = w < h * 0.85;
-  const spacing = portrait ? clamp(w * 0.5, 170, 230) : clamp(w * 0.2, 230, 330);
+  const short = !portrait && h < 560; // phones held sideways: a lower, tighter flight line
+  const spacing = portrait ? clamp(w * 0.5, 170, 230) : clamp(w * 0.2, short ? 200 : 230, 330);
   const startGap = spacing * 0.75;
   const last = startGap + (count - 1) * spacing;
   return {
@@ -35,14 +36,14 @@ function layoutFor(w, h, count) {
     spacing,
     startGap,
     sMax: last + spacing * 0.35,
-    baseY: h * (portrait ? 0.56 : 0.6),
-    amp: portrait ? 10 : 18,
+    baseY: h * (portrait ? 0.56 : short ? 0.66 : 0.6),
+    amp: portrait || short ? 10 : 18,
     lambda: spacing * 0.9,
-    shipW: portrait ? 150 : clamp(w * 0.2, 220, 320),
+    shipW: portrait ? 150 : short ? clamp(w * 0.18, 150, 210) : clamp(w * 0.2, 220, 320),
     // Starts hugging the left edge (exhaust just off-screen), ends centre-right.
-    shipX0: (portrait ? 150 : clamp(w * 0.2, 220, 320)) * 0.42 + (portrait ? 6 : 18),
+    shipX0: (portrait ? 150 : short ? clamp(w * 0.18, 150, 210) : clamp(w * 0.2, 220, 320)) * 0.42 + (portrait ? 6 : 18),
     shipX1: w * (portrait ? 0.62 : 0.72),
-    stem: portrait ? 64 : 92,
+    stem: portrait ? 64 : short ? 34 : 92,
   };
 }
 
@@ -385,7 +386,7 @@ function ScheduleView({ open, onGone }) {
       <SiteNav active="schedule" />
 
       {/* Heading */}
-      <header ref={headRef} className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+5.25rem)] z-30 flex flex-col items-center px-5 text-center sm:top-28">
+      <header ref={headRef} className="sch-head pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+5.25rem)] z-30 flex flex-col items-center px-5 text-center sm:top-28">
         <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/85 uppercase">
           <Star className="h-2 w-2 text-gold-400/70" />
           Flight plan · {EVENT.dateLabel}
@@ -397,7 +398,7 @@ function ScheduleView({ open, onGone }) {
         <div className="pointer-events-auto mt-5 sch-days" role="tablist" aria-label="Day">
           {SCHEDULE_DAYS.map((d, i) => (
             <button key={d.key} type="button" role="tab" aria-selected={i === day} className={`sch-day ${i === day ? 'is-on' : ''}`} onClick={() => switchTo(i)}>
-              <span className="font-display text-[0.7rem] font-bold tracking-[0.22em] uppercase">{d.label}</span>
+              <span className="sch-day__label font-display text-[0.7rem] font-bold tracking-[0.22em] uppercase">{d.label}</span>
               <span className="font-mono text-[0.5rem] tracking-[0.24em] uppercase opacity-70">{d.date}</span>
             </button>
           ))}

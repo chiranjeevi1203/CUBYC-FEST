@@ -31,7 +31,7 @@ export const SCHEDULE_DAYS = [
       { time: '09:00', title: 'Day 2 Check-in', venue: 'Main Block Atrium', tag: 'All' },
       { time: '09:30', title: 'Best Manager · Stage Final', venue: 'Auditorium', tag: 'Commerce' },
       { time: '10:30', title: 'HR Shark Tank', venue: 'Seminar Hall 2', tag: 'Commerce' },
-      { time: '11:30', title: 'Literature Court Room', venue: 'Moot Court Hall', tag: 'English' },
+      { time: '11:30', title: 'Literature Court Room', venue: 'Moot Court Hall', tag: 'Cultural Studies & Languages' },
       { time: '13:00', title: 'Lunch Break', venue: 'Food Court', tag: 'All' },
       { time: '14:00', title: 'Domain Finals', venue: 'Across Campus', tag: 'All Domains' },
       { time: '16:00', title: 'Indian Group Dance', venue: 'Open Air Stage', tag: 'Cultural Events' },

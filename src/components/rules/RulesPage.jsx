@@ -19,6 +19,22 @@ import { useExperience } from '../../store/useExperience';
 
 const pad = (n) => String(n).padStart(2, '0');
 const clamp = (x, a, b) => Math.min(Math.max(x, a), b);
+const smooth = (a, b, x) => {
+  const t = clamp((x - a) / (b - a), 0, 1);
+  return t * t * (3 - 2 * t);
+};
+
+/** Hyperspace builds from here up to full throttle. */
+const WARP_FROM = 0.6;
+/** Flight mode for a throttle setting (shown on the throttle). */
+const flightMode = (t) => (t < 0.15 ? 'Idle' : t < 0.4 ? 'Impulse' : t < WARP_FROM ? 'Cruise' : t < 0.95 ? 'Hyperspace' : 'Lightspeed');
+/** Ship velocity in km/s: a gentle cruise, then it climbs steeply to the speed of light at 100%. */
+const velocityOf = (t) => {
+  const cruise = 4 + t * 26;
+  if (t <= WARP_FROM) return Math.round(cruise);
+  const base = 4 + WARP_FROM * 26;
+  return Math.round(base * Math.pow(299792 / base, (t - WARP_FROM) / (1 - WARP_FROM)));
+};
 
 /** 'text with **key phrases**' → text + highlighted marks */
 function Highlighted({ text }) {
@@ -83,10 +99,13 @@ function Cockpit({ navOn }) {
   );
 }
 
-function Toggle({ label, on, onChange }) {
+function Toggle({ label, hint, on, onChange }) {
   return (
-    <button type="button" className={`bridge-toggle ${on ? 'is-on' : ''}`} onClick={() => onChange(!on)} aria-pressed={on}>
+    <button type="button" className={`bridge-toggle ${on ? 'is-on' : ''}`} onClick={() => onChange(!on)} aria-pressed={on} title={hint}>
       <span className="bridge-toggle__track">
+        <span className="bridge-toggle__state" aria-hidden="true">
+          {on ? 'On' : 'Off'}
+        </span>
         <span className="bridge-toggle__knob" />
       </span>
       <span className="bridge-toggle__label">{label}</span>
@@ -115,7 +134,7 @@ function RulesView({ open, onGone }) {
   const holoRef = useRef(null);
   const scrollRef = useRef(null);
   const closing = useRef(false);
-  const state = useRef({ travel: 0, time: 0, intro: 0, shield: 0, look: { x: 0, y: 0 }, pointer: { x: 0, y: 0 }, throttle: 0.45, speed: 0.45 });
+  const state = useRef({ travel: 0, drift: 0, warp: 0, warpTravel: 0, time: 0, intro: 0, shield: 0, look: { x: 0, y: 0 }, pointer: { x: 0, y: 0 }, throttle: 0.45, speed: 0.45 });
   state.current.throttle = throttle;
   state.current.shieldOn = shields;
   state.current.autopilot = autopilot;
@@ -183,7 +202,20 @@ function RulesView({ open, onGone }) {
       const k = 1 - Math.exp(-dt * 2.5);
       s.time += dt;
       s.speed += (s.throttle - s.speed) * k;
-      s.travel += dt * (reduced ? 0.6 : 2 + s.speed * 22);
+      const cruise = dt * (reduced ? 0.6 : 2 + s.speed * 22);
+      // Past WARP_FROM the craft jumps to hyperspace: the stars rush past many times faster.
+      s.warp = reduced ? 0 : smooth(WARP_FROM, 1, s.speed);
+      s.drift += cruise;
+      s.travel += cruise + dt * s.warp * s.warp * 120;
+      s.warpTravel += dt * s.warp * 1.8;
+      // Engine rumble: the view shudders a touch at warp.
+      const cv = bgRef.current;
+      if (cv && s.warp > 0.01) {
+        const a = s.warp * s.warp * 2.4;
+        cv.style.transform = `translate3d(${((Math.random() - 0.5) * a).toFixed(2)}px, ${((Math.random() - 0.5) * a).toFixed(2)}px, 0) scale(${1 + 0.02 * s.warp})`;
+      } else if (cv?.style.transform) {
+        cv.style.transform = '';
+      }
       s.shield += ((s.shieldOn ? 1 : 0) - s.shield) * k;
       // Autopilot drifts the heading gently; otherwise the view follows the pointer.
       const tx = s.autopilot ? Math.sin(s.time * 0.21) * 0.6 + s.pointer.x * 0.4 : s.pointer.x;
@@ -194,9 +226,12 @@ function RulesView({ open, onGone }) {
         uRes: [window.innerWidth * dpr, window.innerHeight * dpr],
         uTime: s.time,
         uTravel: s.travel,
+        uDrift: s.drift,
         uLook: [s.look.x, s.look.y],
         uIntro: s.intro,
         uShield: s.shield,
+        uWarp: s.warp,
+        uWarpTravel: s.warpTravel,
       });
       raf = requestAnimationFrame(tick);
     };
@@ -273,6 +308,16 @@ function RulesView({ open, onGone }) {
   };
   useEffect(() => {
     const onKey = (e) => {
+      // Throttle: W / S nudge it, Shift+W punches to full warp, Shift+S drops back to cruise.
+      const key = e.key.toLowerCase();
+      const t = e.target;
+      const typing = t?.isContentEditable || t?.tagName === 'TEXTAREA' || (t?.tagName === 'INPUT' && t.type !== 'range');
+      if ((key === 'w' || key === 's') && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        if (e.shiftKey) setThrottle(key === 'w' ? 1 : 0.45);
+        else setThrottle((t) => Math.round(clamp(t + (key === 'w' ? 0.1 : -0.1), 0, 1) * 100) / 100);
+        return;
+      }
       if (e.key !== 'Escape') return;
       e.preventDefault();
       if (holo) closeHolo();
@@ -303,7 +348,9 @@ function RulesView({ open, onGone }) {
   };
 
   let n = 0;
-  const velocity = Math.round(4 + throttle * 26);
+  const velocity = velocityOf(throttle).toLocaleString('en-US');
+  const mode = flightMode(throttle);
+  const warping = throttle >= WARP_FROM;
 
   return (
     <div ref={rootRef} className={`bridge fixed inset-0 z-40 overflow-hidden text-[#f4f1ea] ${holo ? 'is-holo' : ''}`}>
@@ -424,9 +471,9 @@ function RulesView({ open, onGone }) {
         <div className="bridge-controls">
           <Frame size="sm" star={false} />
           <div className="bridge-controls__group">
-            <Toggle label="Nav lights" on={navOn} onChange={setNavOn} />
-            <Toggle label="Shields" on={shields} onChange={setShields} />
-            <Toggle label="Autopilot" on={autopilot} onChange={setAutopilot} />
+            <Toggle label="Nav lights" hint="Red and green navigation lights on the canopy" on={navOn} onChange={setNavOn} />
+            <Toggle label="Shields" hint="Gold deflector shimmer across the window" on={shields} onChange={setShields} />
+            <Toggle label="Autopilot" hint="On: the craft steers itself. Off: steer with your pointer" on={autopilot} onChange={setAutopilot} />
           </div>
           <button type="button" className={`bridge-engage ${holo ? 'is-live' : ''}`} onClick={holo ? closeHolo : openHolo} disabled={busy}>
             {!holo && <span className="bridge-engage__ring" aria-hidden="true" />}
@@ -435,12 +482,32 @@ function RulesView({ open, onGone }) {
             </svg>
             {holo ? 'Close protocol' : 'Display protocol'}
           </button>
-          <label className="bridge-throttle">
-            <span className="flex justify-between">
-              <span>Throttle</span>
-              <span className="text-gold-200">{Math.round(throttle * 100)}%</span>
+          <label className={`bridge-throttle ${warping ? 'is-warp' : ''}`} title="W / S to adjust · Shift+W full warp · Shift+S back to cruise">
+            <span className="bridge-throttle__head">
+              <span className="inline-flex items-center gap-1.5">
+                Throttle <kbd className="bridge-kbd">W/S</kbd>
+              </span>
+              <span className="bridge-throttle__mode">
+                {mode} · <b>{Math.round(throttle * 100)}%</b>
+              </span>
             </span>
-            <input type="range" min="0" max="1" step="0.01" value={throttle} onChange={(e) => setThrottle(Number(e.target.value))} aria-label="Throttle" />
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={throttle}
+              onChange={(e) => setThrottle(Number(e.target.value))}
+              aria-label="Throttle"
+              aria-valuetext={`${Math.round(throttle * 100)}% · ${mode}`}
+              aria-keyshortcuts="W S Shift+W Shift+S"
+              style={{ '--t': `${throttle * 100}%` }}
+            />
+            <span className="bridge-throttle__scale" aria-hidden="true">
+              <span>Impulse</span>
+              <span style={{ left: '40%' }}>Cruise</span>
+              <span className="bridge-throttle__warp">Hyperspace</span>
+            </span>
           </label>
         </div>
       </div>

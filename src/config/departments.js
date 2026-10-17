@@ -420,7 +420,7 @@ export const DEPARTMENTS = {
   },
 
   saturn: {
-    name: 'English & Cultural Studies',
+    name: 'Cultural Studies & Languages',
     short: 'ENG',
     faculty: 'Dr. Rima Bhattacharya',
     tagline: 'Where Words Create Worlds.',

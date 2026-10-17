@@ -6,3 +6,6 @@ dist
 
 # Full-size gallery photos (web versions live in src/assets/gallery)
 gallery-originals
+
+# Personal Claude Code notes
+CLAUDE.local.md

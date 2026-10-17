@@ -92,7 +92,7 @@ src/assets/                          ← christ-university-logo.png goes here
 
 The Sun is **CUBYC**, Christ University Yeshwanthpur Campus, the host. Its page is the hub: diving into it shows the directory of every department.
 
-Every other world is a department: Economics (Mercury), Psychology (Venus), Computer Science (Earth), Mathematics (Moon), Commerce (Mars), **Cultural Events · SWO (the Space Station)**, Media Studies (Jupiter), English & Cultural Studies (Saturn), Management (Uranus) and Professional Studies (Neptune).
+Every other world is a department: Economics (Mercury), Psychology (Venus), Computer Science (Earth), Mathematics (Moon), Commerce (Mars), **Cultural Events · SWO (the Space Station)**, Media Studies (Jupiter), Cultural Studies & Languages (Saturn), Management (Uranus) and Professional Studies (Neptune).
 
 The space station (`STATIONS` in config, `scene/StationModel.jsx`, `lib/stationShaders.js`) has its own dashed orbit between the asteroid belt and Jupiter. It has a rotating habitat ring with lit windows, a hub with a gold docking collar, and navy-and-gold solar wings, and it is lit like the planets. It hovers, clicks, flies-to and tours like any planet. Its interior is a gliding ring corridor.
 

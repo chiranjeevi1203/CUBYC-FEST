@@ -3,16 +3,19 @@
  * shader (drawn with createShaderLayer from ./blackHole). Stars stream past in
  * depth layers as the craft flies on, the violet band of the Milky Way
  * (glowing clouds, a pink-white core and dark dust lanes) fills the sky behind, and the view shifts a touch
- * with uLook.
+ * with uLook. Past ~60% throttle (uWarp) the craft jumps to hyperspace: streaks and a tunnel glow.
  */
 export const SPACE_FRAG = /* glsl */ `
   precision highp float;
   uniform vec2 uRes;
   uniform float uTime;
   uniform float uTravel;   // distance flown (accumulated on the CPU from the throttle)
+  uniform float uDrift;    // slow sideways drift of the sky (cruise speed only)
   uniform vec2 uLook;      // pointer parallax, -1…1
   uniform float uIntro;
   uniform float uShield;   // 0…1 shield shimmer on the glass
+  uniform float uWarp;     // 0…1 hyperspace, builds up past ~60% throttle
+  uniform float uWarpTravel; // distance flown in hyperspace (drives the streaks)
 
   float hash(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
@@ -38,9 +41,10 @@ export const SPACE_FRAG = /* glsl */ `
 
   void main() {
     vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
-    vec2 view = uv + uLook * 0.035;
+    // In hyperspace the view punches in a little (the stars rush toward the window).
+    vec2 view = uv * (1.0 - 0.22 * uWarp) + uLook * 0.035;
     // Deep indigo night sky, brighter violet-blue toward the galactic band.
-    vec2 sky = view + vec2(uTravel * 0.0015, 0.0);
+    vec2 sky = view + vec2(uDrift * 0.0015, 0.0);
     // The Milky Way: a near-vertical band, leaning slightly, through the middle.
     float across = sky.x + sky.y * 0.18 + 0.02;
     float band = exp(-pow(across * 2.4, 2.0));
@@ -97,6 +101,34 @@ export const SPACE_FRAG = /* glsl */ `
       float fade = smoothstep(0.0, 0.25, z) * (1.0 - smoothstep(0.85, 1.0, z));
       float star = step(0.88, h) * pow(smoothstep(size, 0.0, d), 2.0) * fade;
       col += mix(vec3(0.8, 0.82, 1.0), vec3(0.98, 0.95, 1.0), h) * star * 1.4;
+    }
+
+    // Hyperspace: the sky blue-shifts and stars stretch into streaks rushing out
+    // from the vanishing point, with a bright tunnel core ahead.
+    if (uWarp > 0.001) {
+      col = mix(col, col * vec3(0.55, 0.75, 1.35), uWarp * 0.6);
+      vec2 c = uv - uLook * 0.06;            // the vanishing point follows the heading
+      float r = length(c);
+      float a = atan(c.y, c.x) / 6.28318;
+      float streaks = 0.0;
+      for (int i = 0; i < 3; i++) {
+        float fi = float(i);
+        float n = 110.0 + fi * 85.0;          // streaks around the circle, per layer
+        float slot = floor(a * n);
+        float h = hash(vec2(slot, fi * 7.0 + 1.0));
+        float across = fract(a * n) - 0.5;
+        float thin = exp(-across * across * 70.0);
+        float z = fract(h * 17.0 + uWarpTravel * (0.55 + h * 0.9));
+        float head = mix(0.04, 1.7, z * z);   // accelerates as it passes the window
+        float len = head * (0.12 + 0.55 * uWarp);
+        float seg = smoothstep(head - len, head, r) * (1.0 - smoothstep(head, head + 0.012, r));
+        streaks += step(0.5, h) * thin * seg * (0.45 + 0.55 * hash(vec2(slot, fi + 3.0)));
+      }
+      vec3 tint = mix(vec3(0.62, 0.76, 1.0), vec3(1.0, 0.93, 0.82), step(0.85, fract(a * 37.0)));
+      col += tint * streaks * uWarp * 1.8;
+      col += vec3(0.55, 0.68, 1.0) * exp(-r * r * 16.0) * uWarp * 0.7;   // tunnel core
+      col += vec3(0.85, 0.9, 1.0) * exp(-r * r * 90.0) * uWarp * 0.6;
+      col *= 1.0 - 0.3 * uWarp * smoothstep(0.55, 1.3, r);               // edges fall into the dark
     }
 
     // Shield shimmer across the glass.

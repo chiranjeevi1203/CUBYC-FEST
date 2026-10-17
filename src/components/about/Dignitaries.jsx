@@ -75,7 +75,7 @@ function PersonCard({ person, index, section, className = '' }) {
           <span className="gcard__stud gcard__stud--r" aria-hidden="true" />
           <span className="gcard__medal">
             {person.photo ? (
-              <img src={person.photo} alt="" loading="lazy" />
+              <img src={person.photo} alt={person.name} loading="lazy" />
             ) : tba ? (
               <svg viewBox="0 0 20 20" className="gcard__silhouette" aria-hidden="true">
                 <path d="M10 10a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2Z M3.5 18c0-3.8 2.9-6.4 6.5-6.4s6.5 2.6 6.5 6.4" fill="currentColor" />
@@ -89,9 +89,14 @@ function PersonCard({ person, index, section, className = '' }) {
         <div className="gcard__plate">
           <h4 className="gcard__name">{tba ? 'To be announced' : person.name}</h4>
         </div>
-        <p className="gcard__role">{person.role}</p>
+        {/* "Head of Department · X" breaks after the dot, so every card's role takes the same two lines. */}
+        <p className="gcard__role">
+          {person.role.split(' · ').map((part, j) => (
+            <span key={j}>{part}</span>
+          ))}
+        </p>
 
-        {section.contact && (person.phone || person.email) && (
+        {section.contact && (person.phone || person.email || person.linkedin) && (
           <div className="gcard__contact">
             {person.phone && (
               <a href={`tel:+91${person.phone}`}>
@@ -109,9 +114,17 @@ function PersonCard({ person, index, section, className = '' }) {
                 {person.email}
               </a>
             )}
+            {person.linkedin && (
+              <a href={person.linkedin} target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 20 20" strokeLinecap="round" aria-hidden="true">
+                  <path d="M3 3h14v14H3Z M6.5 9v5 M6.5 6.2v.1 M9.5 14V9 M9.5 11.2c0-1.4 1-2.2 2.2-2.2s2 .8 2 2.2V14" />
+                </svg>
+                LinkedIn
+              </a>
+            )}
           </div>
         )}
-        {section.contact && !person.phone && !person.email && <p className="gcard__contact gcard__contact--soon">Contact shared soon</p>}
+        {section.contact && !person.phone && !person.email && !person.linkedin && <p className="gcard__contact gcard__contact--soon">Contact shared soon</p>}
 
         <span className="gcard__ranks" aria-hidden="true">
           <i />

@@ -1,4 +1,4 @@
-import { ALL_EVENTS, DEPARTMENTS, DEPT_ORDER, FEST, RULE_COUNT, RULE_SECTIONS, SCHEDULE_DAYS } from './chatKnowledge';
+import { ALL_EVENTS, CREATOR, DEPARTMENTS, DEPT_ORDER, FEST, RULE_COUNT, RULE_SECTIONS, SCHEDULE_DAYS } from './chatKnowledge';
 
 /**
  * The chatbot's built-in brain: answers fest questions instantly, offline and
@@ -127,7 +127,7 @@ const DEPT_ALIASES = {
   mars: ['commerce', 'bcom', 'mars'],
   station: ['cultural events', 'cultural', 'culturals', 'swo', 'space station', 'station'],
   jupiter: ['media studies', 'media', 'journalism', 'jupiter'],
-  saturn: ['english', 'english and cultural studies', 'literature', 'saturn'],
+  saturn: ['cultural studies and languages', 'cultural studies', 'languages', 'english', 'english and cultural studies', 'literature', 'saturn'],
   uranus: ['management', 'sbm', 'bba', 'uranus'],
   neptune: ['dps', 'professional studies', 'neptune'],
 };
@@ -353,11 +353,26 @@ export function createBrain() {
     if (q.tokens.length <= 4 && has(q, ['hi', 'hello', 'hey', 'hii', 'hiii', 'heyy', 'yo', 'hola', 'namaste', 'good morning', 'good afternoon', 'good evening', 'sup'])) {
       return ok({ text: `Hey there! I'm **CUBYC Comms**, your guide to ${FEST.title}. Ask me about events, domains, rules, the schedule or registration.`, chips: SUGGESTIONS.slice(0, 4) });
     }
+    // Who built the site / the bot — checked before "thanks" so "who made this cool site?" lands here.
+    const firstName = norm(CREATOR.name).split(' ')[0];
+    if (
+      has(q, ['who built', 'who made', 'who created', 'who developed', 'who designed', 'who coded', 'who programmed', 'built you', 'made you', 'created you', 'built this', 'made this', 'creator', 'developer', 'developers', 'website team', 'web team', firstName]) &&
+      !has(q, ['event', 'events'])
+    ) {
+      return ok({
+        text: `I was built by **${CREATOR.name}**, ${CREATOR.role} of the ${FEST.name} website team. ${firstName[0].toUpperCase() + firstName.slice(1)} designed and developed this whole website — the galaxy intro, the solar system of domains, the pages — and me, **CUBYC Comms**.\n• Email: ${CREATOR.email}\n• LinkedIn: linkedin.com/in/${CREATOR.linkedin.replace(/\/+$/, '').split('/').pop()}\nThe rest of the website team is on the About page.`,
+        links: [
+          { label: 'LinkedIn', href: CREATOR.linkedin },
+          { label: 'Meet the team', href: '#/about' },
+        ],
+        chips: ['When is the fest?', 'List all events'],
+      });
+    }
     if (has(q, ['thanks', 'thank you', 'thank', 'thx', 'ty', 'tysm', 'cool', 'great', 'awesome', 'nice'])) return ok({ text: 'Anytime! Anything else you’d like to know?', chips: SUGGESTIONS.slice(1, 4) });
     if (has(q, ['bye', 'goodbye', 'see you', 'cya', 'later'])) return ok({ text: 'Clear skies! See you in orbit. 🚀' });
     if (has(q, ['who are you', 'what are you', 'your name', 'what can you do', 'help', 'how to use', 'what do you know'])) {
       return ok({
-        text: `I'm **CUBYC Comms**, the fest's guide. I can tell you about:\n• all ${FEST.eventCount} events — rules, team size, contacts\n• the ${FEST.deptCount} domains\n• dates, venue and registration\n• the schedule and general rules`,
+        text: `I'm **CUBYC Comms**, the fest's guide. I can tell you about:\n• all ${FEST.eventCount} events — rules, team size, contacts\n• the ${FEST.deptCount} domains\n• dates, venue and registration\n• the schedule and general rules\nI was built by **${CREATOR.name}** — ask me about my creator!`,
         chips: SUGGESTIONS,
       });
     }

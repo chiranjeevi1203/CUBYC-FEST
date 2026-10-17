@@ -17,6 +17,28 @@ const neighbour = (k, d) => ORDER[(indexOf(k) + d + ORDER.length) % ORDER.length
 const placeOf = (k) => (k === 'sun' ? 'The Sun' : k === 'moon' ? 'The Moon' : k === 'station' ? 'The Space Station' : BODY_BY_KEY[k].name);
 const kindOf = (k) => (k === 'sun' ? 'Host star' : k === 'moon' ? 'Moon of Earth' : k === 'station' ? 'Orbital stage' : 'Planet');
 
+/**
+ * The "Enter" button takes each world's colours (from its look in the scene):
+ * [light, mid, deep, text, glow]. Text stays dark so it reads on every gradient.
+ */
+const ENTER_COLORS = {
+  sun: ['#fff1c4', '#ffc04a', '#e2581c', '#2a1203', 'rgba(255, 160, 60, 0.75)'],
+  mercury: ['#ece3db', '#b9a89e', '#7d6e66', '#1c1512', 'rgba(205, 185, 165, 0.6)'],
+  venus: ['#fdf0d2', '#efcf98', '#d19a5c', '#2b1a08', 'rgba(255, 217, 160, 0.7)'],
+  earth: ['#d6ecff', '#7fb4ec', '#4f8fd6', '#061a33', 'rgba(124, 192, 255, 0.75)'],
+  moon: ['#f4f2ec', '#cdc8bf', '#9a958b', '#1d1b17', 'rgba(217, 214, 207, 0.6)'],
+  mars: ['#ffcfb0', '#ea8a5c', '#c4572f', '#2a0c02', 'rgba(255, 140, 95, 0.7)'],
+  station: ['#fdfaf2', '#e6dcc6', '#bfae8a', '#1b2552', 'rgba(233, 194, 122, 0.7)'],
+  jupiter: ['#f8ead4', '#dcb88e', '#b07a52', '#2a1709', 'rgba(243, 210, 165, 0.7)'],
+  saturn: ['#fcf5e0', '#e9d4a1', '#c9a66a', '#2a1d07', 'rgba(247, 226, 176, 0.7)'],
+  uranus: ['#e6fbfb', '#a3dde0', '#72bcc4', '#0b3236', 'rgba(191, 244, 255, 0.7)'],
+  neptune: ['#d8e2fe', '#93adf6', '#5f80e2', '#0a1440', 'rgba(122, 162, 255, 0.75)'],
+};
+const enterStyle = (k) => {
+  const [a, b, c, ink, glow] = ENTER_COLORS[k] ?? ENTER_COLORS.sun;
+  return { '--pb-1': a, '--pb-2': b, '--pb-3': c, '--pb-ink': ink, '--pb-glow': glow };
+};
+
 // The interior is soft haze: once settled inside, render it at reduced resolution.
 const INSIDE_DPR = 0.75;
 
@@ -445,7 +467,7 @@ export default function DepartmentView() {
 
         {/* Enter: sits on the crest of the world */}
         <div data-rise className="dept-enter absolute inset-x-0 flex justify-center">
-          <button type="button" onClick={() => enterWorld()} className="dept-enter__btn pointer-events-auto">
+          <button type="button" onClick={() => enterWorld()} className="dept-enter__btn dept-enter__btn--planet pointer-events-auto" style={enterStyle(key)}>
             <span className="explore-pill__beacon" aria-hidden="true" />
             <span>{d.hub ? 'Enter CUBYC' : `Enter ${place.replace(/^The /, '')}`}</span>
             <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden="true">

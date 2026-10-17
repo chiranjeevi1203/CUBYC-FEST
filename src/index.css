@@ -2162,6 +2162,14 @@
       0 0 34px -8px rgba(233, 194, 122, 0.45),
       0 26px 50px -24px rgba(0, 0, 0, 0.95);
   }
+  /* …in a light blue frosted glass (everything else matches the other cards) */
+  html .dg-section--featured .gcard {
+    background:
+      radial-gradient(75% 48% at 50% 32%, rgba(190, 215, 255, 0.2), transparent 72%),
+      linear-gradient(165deg, rgba(200, 222, 255, 0.24) 0%, rgba(160, 195, 255, 0.13) 50%, rgba(120, 160, 240, 0.09) 100%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+  }
   /* Plain cards (every group but Dignitaries and Heads): no filigree, one clean line */
   .dg-section--plain .gcard__c,
   .dg-section--plain .gcard__frame {
@@ -2368,6 +2376,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* Portraits are tall with the face in the upper third. */
+    object-position: 50% 12%;
   }
   .gcard__medal b {
     font-family: var(--font-display);
@@ -2420,6 +2430,11 @@
     text-align: center;
     text-transform: uppercase;
     color: #e9c27a;
+    /* Always two lines tall, so a long department name never shifts its card. */
+    min-height: 3.2em;
+  }
+  .gcard__role span {
+    display: block;
   }
   .gcard__contact {
     position: relative;
@@ -2801,7 +2816,7 @@
     height: 3rem;
     padding: 0;
     border-radius: 9999px !important;
-    background: radial-gradient(circle, rgba(233, 194, 122, 0.14), transparent 70%);
+    background: radial-gradient(circle, rgba(120, 165, 255, 0.16), transparent 70%);
     outline: none;
     -webkit-tap-highlight-color: transparent;
   }
@@ -2809,12 +2824,11 @@
     width: 100%;
     height: 100%;
     overflow: visible;
-    filter: drop-shadow(0 0 6px rgba(233, 194, 122, 0.35));
+    filter: drop-shadow(0 0 5px rgba(130, 175, 255, 0.55));
+    transition: filter 0.4s ease;
   }
-  .nv-dial__blades,
-  .nv-dial__arcs,
-  .nv-dial__studs,
-  .nv-dial__orb,
+  .nv-dial__star,
+  .nv-dial__halo,
   .nv-dial__x {
     transform-box: view-box;
     transform-origin: 32px 32px;
@@ -2822,15 +2836,12 @@
       transform 0.7s cubic-bezier(0.65, 0, 0.25, 1),
       opacity 0.4s ease;
   }
-  .nv-dial__blades {
-    animation: nv-sway 6s ease-in-out infinite;
+  /* The heart of the star breathes slowly */
+  .nv-dial__halo {
+    animation: nv-twinkle 3.2s ease-in-out infinite;
   }
-  @keyframes nv-sway {
-    50% { transform: rotate(8deg); }
-  }
-  .nv-dial__arc-outer,
-  .nv-dial__arc-inner {
-    transition: stroke-dasharray 0.7s cubic-bezier(0.65, 0, 0.25, 1);
+  @keyframes nv-twinkle {
+    50% { opacity: 0.55; transform: scale(0.85); }
   }
   .nv-dial__x {
     opacity: 0;
@@ -2838,29 +2849,19 @@
   }
   .nv-dial:hover svg,
   .nv-dial:focus-visible svg {
-    filter: drop-shadow(0 0 10px rgba(243, 217, 164, 0.75));
+    filter: drop-shadow(0 0 10px rgba(150, 195, 255, 0.9));
   }
-  .nv-dial:hover .nv-dial__blades {
-    animation-duration: 1.4s;
+  .nv-dial:hover .nv-dial__star {
+    transform: rotate(45deg) scale(1.06);
   }
-  .nv-dial:hover .nv-dial__orb {
-    transform: scale(1.12);
+  /* Open: the star turns and dims, and the × appears over its heart */
+  .nv-dial.is-open .nv-dial__star {
+    transform: rotate(135deg) scale(0.92);
+    opacity: 0.35;
   }
-  /* Open: blades sweep half a turn, crescents turn round, the orb gives way to the × */
-  .nv-dial.is-open .nv-dial__blades {
+  .nv-dial.is-open .nv-dial__halo {
     animation: none;
-    transform: rotate(180deg);
-  }
-  .nv-dial.is-open .nv-dial__arcs {
-    transform: rotate(-180deg);
-  }
-  .nv-dial.is-open .nv-dial__studs {
-    transform: rotate(-180deg);
     opacity: 0.5;
-  }
-  .nv-dial.is-open .nv-dial__orb {
-    transform: scale(1.18);
-    filter: brightness(0.75);
   }
   .nv-dial.is-open .nv-dial__x {
     opacity: 1;
@@ -3017,7 +3018,7 @@
     font-size: 0.78rem;
   }
   @media (prefers-reduced-motion: reduce) {
-    .nv-dial__blades {
+    .nv-dial__halo {
       animation: none;
     }
   }
@@ -3452,12 +3453,14 @@
       margin-top: 0.5rem !important;
     }
   }
+  /* The line of events under the copy (on the hub: the domains). Shown on every screen
+     except phones held sideways, where it would crowd the Enter button. */
   .dept-event-chips {
-    display: none;
+    display: flex;
   }
-  @media (min-width: 768px) and (min-height: 700px) {
+  @media (max-height: 520px) and (orientation: landscape) {
     .dept-event-chips {
-      display: flex;
+      display: none;
     }
   }
 
@@ -5610,27 +5613,110 @@
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.55);
   }
+  /* Throttle: head (label, key hint, flight mode), the lever, then a zone scale.
+     Kept about as tall as before so the hologram above never moves. */
+  .bridge-throttle {
+    gap: 0.3rem;
+  }
+  .bridge-throttle__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    white-space: nowrap;
+  }
+  .bridge-kbd {
+    padding: 0.05rem 0.3rem;
+    border: 1px solid rgba(243, 217, 164, 0.3);
+    font-family: var(--font-mono);
+    font-size: 0.42rem;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .bridge-throttle__mode {
+    color: var(--color-gold-300);
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+  }
+  .bridge-throttle__mode b {
+    color: var(--color-gold-200);
+  }
+  .bridge-throttle.is-warp .bridge-throttle__mode,
+  .bridge-throttle.is-warp .bridge-throttle__mode b {
+    color: #dfe8ff;
+    text-shadow: 0 0 10px rgba(140, 175, 255, 0.9);
+  }
   .bridge-throttle input {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, rgba(233, 194, 122, 0.8), rgba(255, 255, 255, 0.12));
+    height: 4px;
+    /* tick every 10% · gold fill up to the lever · dim track with the hyperspace zone in blue */
+    background:
+      repeating-linear-gradient(90deg, rgba(6, 7, 16, 0.85) 0 1px, transparent 1px 10%),
+      linear-gradient(90deg, rgba(233, 194, 122, 0.95) 0 var(--t, 45%), transparent var(--t, 45%)),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 60%, rgba(130, 165, 255, 0.5) 60% 100%);
+    /* room for the lever, which overhangs the 4px track */
+    margin-block: 0.15rem;
     cursor: pointer;
   }
   .bridge-throttle input::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 0.9rem;
-    height: 1.4rem;
+    height: 1.15rem;
     background: #f3d9a4;
     box-shadow: 0 0 10px #e9c27a;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
   }
   .bridge-throttle input::-moz-range-thumb {
     width: 0.9rem;
-    height: 1.4rem;
+    height: 1.15rem;
     border: 0;
+    border-radius: 0;
     background: #f3d9a4;
     box-shadow: 0 0 10px #e9c27a;
+  }
+  .bridge-throttle.is-warp input::-webkit-slider-thumb {
+    background: #eef3ff;
+    box-shadow: 0 0 14px rgba(140, 175, 255, 1);
+  }
+  .bridge-throttle.is-warp input::-moz-range-thumb {
+    background: #eef3ff;
+    box-shadow: 0 0 14px rgba(140, 175, 255, 1);
+  }
+  .bridge-throttle__scale {
+    position: relative;
+    height: 0.5rem;
+    font-size: 0.4rem;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.35);
+  }
+  .bridge-throttle__scale > span {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .bridge-throttle__scale > .bridge-throttle__warp {
+    left: auto;
+    right: 0;
+    color: rgba(160, 190, 255, 0.75);
+  }
+  /* ON / OFF printed in the switch, on the side away from the knob */
+  .bridge-toggle__state {
+    position: absolute;
+    top: 50%;
+    right: 0.3rem;
+    translate: 0 -50%;
+    font-family: var(--font-mono);
+    font-size: 0.36rem;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .bridge-toggle.is-on .bridge-toggle__state {
+    right: auto;
+    left: 0.3rem;
+    color: #f3d9a4;
   }
 
   /* Projector beam + the hologram */
@@ -5797,6 +5883,10 @@
     }
     .bridge-throttle {
       justify-self: center;
+    }
+    /* Stacked console: drop the zone scale so the strip stays as tall as before. */
+    .bridge-throttle__scale {
+      display: none;
     }
     .bridge-engage {
       grid-row: 1;
@@ -6094,6 +6184,11 @@
   }
 
   /* Header: orb + title (left), tools (right) */
+  /* The navbar (and its small-screen menu) sits above the heading, cards and navigator,
+     but under an open event brief. !important beats the bar's z-40 utility. */
+  .ev-page > .nv {
+    z-index: 250 !important;
+  }
   .ev-head {
     position: absolute;
     inset-inline: 0;
@@ -8696,6 +8791,184 @@
     }
   }
 
+  /* ---------- Sponsors: the roaming UFO (sponsors/Ufo.jsx) ---------- */
+  .ufo-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ufo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: clamp(130px, 15vw, 220px);
+    will-change: transform;
+  }
+  .ufo[data-phase="gone"] {
+    visibility: hidden;
+  }
+  .ufo__body {
+    position: relative;
+    transform-origin: 50% 50%;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 16px rgba(255, 180, 90, 0.16));
+    transition: filter 0.3s ease;
+  }
+  .ufo__body svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  /* What you can "touch": the saucer, not the beam below it */
+  .ufo__hit {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 18%;
+    height: 46%;
+    border-radius: 50%;
+    pointer-events: auto;
+    cursor: crosshair;
+  }
+  .ufo[data-phase="charge"] .ufo__body {
+    filter: brightness(1.5) drop-shadow(0 0 22px rgba(255, 205, 130, 0.95));
+  }
+  .ufo[data-phase="dash"] .ufo__body,
+  .ufo[data-phase="arrive"] .ufo__body {
+    filter: brightness(1.35) blur(0.6px) drop-shadow(0 0 26px rgba(170, 200, 255, 0.9));
+  }
+  /* Lights: chase round the rim and the vents; the core ring breathes */
+  .ufo__rimlight {
+    fill: #ffe2a8;
+    animation: ufo-chase 1.8s linear infinite;
+    animation-delay: calc(var(--i) * -0.09s);
+  }
+  .ufo__vent {
+    fill: #ffb14a;
+    animation: ufo-chase 1.2s linear infinite;
+    animation-delay: calc(var(--i) * -0.09s);
+  }
+  .ufo__domelight {
+    fill: #a8d4ff;
+    animation: ufo-chase 2.4s linear infinite;
+    animation-delay: calc(var(--i) * -0.3s);
+  }
+  @keyframes ufo-chase {
+    0%, 100% { opacity: 0.25; }
+    12% { opacity: 1; }
+  }
+  .ufo__core {
+    animation: ufo-pulse 1.6s ease-in-out infinite;
+  }
+  .ufo__underglow {
+    animation: ufo-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes ufo-pulse {
+    50% { opacity: 0.6; }
+  }
+  .ufo__port {
+    fill: #ffd27a;
+    animation: ufo-chase 3s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.33s);
+  }
+  .ufo__domeglow {
+    fill: rgba(140, 190, 255, 0.35);
+    transition: fill 0.4s ease;
+  }
+  /* Evasive: the lights flash red and race */
+  .ufo.is-alert .ufo__rimlight,
+  .ufo.is-alert .ufo__vent {
+    fill: #ff6a55;
+    animation-duration: 0.55s;
+  }
+  .ufo.is-alert .ufo__domeglow {
+    fill: rgba(255, 110, 90, 0.45);
+  }
+  /* Tractor beam */
+  .ufo__beam {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  .ufo.is-beam .ufo__beam {
+    opacity: 1;
+    animation: ufo-beam 0.24s steps(2) infinite;
+  }
+  @keyframes ufo-beam {
+    50% { opacity: 0.82; }
+  }
+  /* Hyperspeed light streak, trailing behind the saucer */
+  .ufo__trail {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 9%;
+    transform-origin: 0 50%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, rgba(200, 220, 255, 0.85), rgba(150, 185, 255, 0.45) 35%, rgba(233, 194, 122, 0.15) 75%, transparent);
+    filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* white-hot core of the streak */
+  .ufo__trail::after {
+    content: "";
+    position: absolute;
+    inset: 35% 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ffffff, rgba(255, 246, 225, 0.8) 40%, transparent);
+  }
+  .ufo-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 180px;
+    height: 180px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(255, 246, 225, 0.95), rgba(160, 195, 255, 0.5) 32%, rgba(233, 194, 122, 0.15) 55%, transparent 70%);
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  /* Status / quip tag under the saucer */
+  .ufo__tag {
+    position: absolute;
+    top: 64%;
+    left: 50%;
+    translate: -50% 0;
+    padding: 0.22rem 0.55rem;
+    border: 1px solid rgba(243, 217, 164, 0.3);
+    background: rgba(5, 6, 13, 0.6);
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-gold-200);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .ufo.show-tag .ufo__tag {
+    opacity: 1;
+  }
+  .ufo.is-alert .ufo__tag {
+    border-color: rgba(255, 120, 100, 0.5);
+    color: #ffc4b8;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ufo__rimlight,
+    .ufo__vent,
+    .ufo__domelight,
+    .ufo__port,
+    .ufo__core,
+    .ufo__underglow,
+    .ufo.is-beam .ufo__beam {
+      animation: none;
+    }
+  }
+
   /* ---------- The two button skins, shared across the site ---------- */
   /* Gold: the important actions. */
   html :is(.pbtn--primary, .nv-cta, .edk-register, .ev-hud__open, .dept-enter__btn, .bridge-engage, .nf-btn--main, .er-btn--main) {
@@ -8718,6 +8991,27 @@
   }
   html .is-over-world .dept-enter__btn {
     box-shadow: 0 0 30px -6px rgba(246, 186, 92, 0.75) !important;
+  }
+  /* "Enter <world>": the same button, in that world's colours (set per world in DepartmentView.jsx) */
+  html .dept-enter .dept-enter__btn--planet {
+    border-color: var(--pb-1) !important;
+    background: linear-gradient(180deg, var(--pb-1) 0%, var(--pb-2) 50%, var(--pb-3) 100%) !important;
+    box-shadow: 0 10px 28px -14px var(--pb-glow) !important;
+    color: var(--pb-ink) !important;
+  }
+  html .dept-enter .dept-enter__btn--planet:is(:hover, :focus-visible),
+  html .is-over-world .dept-enter .dept-enter__btn--planet {
+    border-color: #ffffff !important;
+    background: linear-gradient(180deg, var(--pb-1) 0%, var(--pb-1) 20%, var(--pb-2) 60%, var(--pb-3) 100%) !important;
+    box-shadow: 0 0 32px -6px var(--pb-glow) !important;
+    color: var(--pb-ink) !important;
+  }
+  .dept-enter__btn--planet .explore-pill__beacon {
+    background: #ffffff;
+    box-shadow: 0 0 10px var(--pb-glow);
+  }
+  .dept-enter__btn--planet .explore-pill__beacon::after {
+    border-color: var(--pb-glow);
   }
 
   /* Light blue glass: everything else. */

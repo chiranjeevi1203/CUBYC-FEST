@@ -332,8 +332,8 @@ export default function LandingPage({ landingRef }) {
 
         {/* Events */}
         <section id="events" className="relative mx-auto max-w-7xl scroll-mt-28 px-5 py-24 sm:px-8 sm:py-32">
-          <SectionHeading eyebrow={`Events · ${DEPT_ORDER.length} Domains · ${EVENT_COUNT} Events`}>
-            Every world is a <span className="text-gold-gradient">domain of events</span>
+          <SectionHeading eyebrow={`${DEPT_ORDER.length} Domains · ${EVENT_COUNT} Events`}>
+            Where every dream finds <span className="text-gold-gradient">its orbit</span>
           </SectionHeading>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {EVENTS.map((e, i) => (

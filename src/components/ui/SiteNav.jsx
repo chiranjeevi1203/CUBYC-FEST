@@ -43,49 +43,64 @@ function PlateOrbits() {
 }
 
 /**
- * The menu button (small screens), after a celestial dial: a blue orb inside two
- * gold crescents, gold blades radiating from them and a filigree stem below.
- * Opening turns the dial: the blades sweep round and the crescents close into a ring.
+ * The star's points: [angle (deg, 0 = up, clockwise), length, half-width, where the width peaks].
+ * A tall north–south axis, shorter east–west, four small diagonals — like a guiding star.
+ */
+const STAR_RAYS = [
+  [0, 29, 3.3, 5.5],
+  [180, 25, 3.3, 5.5],
+  [90, 21, 3.1, 5],
+  [270, 21, 3.1, 5],
+  [45, 13, 2.3, 3.8],
+  [135, 13, 2.3, 3.8],
+  [225, 13, 2.3, 3.8],
+  [315, 13, 2.3, 3.8],
+];
+const pt = (deg, r, side = 0) => {
+  const a = (deg * Math.PI) / 180;
+  const x = 32 + Math.sin(a) * r + Math.cos(a) * side;
+  const y = 32 - Math.cos(a) * r + Math.sin(a) * side;
+  return `${x.toFixed(2)} ${y.toFixed(2)}`;
+};
+// Each point is two facets — a lit half and a shaded half — so the star reads as cut crystal.
+const STAR_FACETS = STAR_RAYS.flatMap(([deg, len, w, at]) => [
+  { d: `M32 32 L${pt(deg, at, -w)} L${pt(deg, len)} Z`, lit: true },
+  { d: `M32 32 L${pt(deg, at, w)} L${pt(deg, len)} Z`, lit: false },
+]);
+
+/**
+ * The menu button (small screens): a light-blue, eight-pointed crystal star with a
+ * glowing heart. Opening turns the star and dims it, and a × appears over its heart.
  */
 function DialButton({ open, onClick }) {
   return (
     <button type="button" className={`nv-dial ${open ? 'is-open' : ''}`} onClick={onClick} aria-expanded={open} aria-controls="site-menu" aria-label={open ? 'Close menu' : 'Open menu'}>
       <svg viewBox="0 0 64 64" aria-hidden="true">
         <defs>
-          <radialGradient id="nv-orb" cx="38%" cy="32%" r="70%">
-            <stop offset="0" stopColor="#bfe0ff" />
-            <stop offset="0.45" stopColor="#4f86c8" />
-            <stop offset="1" stopColor="#1b355f" />
-          </radialGradient>
-          <linearGradient id="nv-blade" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="#fff2c8" />
-            <stop offset="0.6" stopColor="#e9b44c" />
-            <stop offset="1" stopColor="#b8772a" />
+          <linearGradient id="nv-star-lit" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#f4f9ff" />
+            <stop offset="1" stopColor="#a9cbff" />
           </linearGradient>
+          <linearGradient id="nv-star-shade" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#8db6f5" />
+            <stop offset="1" stopColor="#4a78cc" />
+          </linearGradient>
+          <radialGradient id="nv-star-core">
+            <stop offset="0" stopColor="#ffffff" />
+            <stop offset="0.35" stopColor="#dcebff" stopOpacity="0.95" />
+            <stop offset="1" stopColor="#7fa9ff" stopOpacity="0" />
+          </radialGradient>
         </defs>
-        {/* Blades radiating from the left half (they sweep round when open) */}
-        <g className="nv-dial__blades">
-          {[150, 180, 210, 120, 240].map((a, i) => (
-            <path key={a} d={`M44 32 L${i < 3 ? 61 : 57} 30.4 L${i < 3 ? 63.5 : 59} 32 L${i < 3 ? 61 : 57} 33.6 Z`} fill="url(#nv-blade)" stroke="#7a4a1a" strokeWidth="0.4" transform={`rotate(${a} 32 32)`} />
+        <circle cx="32" cy="32" r="15" fill="url(#nv-star-core)" className="nv-dial__halo" />
+        <g className="nv-dial__star">
+          {STAR_FACETS.map((f) => (
+            <path key={f.d} d={f.d} fill={f.lit ? 'url(#nv-star-lit)' : 'url(#nv-star-shade)'} />
           ))}
+          <circle cx="32" cy="32" r="3.2" fill="#ffffff" />
         </g>
-        {/* Two crescents opening to the right */}
-        <g className="nv-dial__arcs" fill="none" strokeLinecap="round">
-          <path className="nv-dial__arc-outer" d="M43.3 20.7 A16 16 0 1 0 43.3 43.3" stroke="#c4542b" strokeWidth="3.2" />
-          <path className="nv-dial__arc-inner" d="M39.8 24.2 A11 11 0 1 0 39.8 39.8" stroke="#f3d9a4" strokeWidth="1.6" />
-        </g>
-        {/* Studs on the crescent */}
-        <g fill="#f7e7c4" className="nv-dial__studs">
-          <circle cx="16" cy="32" r="1.4" />
-          <circle cx="20.7" cy="20.7" r="1.1" />
-          <circle cx="20.7" cy="43.3" r="1.1" />
-        </g>
-        {/* The orb */}
-        <circle cx="32" cy="32" r="7.2" fill="url(#nv-orb)" className="nv-dial__orb" />
-        <circle cx="29.6" cy="29.4" r="2" fill="#ffffff" opacity="0.55" />
-        {/* Close mark over the orb */}
-        <g className="nv-dial__x" stroke="#fff6e0" strokeWidth="1.8" strokeLinecap="round">
-          <path d="M28.6 28.6 35.4 35.4 M35.4 28.6 28.6 35.4" />
+        {/* Close mark over the star's heart */}
+        <g className="nv-dial__x" stroke="#ffffff" strokeWidth="2" strokeLinecap="round">
+          <path d="M27.8 27.8 36.2 36.2 M36.2 27.8 27.8 36.2" />
         </g>
       </svg>
     </button>

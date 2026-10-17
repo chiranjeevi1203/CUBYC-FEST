@@ -4,6 +4,7 @@ import SiteFooter from '../ui/SiteFooter';
 import Star from '../ui/Star';
 import SolarButton from '../ui/SolarButton';
 import SpaceBackdrop from '../about/SpaceBackdrop';
+import Ufo from './Ufo';
 import { OrnateDivider } from '../about/Ornaments';
 import { useMountedWhile, usePageShell, useRiseIn } from '../about/usePageShell';
 import { SPONSOR_CONTACT, SPONSOR_TIERS } from '../../config/sponsors';
@@ -121,6 +122,8 @@ function SponsorsView({ open, onGone }) {
       <div className="sp-stars sp-stars--mid" aria-hidden="true" />
       <div className="sp-stars sp-stars--near" aria-hidden="true" />
       <SiteNav active="sponsors" />
+      {/* A roaming UFO above the page content (under the navbar); try to touch it */}
+      <Ufo />
 
       <main className="relative z-10">
         {/* ---------- Hero: the satellite ---------- */}

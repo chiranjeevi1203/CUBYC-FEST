@@ -1,0 +1,113 @@
+CUBYC FEST'2027 — About page people
+====================================
+
+Fill in each block below. Leave a line blank if you don't have it yet
+(it will show as "To be announced"). The "photo" line is the exact file name
+of the picture you put in the matching folder.
+
+Photos:
+  - Dignitaries -> src/assets/team/dignitaries/
+  - HODs        -> src/assets/team/hods/
+  - JPG or PNG, a head-and-shoulders portrait with the face centred
+    (the site crops it to a circle), around 600 x 600 px or larger.
+
+
+DIGNITARIES  (add or remove blocks as needed; top to bottom = order on the page)
+-----------
+
+name:	   DR. FR.BENNY THOMAS 
+role:      Director
+photo:     DR. FR.BENNY THOMAS (DIRECTOR).jpg
+
+name:      DR. FR. BIIJU K C
+role:      ASSOCIATE DIRECTOR
+photo:     DR. FR. BIIJU K C (ASSOCIATE DIRECTOR).jpg
+
+name:	   DR. JOBY THOMAS
+role:      Dean
+photo:     DR. JOBY THOMAS (DEAN).jpg
+
+name:	   DR. RAGHUNANDAN G
+role:      ASSOCIATE DEAN
+photo:     DR. RAGHUNANDAN G (ASSOCIATE DEAN).jpg
+
+
+HEADS OF DEPARTMENTS  (one block per department; keep the department line as it is)
+--------------------
+
+department: Economics
+name:	    Dr VINEETH M
+photo:      Dr VINEETH M (HOD, ECONOMICS).jpg
+
+department: Psychology
+name:	    DR. SHERIN P ANTHONY
+photo:      DR. SHERIN P ANTHONY (HOD, PSYCHOLOGY).jpg
+
+department: Computer Science
+name:	    DR. VINAY M
+photo:      DR. VINAY M (HOD, COMPUTER SCIENCE).jpg
+
+department: Mathematics
+name:       Dr SUBRAMANI R
+photo:      Dr SUBRAMANI R (HOD, MATHEMATICS).jpg
+
+department: Commerce
+name:       DR. SUSHIN M
+photo:      DR. SUSHIN M (HOD, COMMERCE).jpg
+
+department: Media Studies
+name:	    DR. NIRMALA MN
+photo:      DR. NIRMALA MN (HOD, MEDIA STUDIES).jpg
+
+department: Cultural Studies & Languages
+name:       DR. ARUN D M 
+photo:      DR. ARUN D M (HOD, CULTURAL STUDIES & LANGUAGES).jpg
+
+department: Management
+name:	    Dr Shrinivas Kulkarni
+photo:      Dr Shrinivas Kulkarni (HOD, MANAGEMENT).jpg
+
+department: Professional Studies
+name:       DR. RAGHUNANDAN G 
+photo:      DR. RAGHUNANDAN G (HOD, PROFESSIONAL STUDIES).jpg
+
+department: Cultural Events
+name:
+photo:      hod-cultural-events.jpg
+
+
+WEBSITE TEAM  (add or remove blocks as needed; top to bottom = order on the page)
+------------
+Photos -> src/assets/team/website/   (same photo rules as above)
+phone:    10-digit mobile number, no +91 or spaces (e.g. 9876543210)
+email:    full email address
+linkedin: full profile link (e.g. https://www.linkedin.com/in/your-name)
+Leave any line blank to hide it on the card.
+
+name:      Chiranjeevi P
+role:      Lead Developer & Designer
+photo:	   Chiranjeevi P (Lead Developer & Designer).jpg
+phone:     7892304079
+email:     chiranjeevi.p@bcah.christuniversity.in
+linkedin:  https://www.linkedin.com/in/chiranjeevi-purushotham/
+
+name:
+role:      Developer
+photo:
+phone:
+email:
+linkedin:
+
+name:
+role:      Designer
+photo:
+phone:
+email:
+linkedin:
+
+name:
+role:      Developer
+photo:
+phone:
+email:
+linkedin:

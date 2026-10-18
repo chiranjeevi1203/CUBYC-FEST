@@ -18,12 +18,15 @@ const ICON = {
 /**
  * A person's contact as a simple glass card: a ringed medallion with initials,
  * name and role, and call / mail tags.
- * `compact` for the landing page strip.
+ * `compact` for the landing page strip; `active` lights it up (its station module is focused);
+ * any other props (data attributes, pointer handlers) go on the card itself.
  */
-export default function ContactCard({ person, index = 0, compact = false, className = '' }) {
+export default function ContactCard({ person, index = 0, compact = false, active = false, className = '', ...rest }) {
   const tba = isTBA(person);
   return (
-    <li className={`ct-card ${compact ? 'ct-card--compact' : ''} ${tba ? 'is-tba' : ''} ${className}`} style={{ '--i': index % 6 }} data-rise>
+    // `active` is a data attribute, not a class: the scroll reveal adds .is-in to the class
+    // list, and changing className here would wipe it.
+    <li className={`ct-card ${compact ? 'ct-card--compact' : ''} ${tba ? 'is-tba' : ''} ${className}`} style={{ '--i': index % 6 }} data-rise data-active={active || undefined} {...rest}>
       <span className="ct-card__medal" aria-hidden="true">
         {person.photo ? <img src={person.photo} alt="" loading="lazy" /> : tba ? <span className="ct-card__q">✦</span> : <b>{initials(person.name)}</b>}
       </span>

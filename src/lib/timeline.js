@@ -35,7 +35,7 @@ export function heroPose() {
  *
  * @param {object} opts
  * @param {object} opts.scene          mutable scene state (store)
- * @param {object} opts.hud            { chrome[], dash, update(frame), endCard, veil }
+ * @param {object} opts.hud            { chrome[], dash, update(frame), veil }
  * @param {HTMLElement|null} opts.landing
  * @param {HTMLElement[]} opts.reveals elements marked [data-reveal] in the landing page
  * @param {(phase:string)=>void} opts.onPhase
@@ -54,7 +54,6 @@ function prepareDom({ hud, landing, reveals, reducedMotion }) {
   if (reveals.length) gsap.set(reveals, { autoAlpha: 0, y: reducedMotion ? 0 : 40 });
   gsap.set(hud.chrome, { opacity: 0 });
   gsap.set(hud.dash, { opacity: 0, x: reducedMotion ? 0 : -18 });
-  gsap.set(hud.endCard, { opacity: 0, letterSpacing: '0.08em', y: reducedMotion ? 0 : 8 });
   gsap.set(hud.veil, { opacity: 0 });
 }
 
@@ -171,9 +170,6 @@ function buildCinematic(opts) {
   tl.to(s.planets, { v: 1, duration: 1.0, ease: 'power2.out', stagger: 0.08 }, P.CAPTURE - 0.3)
     // fit → 1 hands framing to CameraRig's auto-fit (whole system, centred, sized to the viewport).
     .to(c, { ...hero, fit: 1, duration: P.HANDOFF - P.CAPTURE + 0.3, ease: 'power2.inOut' }, P.CAPTURE)
-    // End card: title blooms with letter-spacing expansion, then clears for the landing hero.
-    .to(hud.endCard, { opacity: 1, letterSpacing: '0.42em', y: 0, duration: 0.9, ease: 'power3.out' }, P.CAPTURE + 0.35)
-    .to(hud.endCard, { opacity: 0, letterSpacing: '0.62em', duration: 0.4, ease: 'power2.in' }, P.HANDOFF - 0.4)
     .to(hud.dash, { opacity: 0, x: -14, duration: 0.4, ease: 'power2.in' }, P.HANDOFF - 0.4)
     .to(hud.chrome, { opacity: 0, duration: 0.3, ease: 'power1.in' }, P.HANDOFF - 0.3);
 
@@ -211,8 +207,7 @@ function buildReduced(opts) {
     .set(s, { sun: 1, orbits: 1 }, swap)
     .set(s.planets, { v: 1 }, swap)
     .to(hud.veil, { opacity: 0, duration: 0.4, ease: 'power1.out' }, swap + 0.05)
-    .to(hud.endCard, { opacity: 1, letterSpacing: '0.42em', duration: 0.01 }, swap + 0.05)
-    .to([hud.dash, ...hud.chrome, hud.endCard], { opacity: 0, duration: 0.25 }, D - 0.3);
+    .to([hud.dash, ...hud.chrome], { opacity: 0, duration: 0.25 }, D - 0.3);
 
   if (landing) tl.to(landing, { autoAlpha: 1, duration: 0.35 }, D - 0.35);
   if (reveals.length) tl.to(reveals, { autoAlpha: 1, duration: 0.4 }, D - 0.3);

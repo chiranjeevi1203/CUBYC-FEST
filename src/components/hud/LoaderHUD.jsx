@@ -23,7 +23,6 @@ export default function LoaderHUD({ landingRef }) {
   const rootRef = useRef(null);
   const dashRef = useRef(null);
   const dashApi = useRef(null);
-  const endCardRef = useRef(null);
   const veilRef = useRef(null);
   const tlRef = useRef(null);
   const handedOffRef = useRef(false);
@@ -51,7 +50,6 @@ export default function LoaderHUD({ landingRef }) {
         chrome: Array.from(rootRef.current.querySelectorAll('[data-hud]')),
         dash: dashRef.current,
         update: (frame) => dashApi.current?.update(frame),
-        endCard: endCardRef.current,
         veil: veilRef.current,
       },
       landing,
@@ -118,16 +116,6 @@ export default function LoaderHUD({ landingRef }) {
           <br />
           <span className="text-gold-300/85">{BRAND.title}</span>
         </span>
-      </div>
-
-      {/* End-card title */}
-      <div className="absolute inset-x-0 top-[19%] flex justify-center px-4">
-        <h2
-          ref={endCardRef}
-          className="text-center font-serif text-[clamp(1.4rem,4.6vw,3.2rem)] font-light whitespace-nowrap text-[#f6efe0] opacity-0 [text-shadow:0_0_40px_rgba(233,194,122,0.35)]"
-        >
-          CUBYC <span className="text-gold-gradient">— FEST'2027</span>
-        </h2>
       </div>
 
       {/* Bottom-left: the journey dash (0 → 100% to the Sun) */}

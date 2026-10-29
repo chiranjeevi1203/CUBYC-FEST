@@ -14,6 +14,8 @@ export const BRAND = {
   university: 'Christ University',
   universityFull: 'CHRIST (Deemed to be University)',
   campus: 'Yeshwanthpur Campus',
+  // The campus in full, for the badge above the hero title.
+  campusFull: 'Bangalore Yeshwanthpur Campus, BYC',
   fest: 'CUBYC',
   edition: "FEST'2027",
   title: "CUBYC — FEST'2027",
@@ -29,9 +31,9 @@ export const BRAND = {
  * until then the icon shows as "coming soon".
  */
 export const SOCIAL = [
-  { key: 'instagram', label: 'Instagram', href: '' },
-  { key: 'linkedin', label: 'LinkedIn', href: '' },
-  { key: 'youtube', label: 'YouTube', href: '' },
+  { key: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/cubyc_fest/' },
+  { key: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/christ-university-yeshwanthpur-campus-byc/' },
+  { key: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/channel/UCgJ6g0ykpwpTgpYFZcRTSjA/videos' },
 ];
 
 /** Event dates (IST). The landing-page countdown targets `start`. */

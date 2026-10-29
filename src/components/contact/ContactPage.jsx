@@ -13,7 +13,7 @@ import { TEAM_SECTIONS, WEB_LEAD } from '../../config/team';
 import { useExperience } from '../../store/useExperience';
 import { useViewMore, ViewMoreButton } from '../ui/ViewMore';
 
-const PLACE = 'Christ University Yeshwanthpur Campus, Bengaluru';
+const PLACE = 'Christ University Yeshwanthpur Campus, Bangalore';
 const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(PLACE)}&z=16&output=embed`;
 const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(PLACE)}`;
 
@@ -386,7 +386,7 @@ function ContactView({ open, onGone }) {
               <OrnateDivider className="mx-auto my-3 w-36 text-gold-300/50" />
               <p className="ct-venue__line">
                 <b>{BRAND.universityFull}</b>
-                {BRAND.campus}, Bengaluru, Karnataka
+                {BRAND.campus}, Bangalore, Karnataka
               </p>
               <dl className="ct-venue__facts">
                 <div>

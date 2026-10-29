@@ -447,7 +447,7 @@ Follow this website for updates.`, chips: ['How do I register?', 'General rules'
     }
     if (has(q, ['where', 'venue', 'location', 'address', 'campus', 'reach', 'directions', 'map', 'place', 'located'])) {
       return ok({
-        text: `The fest is at **${FEST.university}, ${FEST.campus}** (Yeshwanthpur, Bengaluru). Event venues across campus will be shared with the final schedule.`,
+        text: `The fest is at **${FEST.university}, ${FEST.campus}** (Yeshwanthpur, Bangalore). Event venues across campus will be shared with the final schedule.`,
         links: [{ label: 'Open in Maps', href: 'https://www.google.com/maps/search/?api=1&query=Christ+University+Yeshwanthpur+Campus' }],
       });
     }

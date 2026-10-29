@@ -210,7 +210,7 @@ export default function LandingPage({ landingRef }) {
             <Star className="hero-affil__star hidden h-2 w-2 text-gold-400 sm:block" />
             <span className="block text-white/90 sm:inline">{BRAND.universityFull}</span>
             <span className="mx-3 hidden text-gold-400/80 sm:inline">·</span>
-            <span className="block whitespace-nowrap text-gold-200 sm:inline">{BRAND.campus}</span>
+            <span className="block whitespace-nowrap text-gold-200 sm:inline">{BRAND.campusFull}</span>
             <Star className="hero-affil__star hidden h-2 w-2 text-gold-400 sm:block" />
           </p>
 

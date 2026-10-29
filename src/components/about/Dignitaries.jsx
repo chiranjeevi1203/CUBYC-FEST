@@ -89,7 +89,7 @@ function PersonCard({ person, index, section, className = '' }) {
         <div className="gcard__plate">
           <h4 className="gcard__name">{tba ? 'To be announced' : person.name}</h4>
         </div>
-        {/* "Head of Department · X" breaks after the dot, so every card's role takes the same two lines. */}
+        {/* "Department of · X" breaks after the dot, so every card's role takes the same two lines. */}
         <p className="gcard__role">
           {person.role.split(' · ').map((part, j) => (
             <span key={j}>{part}</span>

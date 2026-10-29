@@ -131,7 +131,7 @@ function Station() {
  * giant blurred CUBYC wordmark sits behind it all. The scene follows the pointer
  * gently and only animates while on screen.
  */
-const MAP_PLACE = 'Christ University Yeshwanthpur Campus, Bengaluru';
+const MAP_PLACE = 'Christ University Yeshwanthpur Campus, Bangalore';
 const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(MAP_PLACE)}&z=16&output=embed`;
 const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(MAP_PLACE)}`;
 
@@ -148,7 +148,7 @@ function FooterMap() {
             <Star className="h-2 w-2 text-gold-400" /> Find the launch pad
           </p>
           <p className="ft-map__name">{BRAND.universityFull}</p>
-          <p className="ft-map__addr">{BRAND.campus} · Bengaluru, Karnataka</p>
+          <p className="ft-map__addr">{BRAND.campus} · Bangalore, Karnataka</p>
           <a href={MAP_DIRECTIONS} target="_blank" rel="noopener noreferrer" className="ft-map__go">
             Get directions
             <svg viewBox="0 0 20 20" aria-hidden="true">

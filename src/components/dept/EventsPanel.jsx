@@ -35,6 +35,7 @@ const ICONS = {
   dept: 'M10 3a7 7 0 1 0 0 14a7 7 0 1 0 0-14Z M3.5 10h13 M10 3c2 2 2.8 4.4 2.8 7S12 15 10 17c-2-2-2.8-4.4-2.8-7S8 5 10 3Z',
   faculty: 'M10 4 2.5 7.5 10 11l7.5-3.5Z M5.5 9v3.6c1.2 1.4 2.8 2 4.5 2s3.3-.6 4.5-2V9',
   student: 'M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M4 17c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5',
+  trophy: 'M6 3.5h8v4a4 4 0 0 1-8 0Z M6 5H3.5v1a2.5 2.5 0 0 0 2.6 2.5 M14 5h2.5v1a2.5 2.5 0 0 1-2.6 2.5 M10 11.5v3 M7 16.5h6 M8 14.5h4',
 };
 
 function Icon({ name, className = 'h-4 w-4' }) {
@@ -42,6 +43,125 @@ function Icon({ name, className = 'h-4 w-4' }) {
     <svg viewBox="0 0 20 20" className={className} aria-hidden="true">
       <path d={ICONS[name]} fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+/* Reward burst pieces: a four-point star, a diamond and a gift box (gold, on a 20-unit box). */
+const BURST_SVG = {
+  star: '<path d="M10 0 12.2 7.8 20 10 12.2 12.2 10 20 7.8 12.2 0 10 7.8 7.8Z" fill="currentColor"/>',
+  diamond: '<path d="M10 1 19 10 10 19 1 10Z" fill="none" stroke="currentColor" stroke-width="2"/>',
+  gift:
+    '<path d="M3 8h14v10H3Z M2 5h16v3H2Z" fill="currentColor"/><path d="M10 5v13" stroke="#1d1103" stroke-width="1.6"/><path d="M10 5C8 1 4.5 2 6 4.6 7 5.5 10 5 10 5Zm0 0c2-4 5.5-3 4-.4C13 5.5 10 5 10 5Z" fill="none" stroke="currentColor" stroke-width="1.4"/>',
+};
+
+/**
+ * Clicking the prize card: a game-style "reward unlocked" burst. A gold shockwave, then stars,
+ * diamonds, sparks and gift boxes fly out, arc down and twinkle away. The pieces live in a fixed
+ * layer on <body> (the card's clipped corners would cut them off) and remove themselves after.
+ */
+function rewardBurst(tile) {
+  const r = tile.getBoundingClientRect();
+  const layer = document.createElement('div');
+  layer.className = 'prize-burst';
+  layer.style.left = `${r.left + r.width / 2}px`;
+  layer.style.top = `${r.top + r.height / 2}px`;
+  layer.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(layer);
+
+  const make = (cls, html = '') => {
+    const el = document.createElement('span');
+    el.className = cls;
+    el.innerHTML = html;
+    layer.appendChild(el);
+    return el;
+  };
+  const rand = gsap.utils.random;
+  const tl = gsap.timeline({ onComplete: () => layer.remove() });
+
+  const ring = make('prize-burst__ring');
+  tl.fromTo(ring, { scale: 0.2, autoAlpha: 0.9 }, { scale: 3.2, autoAlpha: 0, duration: 0.8, ease: 'expo.out' }, 0);
+  const flash = make('prize-burst__flash');
+  tl.fromTo(flash, { scale: 0.3, autoAlpha: 0.85 }, { scale: 1.6, autoAlpha: 0, duration: 0.55, ease: 'power2.out' }, 0);
+
+  const pieces = [
+    ...Array.from({ length: 14 }, () => ['star', rand(10, 22)]),
+    ...Array.from({ length: 8 }, () => ['diamond', rand(7, 12)]),
+    ...Array.from({ length: 12 }, () => ['spark', rand(3, 6)]),
+    ...Array.from({ length: 5 }, () => ['gift', rand(16, 22)]),
+  ];
+  pieces.forEach(([kind, size], i) => {
+    const el = make(`prize-burst__p prize-burst__p--${kind}`, kind === 'spark' ? '' : `<svg viewBox="0 0 20 20">${BURST_SVG[kind]}</svg>`);
+    el.style.width = el.style.height = `${size}px`;
+    const angle = (i / pieces.length) * Math.PI * 2 + rand(-0.25, 0.25);
+    const dist = rand(70, 190) * (kind === 'gift' ? 0.75 : 1);
+    const x = Math.cos(angle) * dist;
+    const y = Math.sin(angle) * dist * 0.8 - rand(20, 60);
+    // fly out, then drift down twinkling for about a second, fading at the end
+    const start = rand(0, 0.08);
+    const fly = rand(0.4, 0.55);
+    const fall = rand(0.9, 1.3);
+    tl.fromTo(
+      el,
+      { x: 0, y: 0, scale: 0, rotate: rand(-90, 90), autoAlpha: 1 },
+      { x, y, scale: 1, rotate: `+=${rand(-200, 200)}`, duration: fly, ease: 'expo.out' },
+      start,
+    )
+      .to(el, { y: y + rand(40, 90), rotate: `+=${rand(-60, 60)}`, duration: fall, ease: 'power1.in' }, start + fly)
+      .to(el, { scale: 0.35, duration: 0.14, yoyo: true, repeat: 5, ease: 'sine.inOut' }, start + fly)
+      .to(el, { autoAlpha: 0, duration: 0.4, ease: 'power1.in' }, start + fly + fall - 0.4);
+  });
+}
+
+/** The prize pool tile: same shape as the other tiles, in gold; click (or Enter / Space) for the reward burst. */
+function PrizeTile({ amount }) {
+  const ref = useRef(null);
+  const celebrate = () => {
+    const tile = ref.current;
+    if (!tile) return;
+    tile.classList.remove('is-burst');
+    void tile.offsetWidth; // restart the flash animation
+    tile.classList.add('is-burst');
+    if (prefersReducedMotion()) return;
+    gsap.fromTo(
+      tile.querySelector('.edk-tile__icon'),
+      { scale: 1, rotate: 0 },
+      {
+        keyframes: [
+          { scale: 1.45, rotate: -14, duration: 0.18 },
+          { rotate: 12, duration: 0.14 },
+          { scale: 1, rotate: 0, duration: 0.5, ease: 'elastic.out(1, 0.45)' },
+        ],
+      },
+    );
+    rewardBurst(tile);
+  };
+  return (
+    <div
+      ref={ref}
+      className="edk-tile edk-tile--prize"
+      data-ev-anim
+      role="button"
+      tabIndex={0}
+      aria-label={`Prize pool ₹${amount.toLocaleString('en-IN')}, plus gift hampers for the winners`}
+      onClick={celebrate}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          celebrate();
+        }
+      }}
+      onAnimationEnd={(e) => e.animationName === 'edk-prize-flash' && e.currentTarget.classList.remove('is-burst')}
+    >
+      <span className="edk-tile--prize__sheen" aria-hidden="true" />
+      <span className="edk-tile__icon">
+        <Icon name="trophy" />
+      </span>
+      <div className="min-w-0">
+        <dt>Prize pool</dt>
+        <dd className="edk-tile--prize__amount">₹{amount.toLocaleString('en-IN')}</dd>
+        <dd className="edk-tile__sub">Plus gift hampers for the winners</dd>
+      </div>
+    </div>
   );
 }
 
@@ -490,6 +610,8 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
                 )}
               </div>
             </div>
+            {/* The prize pool closes the tiles: same tile, in warm gold with a shimmering amount */}
+            {event.prize ? <PrizeTile amount={event.prize} /> : null}
           </dl>
 
           {/* Rules */}

@@ -36,7 +36,7 @@ const CARDS = [
   {
     icon: 'M10 17s-5.5-5-5.5-9a5.5 5.5 0 0 1 11 0c0 4-5.5 9-5.5 9Z M10 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
     title: 'Finding us',
-    text: `${BRAND.campus}, Bengaluru. Carry your college ID — it's your boarding pass on both days. Event venues are listed on each event's page.`,
+    text: `${BRAND.campus}, Bangalore. Carry your college ID — it's your boarding pass on both days. Event venues are listed on each event's page.`,
     link: { label: 'Open in Maps', href: MAPS },
   },
 ];
@@ -132,7 +132,7 @@ function AboutView({ open, onGone }) {
             {BRAND.campus}
           </h1>
           <p data-hero className="mt-3 font-mono text-[0.62rem] tracking-[0.32em] text-white/55 uppercase">
-            {BRAND.universityFull} · Bengaluru
+            {BRAND.universityFull} · Bangalore
           </p>
           <FloatingCampus />
         </section>

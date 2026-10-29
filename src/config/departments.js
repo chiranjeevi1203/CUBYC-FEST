@@ -8,6 +8,7 @@
  *
  * Event fields:
  *   format   team size / participation
+ *   prize    cash prize pool in rupees (e.g. 32000), shown big on the event page
  *   faculty  event faculty in-charge          (optional)
  *   student  student in-charge + phone        (optional)
  *   summary  one-line pitch shown on cards
@@ -40,6 +41,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Battle of Bands (Western)',
+        prize: 32000,
         format: 'Band of 5–9',
         student: { name: 'Deberko Das', phone: '9391253577' },
         summary: 'Up to three songs, no backing tracks — just your band, live.',
@@ -56,6 +58,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Battle of Bands (Indian)',
+        prize: 32000,
         format: 'Band of 5–10',
         summary: 'Three songs, one Indian instrument at the core, zero backing tracks.',
         rules: [
@@ -72,6 +75,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Indian Group Dance (Non-Theme)',
+        prize: 32000,
         format: 'Team of 8–15',
         summary: 'Indian dance forms, Bollywood and contemporary — up to three songs, one stage.',
         rules: [
@@ -86,6 +90,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Street Play',
+        prize: 32000,
         format: 'Team of 8–25',
         summary: 'An English street play with multilingual jingles — no loudspeakers, all voice.',
         rules: [
@@ -106,6 +111,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Mime',
+        prize: 32000,
         format: 'Team of 6–8',
         summary: 'Say everything without a word — and without props.',
         rules: [
@@ -118,6 +124,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Indian Film and Folk Dance Solo',
+        prize: 9000,
         format: 'Individual',
         summary: 'One dancer, one song, two categories: Film/Folk and Western.',
         rules: [
@@ -141,6 +148,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Bulls and Bears (Mock Stock)',
+        prize: 9000,
         format: 'Individual',
         faculty: 'Dr. Edith Jacob',
         student: { name: 'Parth Dhawan', phone: '7016212215' },
@@ -158,6 +166,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Plot Twist (Pop Culture Quiz)',
+        prize: 22000,
         format: 'Team of 2–3',
         faculty: 'Dr. Neelu S Kumar',
         student: { name: 'Parv Saxena', phone: '9993848992' },
@@ -187,6 +196,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Case 404',
+        prize: 32000,
         format: 'Team of 4–6',
         summary: 'Follow the clue trail, profile the suspects and name the culprit, motive and method.',
         rules: [
@@ -202,6 +212,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Crack the Psyche',
+        prize: 22000,
         format: 'Team of 2–3',
         summary: 'Draw, act and decode emotions, thrillers and psychological concepts.',
         rules: [
@@ -232,6 +243,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Cybertronian Wars (Gaming)',
+        prize: 32000,
         format: 'Valorant · Squad of 5 (+1)',
         faculty: 'Dr. Kokilavani T & Dr. Stephen R',
         student: { name: 'Aarav Chawla', phone: '9617345111' },
@@ -248,6 +260,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Transwarp Protocol (Capture the Flag)',
+        prize: 22000,
         format: 'Team of 3',
         faculty: 'Dr. Kokilavani T & Dr. Stephen R',
         student: { name: 'Alex', phone: '8778616699' },
@@ -266,6 +279,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Prime Prompt (AI Prompt Wars)',
+        prize: 22000,
         format: 'Team of 2',
         summary: 'Six hours of prompt engineering, creative AI and constraint-based challenges.',
         rules: [
@@ -290,6 +304,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Monomatics',
+        prize: 22000,
         format: 'Team of 3',
         faculty: 'Rohith Raja',
         student: { name: 'Parvathy Sudheer', phone: '9074796572' },
@@ -308,6 +323,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Auction Sudoku',
+        prize: 22000,
         format: 'Team of 3',
         faculty: 'Rohith Raja',
         student: { name: 'Vansh Modi', phone: '9000248110' },
@@ -337,6 +353,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Best Manager (SustainaQuest)',
+        prize: 9000,
         format: 'Individual',
         faculty: 'Dr. Kamatchi Preethi',
         student: { name: 'Kabeer Shobhit Vaish', phone: '7830404016' },
@@ -354,6 +371,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Percepta (HR)',
+        prize: 22000,
         format: 'Team of 2',
         faculty: 'Dr. Rekha N',
         student: { name: 'Harishna K L', phone: '9944156149' },
@@ -380,6 +398,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: '6-Hour Filmithon',
+        prize: 32000,
         format: 'Group · up to 5',
         faculty: 'Dr. Rajashekar D',
         student: { name: 'Promod Komanduri', phone: '9014778837' },
@@ -399,6 +418,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Imposter',
+        prize: 32000,
         format: 'Team of 2–3',
         faculty: 'Dr. Manas K',
         student: { name: 'Kanishka Sharma', phone: '9306115754' },
@@ -428,6 +448,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Literature Court Room',
+        prize: 22000,
         format: 'Team of 3',
         faculty: 'Dr. Rima Bhattacharya',
         student: { name: 'Jowin Joice', phone: '8281153955' },
@@ -445,6 +466,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Convince the Time Keeper',
+        prize: 22000,
         format: 'Team of 2',
         faculty: 'Dr. Rima Bhattacharya',
         student: { name: 'Greeshma G', phone: '9843092000' },
@@ -471,6 +493,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Brain to Brand (Pitching Event)',
+        prize: 32000,
         format: 'Team of 2–4',
         summary: 'Build a product overnight, face the investors and win the industry rivalry.',
         rules: [
@@ -488,6 +511,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Meme Battle',
+        prize: 22000,
         format: 'Team of 3',
         summary: 'From online prelims to a live meme face-off — humour under pressure.',
         rules: [
@@ -505,6 +529,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Escape Room',
+        prize: 22000,
         format: 'Team of 2',
         summary: 'The CEO has vanished before the big deal. You have 20 minutes.',
         rules: [
@@ -522,6 +547,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Capture the Assets',
+        prize: 32000,
         format: 'Team of 6 (+2 subs)',
         summary: 'Capture the Flag with a business twist — every asset has a hidden value.',
         rules: [
@@ -551,6 +577,7 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Air Crash',
+        prize: 9000,
         format: 'Individual',
         summary: 'The plane is going down and there is one parachute left. Make your case.',
         rules: [
@@ -566,6 +593,7 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Clash of Councils',
+        prize: 32000,
         format: 'Team of 5–8',
         summary: 'Domains go head-to-head across team events for the overall championship.',
         rules: [

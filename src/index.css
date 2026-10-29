@@ -2060,28 +2060,32 @@
   .dg-head {
     text-align: center;
   }
-  /* Cards per row come from config/team.js (data-cols), stepping down on smaller screens */
+  /* Cards per row (--cols) come from config/team.js (data-cols), stepping down on smaller
+     screens. A wrapping flex row, so a last row with fewer cards sits centred. */
   .dg-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1rem, 2.4vw, 1.8rem);
+    --cols: 3;
+    --gap: clamp(1rem, 2.4vw, 1.8rem);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--gap);
     max-width: 66rem;
     margin: 2rem auto 0;
   }
   .dg-grid[data-cols="4"] {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    --cols: 4;
     max-width: 80rem;
-    gap: clamp(1rem, 2vw, 1.6rem);
+    --gap: clamp(1rem, 2vw, 1.6rem);
   }
   .dg-grid[data-cols="5"] {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    --cols: 5;
     max-width: 86rem;
-    gap: clamp(0.9rem, 1.6vw, 1.4rem);
+    --gap: clamp(0.9rem, 1.6vw, 1.4rem);
   }
   .dg-grid[data-cols="6"] {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    --cols: 6;
     max-width: 90rem;
-    gap: clamp(0.8rem, 1.3vw, 1.2rem);
+    --gap: clamp(0.8rem, 1.3vw, 1.2rem);
   }
   .dg-grid[data-cols="6"] .gcard {
     padding: 1.4rem 0.8rem 1rem;
@@ -2128,17 +2132,17 @@
   }
   @media (max-width: 1180px) {
     .dg-grid[data-cols="5"] {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      --cols: 4;
     }
     .dg-grid[data-cols="6"] {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      --cols: 4;
     }
   }
   @media (max-width: 1000px) {
     .dg-grid[data-cols="4"],
     .dg-grid[data-cols="5"],
     .dg-grid[data-cols="6"] {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      --cols: 3;
     }
   }
   @media (max-width: 900px) {
@@ -2146,7 +2150,7 @@
     .dg-grid[data-cols="4"],
     .dg-grid[data-cols="5"],
     .dg-grid[data-cols="6"] {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      --cols: 2;
     }
   }
 
@@ -2199,8 +2203,8 @@
     .dg-grid[data-cols="4"],
     .dg-grid[data-cols="5"],
     .dg-grid[data-cols="6"] {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.7rem;
+      --cols: 2;
+      --gap: 0.7rem;
     }
     .dg-grid .gcard {
       padding: 1.3rem 0.7rem 0.9rem;
@@ -2224,6 +2228,8 @@
 
   /* The game card */
   .gcard-wrap {
+    flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+    min-width: 0;
     list-style: none;
     perspective: 1000px;
   }
@@ -4445,6 +4451,159 @@
     font-weight: 400;
     letter-spacing: 0.02em;
     color: rgba(246, 239, 224, 0.5);
+  }
+  /* The prize pool tile: the same shape and border, in warm gold, with a glowing
+     trophy, a light sweep and the amount in shimmering gold */
+  .edk-tile--prize {
+    isolation: isolate;
+    background:
+      radial-gradient(120% 160% at 0% 0%, rgba(244, 180, 80, 0.24), transparent 60%),
+      linear-gradient(135deg, rgba(52, 36, 13, 0.88), rgba(20, 15, 10, 0.9) 60%, rgba(44, 31, 11, 0.88));
+    box-shadow:
+      inset 0 0 0 1px rgba(243, 217, 164, 0.5),
+      inset 0 0 22px rgba(233, 194, 122, 0.1);
+  }
+  .edk-tile--prize {
+    cursor: pointer;
+  }
+  .edk-tile--prize:hover,
+  .edk-tile--prize:focus-visible {
+    outline: none;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 228, 176, 0.8),
+      inset 0 0 30px rgba(233, 194, 122, 0.16);
+  }
+  .edk-tile--prize:active {
+    transform: translateY(0) scale(0.98);
+  }
+  /* Clicked: a gold flash washes over the card */
+  .edk-tile--prize.is-burst {
+    animation: edk-prize-flash 0.7s ease-out;
+  }
+  @keyframes edk-prize-flash {
+    0% {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 240, 210, 1),
+        inset 0 0 60px rgba(255, 210, 130, 0.65);
+    }
+    100% {
+      box-shadow:
+        inset 0 0 0 1px rgba(243, 217, 164, 0.5),
+        inset 0 0 22px rgba(233, 194, 122, 0.1);
+    }
+  }
+  .edk-tile--prize__sheen {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .edk-tile--prize__sheen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -40%;
+    width: 30%;
+    background: linear-gradient(100deg, transparent, rgba(255, 236, 196, 0.16), transparent);
+    transform: skewX(-20deg);
+    animation: edk-sheen 4.2s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  }
+  .edk-tile--prize .edk-tile__icon {
+    color: #1d1103;
+  }
+  .edk-tile--prize .edk-tile__icon::before {
+    border-color: rgba(255, 228, 176, 0.9);
+    background: radial-gradient(circle at 35% 30%, #fff3d6, #f3c56c 50%, #b8863b 100%);
+    animation: edk-prize-glow 2.8s ease-in-out infinite;
+  }
+  @keyframes edk-prize-glow {
+    0%, 100% {
+      box-shadow: 0 0 8px rgba(244, 180, 80, 0.35);
+    }
+    50% {
+      box-shadow: 0 0 18px rgba(255, 196, 96, 0.75);
+    }
+  }
+  .edk-tile--prize dt {
+    color: rgba(247, 231, 196, 0.85);
+  }
+  .edk-tile .edk-tile--prize__amount {
+    margin-top: 0.2rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(100deg, #fff6e0 0%, #f3d9a4 22%, #e9c27a 40%, #b8863b 52%, #f8e8c4 66%, #e9c27a 82%, #fff6e0 100%) 0 0 / 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: edk-prize-shimmer 5s linear infinite;
+  }
+  @keyframes edk-prize-shimmer {
+    to {
+      background-position: -220% 0;
+    }
+  }
+  /* The reward burst layer (made by rewardBurst in EventsPanel.jsx), centred on the card */
+  .prize-burst {
+    position: fixed;
+    z-index: 90;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+  .prize-burst > span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    translate: -50% -50%;
+  }
+  .prize-burst__ring {
+    width: 5rem;
+    aspect-ratio: 1;
+    border: 2px solid rgba(255, 228, 176, 0.9);
+    border-radius: 9999px !important;
+    box-shadow:
+      0 0 18px rgba(244, 180, 80, 0.7),
+      inset 0 0 14px rgba(244, 180, 80, 0.5);
+  }
+  .prize-burst__flash {
+    width: 7rem;
+    aspect-ratio: 1;
+    border-radius: 9999px !important;
+    background: radial-gradient(circle, rgba(255, 244, 214, 0.9), rgba(244, 180, 80, 0.35) 40%, transparent 70%);
+  }
+  .prize-burst__p svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .prize-burst__p--star {
+    color: #ffe7b0;
+    filter: drop-shadow(0 0 6px rgba(255, 200, 110, 0.95));
+  }
+  .prize-burst__p--diamond {
+    color: #e9c27a;
+    filter: drop-shadow(0 0 4px rgba(244, 180, 80, 0.8));
+  }
+  .prize-burst__p--gift {
+    color: #f3c56c;
+    filter: drop-shadow(0 0 8px rgba(255, 196, 96, 0.85));
+  }
+  .prize-burst__p--spark {
+    border-radius: 9999px !important;
+    background: #fff4d6;
+    box-shadow: 0 0 8px 2px rgba(255, 200, 110, 0.9);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .edk-tile--prize__sheen::before,
+    .edk-tile--prize .edk-tile__icon::before,
+    .edk-tile .edk-tile--prize__amount {
+      animation: none;
+    }
   }
   .edk-tile__phone {
     font-family: var(--font-mono);

@@ -40,7 +40,7 @@ const fill = (n, role) => Array.from({ length: n }, () => ({ name: TBA, role }))
 
 /**
  * Each department's head, by department key; a department missing here shows "To be announced".
- * A `role` here replaces the default "Head of Department · <department>".
+ * A `role` here replaces the default "Department of · <department>".
  */
 const HODS = {
   mercury: { name: 'Dr VINEETH M', photo: vineeth },
@@ -52,13 +52,12 @@ const HODS = {
   saturn: { name: 'DR. ARUN D M', photo: arun },
   uranus: { name: 'Dr Shrinivas Kulkarni', photo: shrinivas },
   neptune: { name: 'DR. RAGHUNANDAN G', photo: raghunandanHod },
-  station: { name: 'Mr Sumanth S Y', photo: sumanth, role: 'Head of Culturals' },
 };
 
-/** Heads of Departments: one per department (the planets, the Moon and the station), Cultural Events last. */
-const heads = [...DEPT_ORDER.filter((k) => k !== 'station'), 'station'].map((k) => ({
+/** Heads of Departments: one per academic department (the planets and the Moon); Cultural Events has no card. */
+const heads = DEPT_ORDER.filter((k) => k !== 'station').map((k) => ({
   name: TBA,
-  role: `Head of Department · ${DEPARTMENTS[k].name}`,
+  role: `Department of · ${DEPARTMENTS[k].name}`,
   ...HODS[k],
 }));
 
@@ -98,11 +97,11 @@ export const TEAM_SECTIONS = [
     cols: 6,
     plain: true,
     people: [
+      { name: 'Dr SHINTO THOMAS', role: 'Core Faculty', photo: shinto },
       { name: 'Dr GAYATHRY S WARRIER', role: 'Core Faculty', photo: gayathry },
       { name: 'Dr KAVYA SANJAYA', role: 'Core Faculty', photo: kavya },
       { name: 'Dr MELVIN VICTOR', role: 'Core Faculty', photo: melvin },
       { name: 'Dr PRASHANTH A S', role: 'Core Faculty', photo: prashanth },
-      { name: 'Dr SHINTO THOMAS', role: 'Core Faculty', photo: shinto },
       { name: 'Mr Sumanth S Y', role: 'Core Faculty', photo: sumanth },
     ],
   },

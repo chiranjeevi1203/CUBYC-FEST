@@ -41,8 +41,8 @@ const STATS = [
   { value: '₹10L', label: 'Prize pool', featured: true },
 ];
 
-// Student core members: the contacts shown on the landing page (edit in config/team.js).
-const STUDENT_CORE = TEAM_SECTIONS.find((s) => s.key === 'student-core')?.people ?? [];
+// Core Students: the contacts shown on the landing page (edit in config/team.js).
+const STUDENT_CORE = TEAM_SECTIONS.find((s) => s.key === 'student-committee')?.people ?? [];
 
 // The four forces of the fest (About section).
 const PILLARS = [

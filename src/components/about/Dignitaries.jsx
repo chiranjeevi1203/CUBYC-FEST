@@ -97,29 +97,29 @@ function PersonCard({ person, index, section, className = '' }) {
         </p>
 
         {section.contact && (person.phone || person.email || person.linkedin) && (
+          // The phone number in full, with mail and LinkedIn as round icon buttons below (address on hover).
           <div className="gcard__contact">
             {person.phone && (
-              <a href={`tel:+91${person.phone}`}>
+              <a href={`tel:+91${person.phone}`} className="gcard__phone">
                 <svg viewBox="0 0 20 20" aria-hidden="true">
                   <path d="M6.6 3.5 8.3 7 6.8 8.4a9.6 9.6 0 0 0 4.8 4.8l1.4-1.5 3.5 1.7-.6 2.7c-.1.5-.6.9-1.1.9A13 13 0 0 1 2.9 4.1c0-.5.4-1 .9-1.1l2.8-.5Z" />
                 </svg>
                 {formatPhone(person.phone)}
               </a>
             )}
+            {person.phone && (person.email || person.linkedin) && <span className="gcard__break" aria-hidden="true" />}
             {person.email && (
-              <a href={`mailto:${person.email}`}>
+              <a href={`mailto:${person.email}`} title={person.email} aria-label={`Email ${person.email}`}>
                 <svg viewBox="0 0 20 20" aria-hidden="true">
                   <path d="M3 5h14v10H3Z M3 5l7 6 7-6" />
                 </svg>
-                {person.email}
               </a>
             )}
             {person.linkedin && (
-              <a href={person.linkedin} target="_blank" rel="noopener noreferrer">
+              <a href={person.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label={`${person.name} on LinkedIn`}>
                 <svg viewBox="0 0 20 20" strokeLinecap="round" aria-hidden="true">
                   <path d="M3 3h14v14H3Z M6.5 9v5 M6.5 6.2v.1 M9.5 14V9 M9.5 11.2c0-1.4 1-2.2 2.2-2.2s2 .8 2 2.2V14" />
                 </svg>
-                LinkedIn
               </a>
             )}
           </div>

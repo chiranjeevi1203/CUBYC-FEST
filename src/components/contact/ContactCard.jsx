@@ -12,12 +12,11 @@ const formatPhone = (p) => (p.length === 10 ? `+91 ${p.slice(0, 5)} ${p.slice(5)
 
 const ICON = {
   phone: 'M6.6 3.5 8.3 7 6.8 8.4a9.6 9.6 0 0 0 4.8 4.8l1.4-1.5 3.5 1.7-.6 2.7c-.1.5-.6.9-1.1.9A13 13 0 0 1 2.9 4.1c0-.5.4-1 .9-1.1l2.8-.5Z',
-  mail: 'M3 5h14v10H3Z M3 5l7 6 7-6',
 };
 
 /**
  * A person's contact as a simple glass card: a ringed medallion with initials,
- * name and role, and call / mail tags.
+ * name and role, and the phone number as a call tag (mail and LinkedIn live on the About page).
  * `compact` for the landing page strip; `active` lights it up (its station module is focused);
  * any other props (data attributes, pointer handlers) go on the card itself.
  */
@@ -43,15 +42,7 @@ export default function ContactCard({ person, index = 0, compact = false, active
               {formatPhone(person.phone)}
             </a>
           ) : null}
-          {person.email ? (
-            <a href={`mailto:${person.email}`} className="ct-seal">
-              <svg viewBox="0 0 20 20" aria-hidden="true">
-                <path d={ICON.mail} />
-              </svg>
-              {compact ? 'Email' : person.email}
-            </a>
-          ) : null}
-          {!person.phone && !person.email && <span className="ct-seal is-soon">Contact shared soon</span>}
+          {!person.phone && <span className="ct-seal is-soon">Contact shared soon</span>}
         </div>
       </div>
     </li>

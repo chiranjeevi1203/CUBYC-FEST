@@ -2096,7 +2096,14 @@
     letter-spacing: 0.16em;
   }
   .dg-grid[data-cols="6"] .gcard__contact {
-    font-size: 0.62rem;
+    gap: 0.4rem;
+  }
+  .dg-grid[data-cols="6"] .gcard__contact a {
+    width: 1.45rem;
+  }
+  .dg-grid[data-cols="6"] .gcard__contact a.gcard__phone {
+    width: auto;
+    font-size: 0.64rem;
   }
   .dg-grid[data-cols="6"] .gcard__stud {
     width: 1.05rem;
@@ -2436,29 +2443,68 @@
   .gcard__role span {
     display: block;
   }
+  /* Contact: the phone number as a pill, then mail and LinkedIn as small round gold buttons */
   .gcard__contact {
     position: relative;
     z-index: 2;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-    margin-top: 0.5rem;
-    font-size: 0.72rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 0.45rem;
+    margin-top: 0.6rem;
   }
   .gcard__contact a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    color: rgba(246, 239, 224, 0.75);
-    transition: color 0.3s ease;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    aspect-ratio: 1;
+    border: 1px solid rgba(243, 217, 164, 0.22);
+    border-radius: 9999px !important;
+    background: transparent;
+    color: rgba(233, 194, 122, 0.8);
+    transition:
+      color 0.3s ease,
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      transform 0.3s ease;
   }
-  .gcard__contact a:hover {
-    color: var(--color-gold-200);
+  .gcard__contact a:hover,
+  .gcard__contact a:focus-visible {
+    outline: none;
+    border-color: rgba(255, 228, 176, 0.9);
+    background: rgba(233, 194, 122, 0.2);
+    color: #fff8ea;
+    transform: translateY(-2px);
+  }
+  /* Ends the phone line, so mail and LinkedIn sit on the line below */
+  .gcard__break {
+    flex-basis: 100%;
+    height: 0;
+  }
+  /* The phone number as plain text (no box), so the block stays light */
+  .gcard__contact a.gcard__phone {
+    display: inline-flex;
+    gap: 0.4rem;
+    width: auto;
+    aspect-ratio: auto;
+    padding: 0;
+    border: 0;
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    color: rgba(246, 239, 224, 0.85);
+  }
+  .gcard__contact a.gcard__phone:hover,
+  .gcard__contact a.gcard__phone:focus-visible {
+    background: none;
+    transform: none;
+  }
+  .gcard__contact a.gcard__phone svg {
+    color: #e9c27a;
   }
   .gcard__contact svg {
-    width: 0.8rem;
-    height: 0.8rem;
+    width: 0.75rem;
+    height: 0.75rem;
     fill: none;
     stroke: currentColor;
     stroke-width: 1.4;
@@ -8429,11 +8475,17 @@
     border-color: rgba(255, 228, 176, 0.8);
     animation-duration: 6s;
   }
+  /* The photo sits inside the circle, behind the gold ring (the medal itself stays
+     overflow: visible for the dashed ring) */
   .ct-card__medal img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    border-radius: inherit;
+    border-radius: 9999px !important;
     object-fit: cover;
+    /* Portraits are tall with the face in the upper third. */
+    object-position: 50% 12%;
   }
   .ct-card__medal b {
     font-family: var(--font-display);

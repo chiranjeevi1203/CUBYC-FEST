@@ -14,7 +14,15 @@ import nirmala from '../assets/team/hods/DR. NIRMALA MN (HOD, MEDIA STUDIES).jpg
 import arun from '../assets/team/hods/DR. ARUN D M (HOD, ENGLISH & CULTURAL STUDIES).jpg';
 import shrinivas from '../assets/team/hods/Dr Shrinivas Kulkarni (HOD, MANAGEMENT).jpg';
 import raghunandanHod from '../assets/team/hods/DR. RAGHUNANDAN G (HOD, PROFESSIONAL STUDIES).jpg';
+import gayathry from '../assets/team/core-faculty/Dr GAYATHRY S WARRIER.jpg';
+import kavya from '../assets/team/core-faculty/Dr KAVYA SANJAYA.jpg';
+import melvin from '../assets/team/core-faculty/Dr MELVIN VICTOR.jpg';
+import prashanth from '../assets/team/core-faculty/Dr PRASHANTH A S.jpg';
+import shinto from '../assets/team/core-faculty/Dr SHINTO THOMAS.jpg';
+import sumanth from '../assets/team/core-faculty/Mr Sumanth  S Y.jpg';
 import chiranjeevi from '../assets/team/website/Chiranjeevi P (Lead Developer & Designer).jpg';
+import jeevan from '../assets/team/website/P B Jeevan (Developer).jpg';
+import athreya from '../assets/team/website/Athreya S Parande (Developer).jpg';
 
 /**
  * The people behind the fest, for the Dignitaries section of the About page (#/about).
@@ -30,7 +38,10 @@ const TBA = 'To be announced';
 
 const fill = (n, role) => Array.from({ length: n }, () => ({ name: TBA, role }));
 
-/** Each department's head, by department key; a department missing here shows "To be announced". */
+/**
+ * Each department's head, by department key; a department missing here shows "To be announced".
+ * A `role` here replaces the default "Head of Department · <department>".
+ */
 const HODS = {
   mercury: { name: 'Dr VINEETH M', photo: vineeth },
   venus: { name: 'DR. SHERIN P ANTHONY', photo: sherin },
@@ -41,20 +52,21 @@ const HODS = {
   saturn: { name: 'DR. ARUN D M', photo: arun },
   uranus: { name: 'Dr Shrinivas Kulkarni', photo: shrinivas },
   neptune: { name: 'DR. RAGHUNANDAN G', photo: raghunandanHod },
+  station: { name: 'Mr Sumanth S Y', photo: sumanth, role: 'Head of Culturals' },
 };
 
 /** Heads of Departments: one per department (the planets, the Moon and the station), Cultural Events last. */
 const heads = [...DEPT_ORDER.filter((k) => k !== 'station'), 'station'].map((k) => ({
   name: TBA,
-  ...HODS[k],
   role: `Head of Department · ${DEPARTMENTS[k].name}`,
+  ...HODS[k],
 }));
 
 /**
  * `cols` = cards per row on wide screens. `plain` drops the ornate card border
  * (only Dignitaries and Heads keep it). `featured` highlights a section.
  * Keys are also used by the Contact page (faculty-core, student-committee) and
- * the landing page (student-core).
+ * the landing page (student-committee).
  */
 export const TEAM_SECTIONS = [
   {
@@ -85,7 +97,14 @@ export const TEAM_SECTIONS = [
     contact: true,
     cols: 6,
     plain: true,
-    people: fill(6, 'Core Faculty'),
+    people: [
+      { name: 'Dr GAYATHRY S WARRIER', role: 'Core Faculty', photo: gayathry },
+      { name: 'Dr KAVYA SANJAYA', role: 'Core Faculty', photo: kavya },
+      { name: 'Dr MELVIN VICTOR', role: 'Core Faculty', photo: melvin },
+      { name: 'Dr PRASHANTH A S', role: 'Core Faculty', photo: prashanth },
+      { name: 'Dr SHINTO THOMAS', role: 'Core Faculty', photo: shinto },
+      { name: 'Mr Sumanth S Y', role: 'Core Faculty', photo: sumanth },
+    ],
   },
   {
     key: 'student-committee',
@@ -94,7 +113,50 @@ export const TEAM_SECTIONS = [
     contact: true,
     cols: 6,
     plain: true,
-    people: fill(6, 'Core Student'),
+    people: [
+      {
+        name: 'Deberko Das',
+        role: 'Core Student',
+        phone: '9391253577',
+        email: 'deberko.das@bbafmah.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/deberkodas',
+      },
+      {
+        name: 'Kavya M Singhani',
+        role: 'Core Student',
+        phone: '8247541692',
+        email: 'kavyam.singhani@bscpsyh.christuniversity.in',
+        linkedin: 'https://in.linkedin.com/in/kavya-singhani-1295a6352',
+      },
+      {
+        name: 'Shreya Vishwanath',
+        role: 'Core Student',
+        phone: '7019839595',
+        email: 'shreya.vishwanath@bcomafh.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/shreya-v-670ab9374',
+      },
+      {
+        name: 'Gauri Joshi',
+        role: 'Core Student',
+        phone: '8263035599',
+        email: 'gauri.joshi@bacph.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/gauri-joshi-45b06b399',
+      },
+      {
+        name: 'Devansh Das',
+        role: 'Core Student',
+        phone: '7853920991',
+        email: 'devansh.das@baecoh.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/das-devansh',
+      },
+      {
+        name: 'Vansh Modi',
+        role: 'Core Student',
+        phone: '9000248110',
+        email: 'vansh.modi@bscemsh.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/vansh-modi',
+      },
+    ],
   },
   {
     key: 'faculty-members',
@@ -119,7 +181,7 @@ export const TEAM_SECTIONS = [
     title: 'Website Team',
     kicker: 'Builders of this orbit',
     contact: true,
-    cols: 4,
+    cols: 3,
     plain: true,
     featured: true,
     people: [
@@ -131,9 +193,22 @@ export const TEAM_SECTIONS = [
         email: 'chiranjeevi.p@bcah.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/chiranjeevi-purushotham/',
       },
-      { name: TBA, role: 'Developer' },
-      { name: TBA, role: 'Designer' },
-      { name: TBA, role: 'Developer' },
+      {
+        name: 'P B Jeevan',
+        role: 'Developer',
+        photo: jeevan,
+        phone: '8088227116',
+        email: 'jeevan.pb@christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/pbjeevan/',
+      },
+      {
+        name: 'Athreya S Parande',
+        role: 'Developer',
+        photo: athreya,
+        phone: '8088617880',
+        email: 'athreya.s@msaic.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/athreya-s-parande/',
+      },
     ],
   },
 ];

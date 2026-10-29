@@ -71,9 +71,60 @@ department: Professional Studies
 name:       DR. RAGHUNANDAN G 
 photo:      DR. RAGHUNANDAN G (HOD, PROFESSIONAL STUDIES).jpg
 
-department: Cultural Events
-name:
-photo:      hod-cultural-events.jpg
+department: Cultural Events   (shown as "Head of Culturals")
+name:       Mr Sumanth S Y
+photo:      core-faculty/Mr Sumanth  S Y.jpg
+
+
+CORE STUDENTS  (6 blocks; top to bottom = order on the page)
+-------------
+Photos -> src/assets/team/core-students/   (same photo rules as above)
+phone:    10-digit mobile number, no +91 or spaces (e.g. 9876543210)
+email:    full email address
+linkedin: full profile link (e.g. https://www.linkedin.com/in/your-name)
+Leave any line blank to hide it on the card.
+
+name:	   Deberko Das
+role:      Core Student
+photo:		
+phone:     9391253577
+email:     deberko.das@bbafmah.christuniversity.in
+linkedin:  https://www.linkedin.com/in/deberkodas?utm_source=share_via&utm_content=profile&utm_medium=member_ios
+
+name:      Kavya M Singhani
+role:      Core Student
+photo:
+phone:     8247541692
+email:     kavyam.singhani@bscpsyh.christuniversity.in
+linkedin:  https://in.linkedin.com/in/kavya-singhani-1295a6352
+
+name:      Shreya Vishwanath 
+role:      Core Student
+photo:
+phone:     7019839595
+email:     shreya.vishwanath@bcomafh.christuniversity.in 
+linkedin:  https://www.linkedin.com/in/shreya-v-670ab9374?utm_source=share_via&utm_content=profile&utm_medium=member_ios
+
+name:      Gauri Joshi
+role:      Core Student
+photo:
+phone:     8263035599
+email:     gauri.joshi@bacph.christuniversity.in
+linkedin:  https://www.linkedin.com/in/gauri-joshi-45b06b399?utm_source=share_via&utm_content=profile&utm_medium=member_ios
+
+name:      Devansh Das
+role:      Core Student
+photo:
+phone:     7853920991
+email:     devansh.das@baecoh.christuniversity.in
+linkedin:  www.linkedin.com/in/das-devansh
+
+name:      Vansh Modi 
+role:      Core Student
+photo:
+phone:     9000248110
+email:     vansh.modi@bscemsh.christuniversity.in 
+linkedin:  https://www.linkedin.com/in/vansh-modi
 
 
 WEBSITE TEAM  (add or remove blocks as needed; top to bottom = order on the page)
@@ -91,23 +142,16 @@ phone:     7892304079
 email:     chiranjeevi.p@bcah.christuniversity.in
 linkedin:  https://www.linkedin.com/in/chiranjeevi-purushotham/
 
-name:
+name:	   P B Jeevan
 role:      Developer
-photo:
-phone:
-email:
-linkedin:
+photo:     P B Jeevan (Developer).jpg
+phone:	   8088227116
+email:	   jeevan.pb@christuniversity.in
+linkedin:  https://www.linkedin.com/in/pbjeevan/
 
-name:
-role:      Designer
-photo:
-phone:
-email:
-linkedin:
-
-name:
+name:	   Athreya S Parande
 role:      Developer
-photo:
-phone:
-email:
-linkedin:
+photo:     Athreya S Parande (Developer).jpg
+phone:     8088617880
+email:	   athreya.s@msaic.christuniversity.in
+linkedin:  https://www.linkedin.com/in/athreya-s-parande/

@@ -23,6 +23,7 @@ import sumanth from '../assets/team/core-faculty/Mr Sumanth  S Y.jpg';
 import chiranjeevi from '../assets/team/website/Chiranjeevi P (Lead Developer & Designer).jpg';
 import jeevan from '../assets/team/website/P B Jeevan (Developer).jpg';
 import athreya from '../assets/team/website/Athreya S Parande (Developer).jpg';
+import sohail from '../assets/team/website/Md Sohail (Developer).jpg';
 
 /**
  * The people behind the fest, for the Dignitaries section of the About page (#/about).
@@ -180,7 +181,7 @@ export const TEAM_SECTIONS = [
     title: 'Website Team',
     kicker: 'Builders of this orbit',
     contact: true,
-    cols: 3,
+    cols: 4,
     plain: true,
     featured: true,
     people: [
@@ -207,6 +208,14 @@ export const TEAM_SECTIONS = [
         phone: '8088617880',
         email: 'athreya.s@msaic.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/athreya-s-parande/',
+      },
+      {
+        name: 'Md Sohail',
+        role: 'Developer',
+        photo: sohail,
+        phone: '9945157324',
+        email: 'mohammed.sohail@bcah.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/md-sohail05',
       },
     ],
   },

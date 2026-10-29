@@ -155,3 +155,10 @@ photo:     Athreya S Parande (Developer).jpg
 phone:     8088617880
 email:	   athreya.s@msaic.christuniversity.in
 linkedin:  https://www.linkedin.com/in/athreya-s-parande/
+
+name:      Md Sohail
+role:      Developer
+photo:	   Md Sohail (Developer).jpg
+phone:     9945157324
+email:     mohammed.sohail@bcah.christuniversity.in
+linkedin:  https://www.linkedin.com/in/md-sohail05

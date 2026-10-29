@@ -627,7 +627,7 @@ function EventsView({ open, onGone }) {
 
       {/* Navigator */}
       {list.length > 0 && (
-        <div className="ev-hud">
+        <div className="ev-hud" data-dock>
           <button type="button" className="bh-btn" onClick={() => go(active - 1)} disabled={active === 0} aria-label="Previous event">
             <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden="true">
               <path d="M16 10H5m4-5-5 5 5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />

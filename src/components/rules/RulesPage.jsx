@@ -372,7 +372,7 @@ function RulesView({ open, onGone }) {
       </header>
 
       {/* ---------------- Console ---------------- */}
-      <div className="bridge-console">
+      <div className="bridge-console" data-dock>
         <div ref={screensRef} className="bridge-screens">
           {/* Systems */}
           <div className="bridge-slot bridge-slot--left">

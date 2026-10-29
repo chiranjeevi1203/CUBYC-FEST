@@ -1,21 +1,48 @@
-import { useEffect, useRef } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import Experience from './components/Experience';
 import LoaderHUD from './components/hud/LoaderHUD';
 import CometCursor from './components/CometCursor';
 import LandingPage from './pages/LandingPage';
 import SpaceOverlays from './components/ui/SpaceOverlays';
-import DepartmentView from './components/dept/DepartmentView';
-import GalleryPage from './components/gallery/GalleryPage';
-import SchedulePage from './components/schedule/SchedulePage';
-import RulesPage from './components/rules/RulesPage';
-import EventsPage from './components/eventsPage/EventsPage';
-import AboutPage from './components/about/AboutPage';
-import ContactPage from './components/contact/ContactPage';
-import SponsorsPage from './components/sponsors/SponsorsPage';
 import ChatBot from './components/chat/ChatBot';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
-import NotFoundPage from './components/system/NotFoundPage';
+
+/*
+ * The full-screen pages are split into their own chunks: each loads the first time it is
+ * opened (or earlier, in the background — see the prefetch below), so the first visit only
+ * downloads the intro and the landing page.
+ */
+const PAGES = {
+  dept: () => import('./components/dept/DepartmentView'),
+  gallery: () => import('./components/gallery/GalleryPage'),
+  schedule: () => import('./components/schedule/SchedulePage'),
+  rules: () => import('./components/rules/RulesPage'),
+  events: () => import('./components/eventsPage/EventsPage'),
+  about: () => import('./components/about/AboutPage'),
+  contact: () => import('./components/contact/ContactPage'),
+  sponsors: () => import('./components/sponsors/SponsorsPage'),
+  notFound: () => import('./components/system/NotFoundPage'),
+};
+const DepartmentView = lazy(PAGES.dept);
+const GalleryPage = lazy(PAGES.gallery);
+const SchedulePage = lazy(PAGES.schedule);
+const RulesPage = lazy(PAGES.rules);
+const EventsPage = lazy(PAGES.events);
+const AboutPage = lazy(PAGES.about);
+const ContactPage = lazy(PAGES.contact);
+const SponsorsPage = lazy(PAGES.sponsors);
+const NotFoundPage = lazy(PAGES.notFound);
+
+/** Mounts a code-split page once it is first needed, then keeps it (each page hides itself when closed). */
+function OnDemand({ when, children }) {
+  const needed = useExperience(when);
+  const [ever, setEver] = useState(needed);
+  useEffect(() => {
+    if (needed) setEver(true);
+  }, [needed]);
+  return needed || ever ? <Suspense fallback={null}>{children}</Suspense> : null;
+}
 
 /** Hash routes that open a page (department routes are checked by parseHash). */
 const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about', '#/contact', '#/sponsors'];
@@ -51,6 +78,27 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle('low-gfx', quality === 'low');
   }, [quality]);
+
+  // Once the landing page is live, fetch the other pages one at a time while the browser is
+  // idle, so opening any of them is instant. Skipped when the visitor asked to save data.
+  useEffect(() => {
+    if (!live || navigator.connection?.saveData) return undefined;
+    const idle = window.requestIdleCallback ?? ((fn) => window.setTimeout(fn, 300));
+    const queue = Object.values(PAGES);
+    let stopped = false;
+    const next = () => {
+      const load = queue.shift();
+      if (stopped || !load) return;
+      load()
+        .catch(() => {})
+        .finally(() => idle(next, { timeout: 4000 }));
+    };
+    const start = window.setTimeout(() => idle(next, { timeout: 4000 }), 2500);
+    return () => {
+      stopped = true;
+      window.clearTimeout(start);
+    };
+  }, [live]);
 
   // Department routes: Back / Forward and deep links (opened once the intro hands off).
   useEffect(() => {
@@ -92,15 +140,33 @@ export default function App() {
       <Experience />
       <LandingPage landingRef={landingRef} />
       <SpaceOverlays />
-      <DepartmentView />
-      <GalleryPage />
-      <SchedulePage />
-      <RulesPage />
-      <EventsPage />
-      <AboutPage />
-      <ContactPage />
-      <SponsorsPage />
-      <NotFoundPage />
+      <OnDemand when={(s) => s.dept !== null}>
+        <DepartmentView />
+      </OnDemand>
+      <OnDemand when={(s) => s.galleryOpen}>
+        <GalleryPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.scheduleOpen}>
+        <SchedulePage />
+      </OnDemand>
+      <OnDemand when={(s) => s.rulesOpen}>
+        <RulesPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.eventsOpen}>
+        <EventsPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.aboutOpen}>
+        <AboutPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.contactOpen}>
+        <ContactPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.sponsorsOpen}>
+        <SponsorsPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.notFound}>
+        <NotFoundPage />
+      </OnDemand>
       <ChatBot />
       {hudMounted && <LoaderHUD landingRef={landingRef} />}
       <CometCursor />

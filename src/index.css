@@ -7012,7 +7012,8 @@
   .comms-launcher {
     position: fixed;
     right: calc(env(safe-area-inset-right) + 1.1rem);
-    bottom: calc(env(safe-area-inset-bottom) + 1.1rem);
+    /* --dock-lift: set by ChatBot to clear a page's bottom bar */
+    bottom: calc(env(safe-area-inset-bottom) + 1.1rem + var(--dock-lift, 0px));
     z-index: 65;
     display: grid;
     place-items: center;
@@ -7025,7 +7026,8 @@
       transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     animation: comms-float 5s ease-in-out infinite;
   }
-  .comms-launcher.is-hidden {
+  .comms-launcher.is-hidden,
+  .comms-launcher.is-docked-out {
     opacity: 0;
     pointer-events: none;
   }

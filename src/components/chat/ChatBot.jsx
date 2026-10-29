@@ -152,6 +152,53 @@ export default function ChatBot() {
   const listRef = useRef(null);
   const inputRef = useRef(null);
 
+  // Keep the ship clear of a page's bottom bar ([data-dock]): where the bar reaches the
+  // ship's corner (phones), the ship floats just above it instead of covering it.
+  useEffect(() => {
+    let raf = 0;
+    let ro = null;
+    const measure = () => {
+      raf = 0;
+      const ship = launcherRef.current;
+      if (!ship) return;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const corner = vw - ship.offsetWidth - 24;
+      let lift = 0;
+      document.querySelectorAll('[data-dock]').forEach((d) => {
+        const r = d.getBoundingClientRect();
+        if (!r.width || r.right < corner || r.bottom < vh - 160 || r.top > vh) return;
+        if (d.closest('[aria-hidden="true"], [inert]') || getComputedStyle(d).visibility === 'hidden') return;
+        lift = Math.max(lift, vh - r.top + 6);
+      });
+      // A bar taller than a third of the screen (the rules console on phones): floating above
+      // it would cover the page, so the ship steps aside on that page instead.
+      const tall = lift > vh / 3;
+      ship.classList.toggle('is-docked-out', tall);
+      ship.style.setProperty('--dock-lift', `${tall ? 0 : Math.round(lift)}px`);
+    };
+    const queue = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+    // Pages fade in and their bars resize (the rules console grows), so watch the bars themselves.
+    const watch = () => {
+      ro?.disconnect();
+      ro = new ResizeObserver(queue);
+      document.querySelectorAll('[data-dock]').forEach((d) => ro.observe(d));
+      queue();
+    };
+    const onRoute = () => [0, 400, 1200].forEach((t) => window.setTimeout(watch, t));
+    onRoute();
+    window.addEventListener('resize', queue);
+    window.addEventListener('hashchange', onRoute);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+      window.removeEventListener('resize', queue);
+      window.removeEventListener('hashchange', onRoute);
+    };
+  }, []);
+
   // Remember the conversation for this visit.
   useEffect(() => {
     try {

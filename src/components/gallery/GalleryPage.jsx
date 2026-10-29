@@ -571,7 +571,7 @@ function GalleryView({ open, onGone }) {
       </header>
 
       {/* Controls */}
-      <div className="bh-controls">
+      <div className="bh-controls" data-dock>
         <button type="button" className="bh-btn" onClick={() => nudge(-1)} aria-label="Previous photos">
           <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden="true">
             <path d="M16 10H5m4-5-5 5 5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />

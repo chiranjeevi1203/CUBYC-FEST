@@ -406,7 +406,7 @@ function ScheduleView({ open, onGone }) {
       </header>
 
       {/* Flight HUD */}
-      <div className="sch-hud">
+      <div className="sch-hud" data-dock>
         <div className="flex items-center justify-between gap-4">
           <span className="font-mono text-[0.56rem] tracking-[0.3em] text-gold-300/85 uppercase">
             {plan.label} · {plan.title}

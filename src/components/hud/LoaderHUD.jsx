@@ -6,6 +6,9 @@ import { BRAND, TIMELINE, prefersReducedMotion } from '../../config/experience';
 import { buildMasterTimeline } from '../../lib/timeline';
 import { useExperience } from '../../store/useExperience';
 
+/** Remembered once the journey has been seen, so later visits fly in quickly. */
+const INTRO_SEEN_KEY = 'cubyc-intro-seen';
+
 /**
  * DOM overlay for the FPV loader. It builds and owns the GSAP master timeline,
  * which outlives this component by a beat: after the hand-off the same timeline
@@ -31,6 +34,11 @@ export default function LoaderHUD({ landingRef }) {
   const handleHandoff = useCallback(() => {
     if (handedOffRef.current) return;
     handedOffRef.current = true;
+    try {
+      localStorage.setItem(INTRO_SEEN_KEY, '1');
+    } catch {
+      /* storage blocked: the next visit just plays the full journey */
+    }
     const veil = veilRef.current;
     if (veil && Number(gsap.getProperty(veil, 'opacity')) > 0.01) {
       gsap.to(veil, { opacity: 0, duration: 0.45, ease: 'power1.out', onComplete: finishLoader });
@@ -59,7 +67,14 @@ export default function LoaderHUD({ landingRef }) {
       onHandoff: handleHandoff,
       reducedMotion: prefersReducedMotion(),
     });
-    tl.timeScale(TIMELINE.timeScale);
+    // First visit: the full journey (a touch brisk); returning visitors: a quick fly-in.
+    let seen = false;
+    try {
+      seen = localStorage.getItem(INTRO_SEEN_KEY) === '1';
+    } catch {
+      /* storage blocked: treat as a first visit */
+    }
+    tl.timeScale(seen ? TIMELINE.returnTimeScale : TIMELINE.timeScale);
     tlRef.current = tl;
 
     // Art-direction helper: ?scrub=3.2 freezes at 3.2s; ?scrub=99 jumps to the landing page.

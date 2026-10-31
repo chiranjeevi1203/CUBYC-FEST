@@ -17,6 +17,7 @@ import {
   mulberry32,
 } from '../../config/experience';
 import StationModel from './StationModel';
+import PrizeShip from './PrizeShip';
 import { getScene, useExperience } from '../../store/useExperience';
 import { interaction } from '../../lib/interaction';
 
@@ -36,6 +37,8 @@ const planetAngles = PLANETS.map((p) => p.angle);
 /** Extra angle a body has travelled because of scrolling (true speed ratios). */
 const scrollAngle = (speed) => orbitScroll.value * SCROLL_RADIANS * (speed / EARTH_ORBIT_SPEED);
 const sysFade = () => fade.value;
+/** The prize ship appears with the orbits and fades with the system. */
+const shipVisibility = () => getScene().orbits * sysFade();
 
 function isHighlighted(id) {
   return interaction.hover === id || useExperience.getState().focus === id;
@@ -616,6 +619,8 @@ export default function SolarSystem({ quality }) {
         ))}
         <OrbitLines />
         <MotionTrails />
+        {/* The prize-pool freighter, wandering between the worlds */}
+        <PrizeShip sunPos={SUN_WORLD} visibility={shipVisibility} />
         <AsteroidBelt quality={quality} />
       </group>
     </group>

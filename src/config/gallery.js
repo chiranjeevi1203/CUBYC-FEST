@@ -11,12 +11,25 @@
  * Keep photos around 2000 px on the long side (full-size originals can live in
  * /gallery-originals, which isn't published). Until photos are added, the page
  * uses the illustrated placeholders.
+ *
+ * Optional thumbnails: a same-named file in src/assets/gallery/thumbs/ (about
+ * 960 px, e.g. cs-1.webp) is used for the small sliding tiles on the landing
+ * page, so they load fast; the gallery page keeps the full photo. Without one,
+ * the tile simply uses the full photo.
  */
 const files = import.meta.glob('../assets/gallery/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}', {
   eager: true,
   query: '?url',
   import: 'default',
 });
+
+const thumbFiles = import.meta.glob('../assets/gallery/thumbs/*.{jpg,jpeg,png,webp,avif}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const baseName = (path) => path.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase();
+const THUMBS = Object.fromEntries(Object.entries(thumbFiles).map(([path, url]) => [baseName(path), url]));
 
 /** Filename prefix → department (for names like "cs-3.jpg"). */
 const DEPT_CODES = {
@@ -55,7 +68,7 @@ function describe(path) {
 
 const sorted = Object.entries(files)
   .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-  .map(([path, src]) => ({ src, group: path.split('/').pop().replace(/[-_\s]*\d*\.[^.]+$/, '').toLowerCase(), ...describe(path) }));
+  .map(([path, src]) => ({ src, thumb: THUMBS[baseName(path)] ?? src, group: path.split('/').pop().replace(/[-_\s]*\d*\.[^.]+$/, '').toLowerCase(), ...describe(path) }));
 
 /**
  * Round-robin across groups (cs-1, psy-1, cs-2, psy-2 …) so photos from the same

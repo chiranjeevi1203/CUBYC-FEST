@@ -16,7 +16,7 @@ const STATS = [
   { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Domains' },
   { value: String(EVENT_COUNT).padStart(2, '0'), label: 'Events' },
   { value: '02', label: 'Days in orbit' },
-  { value: '₹10L', label: 'Prize pool' },
+  { value: '₹10L+', label: 'Prize pool' },
 ];
 
 // The university's vision, mission and core values (as published by CHRIST).
@@ -67,7 +67,7 @@ function FloatingCampus() {
         </svg>
         <div className="fcampus__tilt">
           <div className="fcampus__photo">
-            <img src={campus} alt={`${BRAND.universityFull}, ${BRAND.campus}`} />
+            <img src={campus} alt={`${BRAND.universityFull}, ${BRAND.campus}`} decoding="async" />
             <span className="fcampus__night" aria-hidden="true" />
             <span className="fcampus__lights" aria-hidden="true" />
           </div>

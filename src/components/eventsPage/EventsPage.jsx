@@ -477,7 +477,7 @@ function EventsView({ open, onGone }) {
   return (
     <div
       ref={rootRef}
-      className="ev-page fixed inset-0 z-40 overflow-hidden text-[#f4f1ea]"
+      className={`ev-page fixed inset-0 z-40 overflow-hidden text-[#f4f1ea] ${brief ? 'has-brief' : ''}`}
       onWheel={onWheel}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}

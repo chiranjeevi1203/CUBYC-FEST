@@ -6340,6 +6340,12 @@
   }
   .ev-stage {
     perspective: 1500px;
+    transition: opacity 0.35s ease;
+  }
+  /* While a brief is open the fan fades away: its 3D-composited cards would otherwise ghost through */
+  .ev-page.has-brief .ev-stage,
+  .ev-page.has-brief .ev-sweep {
+    opacity: 0;
   }
 
   /* The card */
@@ -6636,6 +6642,9 @@
     white-space: nowrap;
   }
   .ev-tools {
+    /* Above the orb + title, so the open filter menu is never painted over */
+    position: relative;
+    z-index: 3;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -6955,9 +6964,10 @@
     place-items: center;
     padding: 5.5rem 1rem 1.5rem;
     overflow-y: auto;
-    background: radial-gradient(ellipse at 40% 50%, rgba(2, 3, 8, 0.6), rgba(2, 3, 8, 0.92));
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
+    /* The page behind goes fully soft and dark, so the brief reads cleanly */
+    background: radial-gradient(ellipse at 40% 50%, rgba(3, 4, 12, 0.78), rgba(2, 3, 8, 0.95));
+    -webkit-backdrop-filter: blur(16px) saturate(0.8);
+    backdrop-filter: blur(16px) saturate(0.8);
     cursor: default;
   }
   .ev-brief__inner {
@@ -7068,6 +7078,10 @@
   }
 
   @media (max-width: 760px) {
+    /* Small screens: the brief covers the whole page, so the fan behind can't compete */
+    .ev-brief {
+      background: linear-gradient(180deg, rgba(4, 5, 14, 0.9), rgba(2, 3, 8, 0.96));
+    }
     .ev-head {
       flex-direction: column;
       align-items: stretch;
@@ -7114,6 +7128,306 @@
       bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
     }
   }
+  /* ---------- Scrollbar: the spacecraft rail (mouse / trackpad only) ---------- */
+  @media (pointer: fine) {
+    html.has-scroll-ship,
+    html.has-scroll-ship body,
+    html.has-scroll-ship .space-page,
+    html.has-scroll-ship .dept-events {
+      scrollbar-width: none;
+    }
+    html.has-scroll-ship::-webkit-scrollbar,
+    html.has-scroll-ship body::-webkit-scrollbar,
+    html.has-scroll-ship .space-page::-webkit-scrollbar,
+    html.has-scroll-ship .dept-events::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  }
+  html.is-scroll-dragging,
+  html.is-scroll-dragging * {
+    user-select: none !important;
+    cursor: grabbing !important;
+  }
+  .ss-rail {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 95;
+    width: 24px;
+    opacity: 0;
+    visibility: hidden;
+    cursor: pointer;
+    transition:
+      opacity 0.5s ease,
+      visibility 0.5s;
+  }
+  .ss-rail.is-on {
+    opacity: 1;
+    visibility: visible;
+  }
+  /* The rail: a hairline gold gantry with measured ticks; the flown part glows brighter */
+  .ss-track,
+  .ss-track__done {
+    position: absolute;
+    left: 50%;
+    top: 10px;
+    width: 1px;
+    translate: -50% 0;
+    pointer-events: none;
+  }
+  .ss-track {
+    bottom: 10px;
+    background: linear-gradient(transparent, rgba(233, 194, 122, 0.26) 6%, rgba(233, 194, 122, 0.26) 94%, transparent);
+  }
+  .ss-track::before {
+    content: "";
+    position: absolute;
+    inset: 0 -3px;
+    background: repeating-linear-gradient(to bottom, transparent 0 47px, rgba(233, 194, 122, 0.32) 47px 48px);
+    -webkit-mask-image: linear-gradient(transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(transparent, #000 6%, #000 94%, transparent);
+  }
+  .ss-track__done {
+    height: max(0px, calc(var(--done, 0px) - 10px));
+    background: linear-gradient(transparent, rgba(243, 211, 154, 0.75));
+    box-shadow: 0 0 6px rgba(233, 194, 122, 0.45);
+  }
+  .ss-rail:hover .ss-track {
+    background: linear-gradient(transparent, rgba(233, 194, 122, 0.45) 6%, rgba(233, 194, 122, 0.45) 94%, transparent);
+  }
+
+  /* The craft (thumb) */
+  .ss-ship {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 22px;
+    height: 132px;
+    cursor: grab;
+    will-change: transform;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 calc(var(--thrust, 0) * 10px) rgba(255, 140, 70, 0.55));
+    transition: filter 0.3s ease;
+  }
+  .ss-rail:hover .ss-ship,
+  .ss-rail.is-dragging .ss-ship {
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 7px rgba(233, 194, 122, 0.55));
+  }
+  .ss-ship__art {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .ss-throat {
+    opacity: calc(0.35 + var(--thrust, 0) * 0.65);
+  }
+  .ss-nav {
+    animation: ss-blink 2.2s linear infinite;
+  }
+  @keyframes ss-blink {
+    0%,
+    10% {
+      opacity: 1;
+    }
+    11%,
+    100% {
+      opacity: 0.15;
+    }
+  }
+
+  /* Main burn: a white-hot core in an amber body, a red outer glow, trailing above */
+  .ss-plume {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% - 3px);
+    width: 18px;
+    height: calc(8px + var(--thrust, 0) * 84px);
+    translate: -50% 0;
+    transform-origin: 50% 100%;
+    opacity: calc(var(--thrust, 0) * 1.4);
+    pointer-events: none;
+  }
+  .ss-plume > span {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    translate: -50% 0;
+    transform-origin: 50% 100%;
+  }
+  .ss-plume__glow {
+    width: 34px;
+    height: 100%;
+    background: radial-gradient(ellipse 50% 100% at 50% 100%, rgba(255, 110, 60, 0.55), rgba(255, 70, 40, 0.18) 55%, transparent 80%);
+    filter: blur(6px);
+  }
+  .ss-plume__body {
+    width: 15px;
+    height: 100%;
+    background: radial-gradient(ellipse 50% 100% at 50% 100%, rgba(255, 246, 228, 0.95), rgba(255, 180, 90, 0.85) 25%, rgba(255, 96, 54, 0.45) 60%, transparent 85%);
+    filter: blur(1.6px);
+    animation: ss-flick 0.12s linear infinite alternate;
+  }
+  .ss-plume__core {
+    width: 7px;
+    height: 55%;
+    background: radial-gradient(ellipse 50% 100% at 50% 100%, #fff, rgba(255, 238, 210, 0.9) 35%, transparent 80%);
+    filter: blur(0.6px);
+    animation: ss-flick 0.08s linear infinite alternate-reverse;
+  }
+  @keyframes ss-flick {
+    0% {
+      transform: scale(1, 1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.9, 0.93);
+      opacity: 0.85;
+    }
+  }
+  /* Glare over the nozzle cluster (always a faint idle glow, flaring with the burn) */
+  .ss-glare {
+    position: absolute;
+    left: 50%;
+    top: 2px;
+    width: 30px;
+    height: 30px;
+    translate: -50% -50%;
+    background: radial-gradient(circle, rgba(255, 236, 214, 0.9), rgba(255, 120, 70, 0.45) 30%, transparent 68%);
+    opacity: calc(0.18 + var(--thrust, 0) * 0.82);
+    transform: scale(calc(0.6 + var(--thrust, 0) * 0.7));
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .ss-glare::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 1.5px;
+    translate: -50% -50%;
+    background: linear-gradient(90deg, transparent, rgba(255, 220, 190, 0.85), transparent);
+    opacity: var(--thrust, 0);
+  }
+  /* Retro thrusters: two small jets angled down from the nose when scrolling up */
+  .ss-retro {
+    position: absolute;
+    top: calc(100% - 12px);
+    width: 6px;
+    height: calc(4px + var(--retro, 0) * 22px);
+    background: radial-gradient(ellipse 50% 100% at 50% 0%, rgba(255, 248, 236, 0.95), rgba(255, 170, 100, 0.6) 40%, transparent 85%);
+    filter: blur(1px);
+    opacity: calc(var(--retro, 0) * 1.4);
+    transform-origin: 50% 0;
+    pointer-events: none;
+  }
+  .ss-retro--l {
+    left: 2px;
+    rotate: 32deg;
+  }
+  .ss-retro--r {
+    right: 2px;
+    rotate: -32deg;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ss-plume__body,
+    .ss-plume__core,
+    .ss-nav {
+      animation: none;
+    }
+  }
+
+  /* ---------- Prize-pool ship tag (landing scene) ---------- */
+  .prize-tag {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .prize-tag__plate {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    padding: 0.24rem 0.55rem;
+    border: 1px solid rgba(233, 194, 122, 0.22);
+    background: rgba(6, 8, 20, 0.42);
+    white-space: nowrap;
+    transition:
+      border-color 0.45s ease,
+      background-color 0.45s ease,
+      box-shadow 0.45s ease;
+  }
+  .prize-tag__amt {
+    font-family: var(--font-display);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: rgba(243, 217, 164, 0.9);
+    transition: font-size 0.45s ease;
+  }
+  .prize-tag__label {
+    font-family: var(--font-mono);
+    font-size: 0.46rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  /* Opens on hover: "· Across all 27 events" */
+  .prize-tag__more {
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    font-family: var(--font-mono);
+    font-size: 0.44rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(243, 217, 164, 0.65);
+    transition:
+      max-width 0.55s ease,
+      opacity 0.45s ease;
+  }
+  .prize-tag__more::before {
+    content: "· ";
+    color: rgba(255, 255, 255, 0.35);
+  }
+  .prize-tag__stem {
+    width: 1px;
+    height: 10px;
+    background: linear-gradient(rgba(233, 194, 122, 0.45), transparent);
+  }
+  .prize-tag.is-hot .prize-tag__plate {
+    border-color: rgba(233, 194, 122, 0.6);
+    background: rgba(10, 12, 28, 0.72);
+    box-shadow: 0 0 22px -8px rgba(233, 194, 122, 0.6);
+  }
+  .prize-tag.is-hot .prize-tag__amt {
+    font-size: 0.84rem;
+    background: linear-gradient(100deg, #fff1d2, #f3d39a 40%, #e9c27a 70%, #fbe4b0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .prize-tag.is-hot .prize-tag__more {
+    max-width: 12rem;
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .prize-tag__plate,
+    .prize-tag__amt,
+    .prize-tag__more {
+      transition: none;
+    }
+  }
+
   /* ---------- "Open to all" docking advisory (events page) ---------- */
   .xd-defs {
     position: absolute;
@@ -7599,6 +7913,10 @@
   .low-gfx .ev-brief {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+  /* No blur on low-graphics devices: hide the page behind the brief with a near-solid veil instead */
+  .low-gfx .ev-brief {
+    background: rgba(3, 4, 10, 0.99);
   }
 
   /* ---------- The chat launcher's corner ---------- */

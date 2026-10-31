@@ -186,9 +186,10 @@ function Art({ kind, uid }) {
   }
 }
 
-export function Media({ item, uid, eager = false }) {
+export function Media({ item, uid, eager = false, small = false }) {
   if (item.src) {
-    return <img src={item.src} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" className="h-full w-full object-cover" />;
+    const src = small ? (item.thumb ?? item.src) : item.src;
+    return <img src={src} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" className="h-full w-full object-cover" />;
   }
   return (
     <svg viewBox="0 0 400 280" preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden="true">
@@ -226,11 +227,11 @@ function Tile({ item, uid, hidden, soft }) {
       <Frame size="sm" star={false} className="pgal__frame" />
       <span className="pgal__media">
         <span className="pgal__img">
-          <Media item={item} uid={`${uid}-a`} eager />
+          <Media item={item} uid={`${uid}-a`} small />
         </span>
         {soft && (
           <span className="pgal__blur">
-            <Media item={item} uid={`${uid}-b`} />
+            <Media item={item} uid={`${uid}-b`} small />
           </span>
         )}
         <span className="pgal__shade" />

@@ -56,7 +56,9 @@ export const EVENT = {
 export const TIMELINE = {
   duration: 8,
   // 1 = canonical 8.0s. 0.8 = slower, 1.25 = faster.
-  timeScale: 1,
+  timeScale: 1.3,
+  // Returning visitors (they've seen it) get a quick fly-in.
+  returnTimeScale: 2.4,
   // prefers-reduced-motion: no warp, galaxy → solar system crossfade.
   reducedDuration: 1.2,
   // GALAXY: slow drift toward the galaxy · WARP: the sudden jump to lightspeed ·

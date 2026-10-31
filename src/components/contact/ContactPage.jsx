@@ -131,7 +131,7 @@ function WebCrewCard({ open, onClose }) {
       <p className="cts-core__kicker">
         <span className="cts-core__led" aria-hidden="true" /> Website &amp; tech support
       </p>
-      <span className="cts-core__medal">{p.photo ? <img src={p.photo} alt={p.name} loading="lazy" /> : <b>{initials(p.name)}</b>}</span>
+      <span className="cts-core__medal">{p.photo ? <img src={p.photo} alt={p.name} loading="lazy" decoding="async" /> : <b>{initials(p.name)}</b>}</span>
       <h3 className="cts-core__name">{p.name}</h3>
       <p className="cts-core__role">{p.role}</p>
       <p className="cts-core__note">Anything about this website — a broken link, a bug or an idea? Reach out.</p>

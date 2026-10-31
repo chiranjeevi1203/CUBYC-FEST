@@ -38,7 +38,7 @@ const STATS = [
   { value: '02', label: 'Days in orbit' },
   { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Domains' },
   { value: String(EVENT_COUNT).padStart(2, '0'), label: 'Events' },
-  { value: '₹10L', label: 'Prize pool', featured: true },
+  { value: '₹10L+', label: 'Prize pool', featured: true },
 ];
 
 // The fest's dates, read from EVENT.start / EVENT.end in Indian time (the same everywhere).
@@ -415,7 +415,7 @@ export default function LandingPage({ landingRef }) {
               </p>
               <p>
                 From esports arenas and capture-the-flag labs to bands, stages and boardroom pitches, every world hosts its own missions — with
-                a <span className="text-gold-200">₹10 lakh prize pool</span> waiting for the crews who conquer them.
+                a <span className="text-gold-200">₹10L+ prize pool</span> waiting for the crews who conquer them.
               </p>
               <ul className="about-pillars">
                 {PILLARS.map((p) => (

@@ -5,6 +5,7 @@ import CometCursor from './components/CometCursor';
 import LandingPage from './pages/LandingPage';
 import SpaceOverlays from './components/ui/SpaceOverlays';
 import ChatBot from './components/chat/ChatBot';
+import ScrollShip from './components/ui/ScrollShip';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
 
@@ -168,6 +169,7 @@ export default function App() {
         <NotFoundPage />
       </OnDemand>
       <ChatBot />
+      <ScrollShip />
       {hudMounted && <LoaderHUD landingRef={landingRef} />}
       <CometCursor />
     </>

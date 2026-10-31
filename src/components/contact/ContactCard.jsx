@@ -27,7 +27,7 @@ export default function ContactCard({ person, index = 0, compact = false, active
     // list, and changing className here would wipe it.
     <li className={`ct-card ${compact ? 'ct-card--compact' : ''} ${tba ? 'is-tba' : ''} ${className}`} style={{ '--i': index % 6 }} data-rise data-active={active || undefined} {...rest}>
       <span className="ct-card__medal" aria-hidden="true">
-        {person.photo ? <img src={person.photo} alt="" loading="lazy" /> : tba ? <span className="ct-card__q">✦</span> : <b>{initials(person.name)}</b>}
+        {person.photo ? <img src={person.photo} alt="" loading="lazy" decoding="async" /> : tba ? <span className="ct-card__q">✦</span> : <b>{initials(person.name)}</b>}
       </span>
 
       <div className="ct-card__body">

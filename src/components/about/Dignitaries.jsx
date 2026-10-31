@@ -75,7 +75,7 @@ function PersonCard({ person, index, section, className = '' }) {
           <span className="gcard__stud gcard__stud--r" aria-hidden="true" />
           <span className="gcard__medal">
             {person.photo ? (
-              <img src={person.photo} alt={person.name} loading="lazy" />
+              <img src={person.photo} alt={person.name} loading="lazy" decoding="async" />
             ) : tba ? (
               <svg viewBox="0 0 20 20" className="gcard__silhouette" aria-hidden="true">
                 <path d="M10 10a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2Z M3.5 18c0-3.8 2.9-6.4 6.5-6.4s6.5 2.6 6.5 6.4" fill="currentColor" />

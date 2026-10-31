@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import FestMark from './FestMark';
 import Star from './Star';
 import BrandLogo from '../hud/BrandLogo';
@@ -137,10 +137,25 @@ const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${enc
 
 /** The campus map band: the live map in night colours, a gold beacon and a venue plate. */
 function FooterMap() {
+  // The embed is heavy: start loading it about two screens before it scrolls into
+  // view (measured inside whichever surface scrolls), so it is drawn by the time
+  // it arrives and never stalls the scroll, and never loads for visitors who stop short.
+  const ref = useRef(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || near) return undefined;
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setNear(true), {
+      root: el.closest('.space-page'),
+      rootMargin: '200% 0px',
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
   return (
-    <section className="ft-map" aria-label="Campus map">
+    <section ref={ref} className="ft-map" aria-label="Campus map">
       <div className="ft-map__frame">
-        <iframe title={`Map: ${MAP_PLACE}`} src={MAP_EMBED} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+        {near && <iframe title={`Map: ${MAP_PLACE}`} src={MAP_EMBED} referrerPolicy="no-referrer-when-downgrade" />}
         <span className="ft-map__veil" aria-hidden="true" />
         <span className="ft-map__pin" aria-hidden="true" />
         <div className="ft-map__plate">

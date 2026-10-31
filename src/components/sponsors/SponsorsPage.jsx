@@ -51,7 +51,7 @@ function SponsorCard({ sponsor, tier, index }) {
               <b className="spc__name">Your brand here</b>
             </>
           ) : sponsor.logo ? (
-            <img src={sponsor.logo} alt={sponsor.name} className="spc__logo" loading="lazy" />
+            <img src={sponsor.logo} alt={sponsor.name} className="spc__logo" loading="lazy" decoding="async" />
           ) : (
             <b className="spc__name">{sponsor.name}</b>
           )}

@@ -131,7 +131,7 @@ function Station() {
  * giant blurred CUBYC wordmark sits behind it all. The scene follows the pointer
  * gently and only animates while on screen.
  */
-const MAP_PLACE = 'Christ University Yeshwanthpur Campus, Bangalore';
+const MAP_PLACE = 'CHRIST (Deemed to be University) Yeshwanthpur Campus, Bangalore';
 const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(MAP_PLACE)}&z=16&output=embed`;
 const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(MAP_PLACE)}`;
 

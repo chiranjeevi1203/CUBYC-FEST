@@ -15,13 +15,17 @@ Photos:
 DIGNITARIES  (add or remove blocks as needed; top to bottom = order on the page)
 -----------
 
+name:      DR. FR. JOSEPH C C
+role:      Vice Chancellor
+photo:     Dr Fr Joseph C C(Vice Chancellor).jpg
+
 name:	   DR. FR.BENNY THOMAS 
 role:      Director
 photo:     DR. FR.BENNY THOMAS (DIRECTOR).jpg
 
-name:      DR. FR. BIIJU K C
+name:      DR. FR. BIJU K C
 role:      ASSOCIATE DIRECTOR
-photo:     DR. FR. BIIJU K C (ASSOCIATE DIRECTOR).jpg
+photo:     DR. FR. BIJU K C (ASSOCIATE DIRECTOR).jpg
 
 name:	   DR. JOBY THOMAS
 role:      Dean
@@ -68,8 +72,8 @@ name:	    Dr Shrinivas Kulkarni
 photo:      Dr Shrinivas Kulkarni (HOD, MANAGEMENT).jpg
 
 department: Professional Studies
-name:       DR. RAGHUNANDAN G 
-photo:      DR. RAGHUNANDAN G (HOD, PROFESSIONAL STUDIES).jpg
+name:       DR. HRIDHYA P K
+photo:      DR. HRIDHYA P K (HOD, PROFESSIONAL STUDIES) .jpg
 
 department: Cultural Events   (shown as "Head of Culturals")
 name:       Mr Sumanth S Y

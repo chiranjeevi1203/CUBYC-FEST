@@ -78,7 +78,7 @@ const EVENT_ALIASES = {
   'crack-the-psyche': ['crack the psyche', 'charades', 'dumb charades', 'pictionary', 'psyche'],
   'cybertronian-wars-gaming': ['cybertronian', 'gaming', 'esports', 'e sports', 'valorant', 'games'],
   'transwarp-protocol-capture-the-flag': ['transwarp', 'capture the flag', 'ctf', 'hacking', 'cybersecurity', 'cyber security'],
-  'prime-prompt-ai-prompt-wars': ['prime prompt', 'prompt wars', 'prompt engineering', 'prompting', 'prompt', 'chatgpt'],
+  'prime-prompt-ai-battle-of-prompts': ['prime prompt', 'battle of prompts', 'prompt wars', 'prompt engineering', 'prompting', 'prompt', 'chatgpt'],
   monomatics: ['monomatics', 'monopoly'],
   'auction-sudoku': ['auction sudoku', 'sudoku'],
   'best-manager-sustainaquest': ['best manager', 'sustainaquest', 'sustainability'],

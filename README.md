@@ -101,7 +101,7 @@ The space station (`STATIONS` in config, `scene/StationModel.jsx`, `lib/stationS
 - **Next / previous:** the buttons beside the semicircle, **← / →**, the dots in the top bar, or a sideways swipe on phones. The worlds hang off a wheel whose hub is below the screen, so a swap reads as a rotation.
 - **Inside the world:** click the world (or **Enter**). It fills the screen from below, the atmosphere streaks past, and its environment becomes the backdrop for the events: the list, plus each event's format, faculty and student in-charge, and rules.
 - **Leave:** **Esc** steps back (events → orbit → solar system). Browser Back / Forward work, and the landing keeps its scroll position.
-- **Routes:** `#/dept/<world>`, `#/dept/<world>/events` and `#/dept/<world>/events/<event>` (for example `#/dept/earth/events/prime-prompt-ai-prompt-wars`) are deep-linkable.
+- **Routes:** `#/dept/<world>`, `#/dept/<world>/events` and `#/dept/<world>/events/<event>` (for example `#/dept/earth/events/prime-prompt-ai-battle-of-prompts`) are deep-linkable.
 - **Content:** everything lives in `src/config/departments.js`. Rules are `'Label: text'` strings, and lines starting with `- ` render as bullets. Department names and taglines also drive the planet tooltip, the tour card and the Events grid.
 
 ## Gallery page (`#/gallery`)

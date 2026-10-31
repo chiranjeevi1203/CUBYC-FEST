@@ -1,8 +1,9 @@
 import { DEPARTMENTS, DEPT_ORDER } from './departments';
 
 // Portraits (src/assets/team; details in src/assets/team/details.txt).
+import joseph from '../assets/team/dignitaries/Dr Fr Joseph C C(Vice Chancellor).jpg';
 import benny from '../assets/team/dignitaries/DR. FR.BENNY THOMAS (DIRECTOR).jpg';
-import biiju from '../assets/team/dignitaries/DR. FR. BIIJU K C (ASSOCIATE DIRECTOR).jpg';
+import biju from '../assets/team/dignitaries/DR. FR. BIJU K C (ASSOCIATE DIRECTOR).jpg';
 import joby from '../assets/team/dignitaries/DR. JOBY THOMAS (DEAN).jpg';
 import raghunandanDean from '../assets/team/dignitaries/DR. RAGHUNANDAN G (ASSOCIATE DEAN).jpg';
 import vineeth from '../assets/team/hods/Dr VINEETH M (HOD, ECONOMICS).jpg';
@@ -13,7 +14,7 @@ import sushin from '../assets/team/hods/DR. SUSHIN M (HOD, COMMERCE).jpg';
 import nirmala from '../assets/team/hods/DR. NIRMALA MN (HOD, MEDIA STUDIES).jpg';
 import arun from '../assets/team/hods/DR. ARUN D M (HOD, ENGLISH & CULTURAL STUDIES).jpg';
 import shrinivas from '../assets/team/hods/Dr Shrinivas Kulkarni (HOD, MANAGEMENT).jpg';
-import raghunandanHod from '../assets/team/hods/DR. RAGHUNANDAN G (HOD, PROFESSIONAL STUDIES).jpg';
+import hridhya from '../assets/team/hods/DR. HRIDHYA P K (HOD, PROFESSIONAL STUDIES) .jpg';
 import gayathry from '../assets/team/core-faculty/Dr GAYATHRY S WARRIER.jpg';
 import kavya from '../assets/team/core-faculty/Dr KAVYA SANJAYA.jpg';
 import melvin from '../assets/team/core-faculty/Dr MELVIN VICTOR.jpg';
@@ -52,7 +53,7 @@ const HODS = {
   jupiter: { name: 'DR. NIRMALA MN', photo: nirmala },
   saturn: { name: 'DR. ARUN D M', photo: arun },
   uranus: { name: 'Dr Shrinivas Kulkarni', photo: shrinivas },
-  neptune: { name: 'DR. RAGHUNANDAN G', photo: raghunandanHod },
+  neptune: { name: 'DR. HRIDHYA P K', photo: hridhya },
 };
 
 /** Heads of Departments: one per academic department (the planets and the Moon); Cultural Events has no card. */
@@ -74,10 +75,11 @@ export const TEAM_SECTIONS = [
     title: 'Dignitaries',
     kicker: 'Guiding stars',
     contact: false,
-    cols: 4,
+    cols: 5,
     people: [
+      { name: 'DR. FR. JOSEPH C C', role: 'Vice Chancellor', photo: joseph },
       { name: 'DR. FR.BENNY THOMAS', role: 'Director', photo: benny },
-      { name: 'DR. FR. BIIJU K C', role: 'Associate Director', photo: biiju },
+      { name: 'DR. FR. BIJU K C', role: 'Associate Director', photo: biju },
       { name: 'DR. JOBY THOMAS', role: 'Dean', photo: joby },
       { name: 'DR. RAGHUNANDAN G', role: 'Associate Dean', photo: raghunandanDean },
     ],
@@ -92,18 +94,18 @@ export const TEAM_SECTIONS = [
   },
   {
     key: 'faculty-core',
-    title: 'Core Faculty',
+    title: 'Faculty Coordinators',
     kicker: 'Mission control',
     contact: true,
     cols: 6,
     plain: true,
     people: [
-      { name: 'Dr SHINTO THOMAS', role: 'Core Faculty', photo: shinto },
-      { name: 'Dr GAYATHRY S WARRIER', role: 'Core Faculty', photo: gayathry },
-      { name: 'Dr KAVYA SANJAYA', role: 'Core Faculty', photo: kavya },
-      { name: 'Dr MELVIN VICTOR', role: 'Core Faculty', photo: melvin },
-      { name: 'Dr PRASHANTH A S', role: 'Core Faculty', photo: prashanth },
-      { name: 'Mr Sumanth S Y', role: 'Core Faculty', photo: sumanth },
+      { name: 'Dr SHINTO THOMAS', role: 'Faculty Coordinator', photo: shinto },
+      { name: 'Dr GAYATHRY S WARRIER', role: 'Faculty Coordinator', photo: gayathry },
+      { name: 'Dr KAVYA SANJAYA', role: 'Faculty Coordinator', photo: kavya },
+      { name: 'Dr MELVIN VICTOR', role: 'Faculty Coordinator', photo: melvin },
+      { name: 'Dr PRASHANTH A S', role: 'Faculty Coordinator', photo: prashanth },
+      { name: 'Mr Sumanth S Y', role: 'Faculty Coordinator', photo: sumanth },
     ],
   },
   {

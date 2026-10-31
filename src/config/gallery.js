@@ -43,14 +43,14 @@ function describe(path) {
   const coded = base.match(/^([a-z]+)[-_\s]*(\d+)$/i);
   if (coded && DEPT_CODES[coded[1].toLowerCase()]) {
     const dept = DEPT_CODES[coded[1].toLowerCase()];
-    return { title: dept, caption: `Moment ${pad(coded[2])} · Christ University · Yeshwanthpur Campus` };
+    return { title: dept, caption: `Moment ${pad(coded[2])} · CHRIST (Deemed to be University) · Yeshwanthpur Campus` };
   }
   const title = base
     .replace(/^\d+[-_\s]*/, '')
     .replace(/[-_]+/g, ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase())
     .trim();
-  return { title: title || 'Campus', caption: 'Christ University · Yeshwanthpur Campus' };
+  return { title: title || 'Campus', caption: 'CHRIST (Deemed to be University) · Yeshwanthpur Campus' };
 }
 
 const sorted = Object.entries(files)

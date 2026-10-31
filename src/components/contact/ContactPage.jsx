@@ -13,7 +13,7 @@ import { TEAM_SECTIONS, WEB_LEAD } from '../../config/team';
 import { useExperience } from '../../store/useExperience';
 import { useViewMore, ViewMoreButton } from '../ui/ViewMore';
 
-const PLACE = 'Christ University Yeshwanthpur Campus, Bangalore';
+const PLACE = 'CHRIST (Deemed to be University) Yeshwanthpur Campus, Bangalore';
 const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(PLACE)}&z=16&output=embed`;
 const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(PLACE)}`;
 
@@ -365,7 +365,7 @@ function ContactView({ open, onGone }) {
 
         {/* ---------- Map ---------- */}
         <section id="ct-map" className="mx-auto mt-[clamp(4rem,9vw,6.5rem)] max-w-6xl scroll-mt-24" aria-label="Campus map">
-          <SectionHead kicker="Find the launch pad" title="Christ University · Yeshwanthpur" />
+          <SectionHead kicker="Find the launch pad" title="CHRIST (Deemed to be University) · Yeshwanthpur" />
           <div className="ct-map-wrap">
             <div data-rise className="ct-map">
               <OrnateCorners />

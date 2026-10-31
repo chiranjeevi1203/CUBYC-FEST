@@ -22,10 +22,10 @@ export const DEPARTMENTS = {
     hub: true,
     name: 'CUBYC',
     short: 'CUBYC',
-    org: 'Christ University Yeshwanthpur Campus',
+    org: 'CHRIST (Deemed to be University) Yeshwanthpur Campus',
     facultyLabel: 'Host',
-    faculty: 'Christ University · Yeshwanthpur Campus',
-    tagline: 'Christ University Yeshwanthpur Campus',
+    faculty: 'CHRIST (Deemed to be University) · Yeshwanthpur Campus',
+    tagline: 'CHRIST (Deemed to be University) Yeshwanthpur Campus',
     intro: 'The star every world orbits. Our flagship fest brings ten domains and one orbital stage together for two days of competition, culture and ambition.',
     events: [],
   },
@@ -239,7 +239,7 @@ export const DEPARTMENTS = {
     short: 'CS',
     faculty: 'Dr. Kokilavani T & Dr. Stephen R',
     tagline: 'Create what the world has never seen.',
-    intro: 'The world that runs on signal. Esports on the big screen, a three-hour Capture the Flag and a six-hour AI prompt war.',
+    intro: 'The world that runs on signal. Esports on the big screen, a three-hour Capture the Flag and a six-hour AI Battle of Prompts.',
     events: [
       {
         name: 'Cybertronian Wars (Gaming)',
@@ -278,7 +278,7 @@ export const DEPARTMENTS = {
         ],
       },
       {
-        name: 'Prime Prompt (AI Prompt Wars)',
+        name: 'Prime Prompt (AI Battle of Prompts)',
         prize: 22000,
         format: 'Team of 2',
         summary: 'Six hours of prompt engineering, creative AI and constraint-based challenges.',

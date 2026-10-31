@@ -81,7 +81,7 @@ function FocusCard() {
           <div className="min-w-0 flex-1">
             <p className="font-mono text-[0.58rem] tracking-[0.32em] text-white/50 uppercase">
               {isSun
-                ? 'The Sun · Christ University Yeshwanthpur Campus'
+                ? 'The Sun · CHRIST (Deemed to be University) Yeshwanthpur Campus'
                 : planet?.kind === 'moon'
                   ? `Moon of ${planet.parent} · ${planet.name}`
                   : planet?.kind === 'station'

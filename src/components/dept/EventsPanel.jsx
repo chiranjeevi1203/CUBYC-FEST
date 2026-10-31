@@ -438,8 +438,8 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
     {
       icon: 'venue',
       label: 'Venue',
-      value: slots.length ? unique(slots.map((s) => s.venue)).join(' · ') : 'Christ University',
-      sub: slots.length ? 'Christ University · Yeshwanthpur Campus' : 'Yeshwanthpur Campus · room announced soon',
+      value: slots.length ? unique(slots.map((s) => s.venue)).join(' · ') : 'CHRIST (Deemed to be University)',
+      sub: slots.length ? 'CHRIST (Deemed to be University) · Yeshwanthpur Campus' : 'Yeshwanthpur Campus · room announced soon',
     },
     { icon: 'dept', label: 'Domain', value: dept.name, sub: `${world} · ${dept.org ?? 'CUBYC — Fest’2027'}` },
   ];

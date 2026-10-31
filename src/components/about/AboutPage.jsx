@@ -8,11 +8,9 @@ import SpaceBackdrop from './SpaceBackdrop';
 import Dignitaries from './Dignitaries';
 import { OrnateCorners, OrnateDivider } from './Ornaments';
 import { useMountedWhile, usePageShell, useRiseIn } from './usePageShell';
-import { BRAND, EVENT } from '../../config/experience';
+import { BRAND } from '../../config/experience';
 import { DEPT_ORDER, EVENT_COUNT } from '../../config/departments';
 import { useExperience } from '../../store/useExperience';
-
-const MAPS = 'https://www.google.com/maps/search/?api=1&query=Christ+University+Yeshwanthpur+Campus';
 
 const STATS = [
   { value: String(DEPT_ORDER.length).padStart(2, '0'), label: 'Domains' },
@@ -21,23 +19,26 @@ const STATS = [
   { value: '₹10L', label: 'Prize pool' },
 ];
 
-// About-the-campus copy. Edit freely — keep it to what is true of the campus.
+// The university's vision, mission and core values (as published by CHRIST).
 const CARDS = [
   {
-    icon: 'M3 17h14 M5 17V8l5-4 5 4v9 M8 17v-4h4v4 M8 10h4',
-    title: 'The campus',
-    text: `${BRAND.universityFull}, ${BRAND.campus} rises in tall sandstone-and-ivory blocks around an open, colonnaded entrance — classrooms, labs and halls stacked above a floodlit sports turf.`,
+    // a target with an arrow
+    icon: 'M10 4a6 6 0 1 0 6 6 M10 7a3 3 0 1 0 3 3 M10 10l6-6 M13.5 3.5 16 4l.5 2.5 M16 4l-2.2 2.2',
+    title: 'Vision',
+    text: 'Excellence and Service',
+    lead: true,
   },
   {
-    icon: 'M10 2l2.2 5.3L18 8l-4.4 3.8L15 18l-5-3-5 3 1.4-6.2L2 8l5.8-.7Z',
-    title: `Home of ${BRAND.fest}`,
-    text: `For two days the whole campus becomes one orbit: ${DEPT_ORDER.length} domains and ${EVENT_COUNT} events in halls, studios, labs, stages and open grounds — ${EVENT.dateLabel}.`,
+    // an eye in a viewfinder
+    icon: 'M2.5 6V3.5H5 M15 3.5h2.5V6 M17.5 14v2.5H15 M5 16.5H2.5V14 M4 10s2.4-4 6-4 6 4 6 4-2.4 4-6 4-6-4-6-4Z M10 11.6a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z',
+    title: 'Mission',
+    text: 'CHRIST (Deemed to be University) is a nurturing ground for an individual’s holistic development to make effective contribution to the society in a dynamic environment.',
   },
   {
-    icon: 'M10 17s-5.5-5-5.5-9a5.5 5.5 0 0 1 11 0c0 4-5.5 9-5.5 9Z M10 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
-    title: 'Finding us',
-    text: `${BRAND.campus}, Bangalore. Carry your college ID — it's your boarding pass on both days. Event venues are listed on each event's page.`,
-    link: { label: 'Open in Maps', href: MAPS },
+    // a cut gem
+    icon: 'M6 3.5h8l3 4-7 9-7-9Z M3 7.5h14 M8 3.5 7 7.5l3 9 3-9-1-4',
+    title: 'Core values',
+    list: ['Faith in God', 'Moral Uprightness', 'Love of Fellow Beings', 'Social Responsibility', 'Pursuit of Excellence'],
   },
 ];
 
@@ -128,11 +129,17 @@ function AboutView({ open, onGone }) {
             About the campus
             <Star className="h-2 w-2 text-gold-400/70" />
           </p>
-          <h1 data-hero className="title-cosmic mt-4 font-display text-[clamp(2.2rem,7vw,5rem)] font-bold leading-[1.02] tracking-[0.08em] uppercase">
-            {BRAND.campus}
+          {/* The university leads; the campus sits beneath it, smaller and in gold */}
+          {/* One line from tablets up (sized to the screen); phones wrap after the comma */}
+          <h1 data-hero className="title-cosmic mt-4 font-display text-[clamp(1.5rem,6.6vw,2.2rem)] font-bold leading-[1.1] tracking-[0.06em] uppercase sm:text-[clamp(1rem,3.8vw,3.4rem)] sm:whitespace-nowrap">
+            {BRAND.university}, <span className="whitespace-nowrap">Bangalore</span>
           </h1>
-          <p data-hero className="mt-3 font-mono text-[0.62rem] tracking-[0.32em] text-white/55 uppercase">
-            {BRAND.universityFull} · Bangalore
+          <p data-hero className="mt-4 inline-flex items-center gap-3 sm:mt-5 sm:gap-4">
+            <span className="h-px w-8 bg-gradient-to-r from-transparent to-gold-300/70 sm:w-14" aria-hidden="true" />
+            <span className="bg-[linear-gradient(100deg,#fff1d2,#f3d39a_35%,#e9c27a_60%,#fbe4b0)] bg-clip-text text-transparent font-display text-[clamp(0.95rem,2.6vw,1.6rem)] font-bold [filter:drop-shadow(0_2px_8px_rgba(0,0,0,0.85))] tracking-[0.3em] whitespace-nowrap uppercase [margin-right:-0.3em]">
+              {BRAND.campus}
+            </span>
+            <span className="h-px w-8 bg-gradient-to-l from-transparent to-gold-300/70 sm:w-14" aria-hidden="true" />
           </p>
           <FloatingCampus />
         </section>
@@ -160,6 +167,12 @@ function AboutView({ open, onGone }) {
             </ul>
           </div>
 
+          <div data-rise className="mt-14 text-center">
+            <p className="font-mono text-[0.58rem] tracking-[0.36em] text-gold-300/70 uppercase">What guides us</p>
+            <h2 className="mt-3 font-display text-2xl font-bold tracking-[0.08em] uppercase sm:text-3xl">
+              Vision <span className="text-gold-gradient">and Mission</span>
+            </h2>
+          </div>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {CARDS.map((c, i) => (
               <article key={c.title} data-rise className="sp-card" style={{ '--i': i }}>
@@ -171,11 +184,13 @@ function AboutView({ open, onGone }) {
                 </span>
                 <h3 className="sp-card__title">{c.title}</h3>
                 <OrnateDivider className="mx-auto my-3 w-32 text-gold-300/50" />
-                <p className="sp-card__text">{c.text}</p>
-                {c.link && (
-                  <a href={c.link.href} target="_blank" rel="noopener noreferrer" className="sp-card__link">
-                    {c.link.label} <span aria-hidden="true">↗</span>
-                  </a>
+                {c.text && <p className={`sp-card__text ${c.lead ? 'sp-card__text--lead' : ''}`}>{c.text}</p>}
+                {c.list && (
+                  <ul className="sp-card__list">
+                    {c.list.map((v) => (
+                      <li key={v}>{v}</li>
+                    ))}
+                  </ul>
                 )}
               </article>
             ))}

@@ -49,10 +49,10 @@ function Monogram({ className = '', title }) {
 }
 
 /**
- * Christ University mark. Renders the supplied PNG when present (and loadable),
+ * CHRIST (Deemed to be University) mark. Renders the supplied PNG when present (and loadable),
  * otherwise an elegant gold "CU" monogram. Size it with className (h-* / w-*).
  */
-export default function BrandLogo({ className = 'h-10', title = 'Christ University' }) {
+export default function BrandLogo({ className = 'h-10', title = 'CHRIST (Deemed to be University)' }) {
   const [failed, setFailed] = useState(false);
 
   if (!LOGO_SRC || failed) {

@@ -41,6 +41,19 @@ const STATS = [
   { value: '₹10L', label: 'Prize pool', featured: true },
 ];
 
+// The fest's dates, read from EVENT.start / EVENT.end in Indian time (the same everywhere).
+const IST = (opts) => new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', ...opts });
+const FEST_DATES = (() => {
+  const s = new Date(EVENT.start);
+  const e = new Date(EVENT.end);
+  return {
+    from: IST({ day: '2-digit' }).format(s),
+    to: IST({ day: '2-digit' }).format(e),
+    month: IST({ month: 'long' }).format(s),
+    year: IST({ year: 'numeric' }).format(s),
+  };
+})();
+
 // Core Students: the contacts shown on the landing page (edit in config/team.js).
 const STUDENT_CORE = TEAM_SECTIONS.find((s) => s.key === 'student-committee')?.people ?? [];
 
@@ -229,12 +242,19 @@ export default function LandingPage({ landingRef }) {
 
           {/* Date + live countdown */}
           <div data-reveal className="mt-9 flex flex-col items-center gap-6 sm:mt-11">
-            <p className="date-chip inline-flex items-center gap-3 rounded-full px-5 py-2 font-mono text-[0.62rem] tracking-[0.34em] text-gold-200 uppercase sm:text-[0.7rem]">
-              <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden="true">
-                <circle cx="10" cy="10" r="3.2" fill="currentColor" />
-                <ellipse cx="10" cy="10" rx="8.5" ry="3" fill="none" stroke="currentColor" strokeWidth="1" transform="rotate(-20 10 10)" />
-              </svg>
-              <time dateTime="2027-02-04">{EVENT.dateLabel}</time>
+            {/* The dates on a pane of gold glass, framed like the countdown below it and as wide */}
+            <p className="date-plate" aria-label={EVENT.dateLabel}>
+              <Frame />
+              <span className="date-plate__sheen" aria-hidden="true" />
+              <time className="date-plate__days" dateTime={EVENT.start.slice(0, 10)} aria-hidden="true">
+                {FEST_DATES.from}
+                <span className="date-plate__dash">–</span>
+                {FEST_DATES.to}
+              </time>
+              <span className="date-plate__rule" aria-hidden="true" />
+              <span className="date-plate__month" aria-hidden="true">
+                {FEST_DATES.month} {FEST_DATES.year}
+              </span>
             </p>
             <EventCountdown />
           </div>
@@ -359,14 +379,23 @@ export default function LandingPage({ landingRef }) {
                     {e.world} · {e.count} event{e.count === 1 ? '' : 's'}
                   </p>
                   <p className="mt-4 text-sm leading-relaxed text-white/55">{e.copy}</p>
-                  <span className="mt-auto inline-flex items-center gap-2 pt-6 text-[0.7rem] tracking-[0.2em] text-white/60 uppercase transition group-hover:text-gold-200">
-                    Enter orbit <span className="transition group-hover:translate-x-1">→</span>
+                  {/* The whole card is the link; this is its visible button */}
+                  <span className="mt-auto pt-6">
+                    <span className="orbit-card__cta">
+                      Explore
+                      <svg viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M4 10h11m-4-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
                   </span>
                 </a>
               </li>
             ))}
           </ul>
           <ViewMoreButton {...vmDomains} label="All domains" />
+          <div className="mt-12 flex justify-center">
+            <SolarButton href="#/events" royal>View all events</SolarButton>
+          </div>
         </section>
 
         {/* About */}

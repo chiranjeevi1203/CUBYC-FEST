@@ -11,7 +11,7 @@ import { DEPARTMENTS } from './departments';
 /* -------------------------------------------------------------------------- */
 
 export const BRAND = {
-  university: 'Christ University',
+  university: 'CHRIST (Deemed to be University)',
   universityFull: 'CHRIST (Deemed to be University)',
   campus: 'Yeshwanthpur Campus',
   // The campus in full, for the badge above the hero title.

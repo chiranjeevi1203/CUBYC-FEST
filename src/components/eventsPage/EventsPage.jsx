@@ -19,7 +19,7 @@ import { useExperience } from '../../store/useExperience';
  * Every event as a glass card, fanned along an arc. Scrolling (wheel, drag,
  * swipe, arrow keys) slides the fan; it settles on the nearest card, whose world
  * (planet, Moon or space station) appears in the orb on the left. Clicking a
- * card opens its brief; Register goes to the event's full page in its department.
+ * card opens its brief; View Details goes to the event's full page in its department.
  */
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -150,7 +150,7 @@ function Brief({ e, onClose }) {
     return () => window.removeEventListener('keydown', onKey, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const register = () => {
+  const viewDetails = () => {
     useExperience.getState().setEventsOpen(false);
     navigate({ dept: e.dept, view: 'events', event: e.slug });
   };
@@ -218,10 +218,7 @@ function Brief({ e, onClose }) {
             </div>
           </div>
           <div className="mt-7 flex flex-wrap items-center gap-3" data-line>
-            <SolarButton onClick={register} bare>Register</SolarButton>
-            <button type="button" className="ev-ghost" onClick={close}>
-              Back to events
-            </button>
+            <SolarButton onClick={viewDetails} bare>View Details</SolarButton>
           </div>
         </div>
         <button type="button" className="ev-brief__close" onClick={close} aria-label="Close">
@@ -307,7 +304,7 @@ function EventsView({ open, onGone }) {
       return () => tl.kill();
     }
     closing.current = true;
-    // Register hands over to a department page: keep the page locked for it.
+    // View Details hands over to a department page: keep the page locked for it.
     if (!useExperience.getState().dept) {
       setCovered(false);
       document.documentElement.classList.remove('dept-open');

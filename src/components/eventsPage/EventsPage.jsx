@@ -5,6 +5,7 @@ import Frame from '../ui/Frame';
 import Star from '../ui/Star';
 import BodyIcon from '../ui/BodyIcon';
 import Constellation from '../ui/Constellation';
+import OpenToAllDock from './OpenToAllDock';
 import SolarButton from '../ui/SolarButton';
 import { ALL_EVENTS } from '../../config/allEvents';
 import { DEPARTMENTS, DEPT_ORDER } from '../../config/departments';
@@ -437,14 +438,14 @@ function EventsView({ open, onGone }) {
   }, [brief, filterOpen, list, go]);
 
   const onWheel = (e) => {
-    if (brief || (e.target instanceof Element && e.target.closest('.ev-filter__menu, .nv'))) return;
+    if (brief || (e.target instanceof Element && e.target.closest('.ev-filter__menu, .nv, .xd'))) return;
     const f = flow.current;
     f.target += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 0.0042;
     f.idle = 0;
   };
   const drag = useRef(null);
   const onPointerDown = (e) => {
-    if (brief || (e.target instanceof Element && e.target.closest('input, .ev-filter, .ev-hud, .nv, a'))) return;
+    if (brief || (e.target instanceof Element && e.target.closest('input, .ev-filter, .ev-hud, .nv, a, .xd, .xd-scrim'))) return;
     drag.current = { x: e.clientX, moved: 0 };
   };
   const onPointerMove = (e) => {
@@ -624,6 +625,9 @@ function EventsView({ open, onGone }) {
           )}
         </div>
       </div>
+
+      {/* "Open to all" pop-up: two docked spacecraft part to reveal it, each visit */}
+      <OpenToAllDock />
 
       {/* Navigator */}
       {list.length > 0 && (

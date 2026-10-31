@@ -7114,6 +7114,485 @@
       bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
     }
   }
+  /* ---------- "Open to all" docking advisory (events page) ---------- */
+  .xd-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  .xd-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 230;
+    background: radial-gradient(ellipse 80% 60% at 50% 22%, rgba(4, 6, 18, 0.5), rgba(2, 3, 10, 0.84));
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+  }
+  .xd {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 235;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  .xd-body {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+  }
+  @keyframes xd-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .xd-craft {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--cw);
+    height: var(--ch);
+    filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.55)) brightness(calc(1 + var(--lit, 0) * 0.4));
+  }
+  .xd-craft--l {
+    transform: translate(calc(-100% - var(--sep, 0px)), -50%);
+  }
+  .xd-craft--r {
+    transform: translate(var(--sep, 0px), -50%);
+  }
+  .xd-craft__art {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    animation: xd-drift 6s ease-in-out infinite;
+  }
+  .xd-craft--r .xd-craft__art {
+    animation-delay: -3s;
+  }
+  /* Station-keeping: each craft drifts a touch, out of step with the other */
+  @keyframes xd-drift {
+    0%,
+    100% {
+      transform: translateY(-1.5px) rotate(-0.4deg);
+    }
+    50% {
+      transform: translateY(1.5px) rotate(0.4deg);
+    }
+  }
+  .xd-throat {
+    opacity: calc(0.12 + var(--idle, 0) * 0.55 + var(--main, 0) * 0.6);
+  }
+  .xd-mark text {
+    font-family: var(--font-display);
+    font-size: 7px;
+    font-weight: 700;
+    fill: rgba(34, 38, 46, 0.6);
+  }
+  .xd-nav {
+    animation: xd-blink 2.4s linear infinite;
+  }
+  .xd-nav--port {
+    fill: #ff5a4f;
+    filter: drop-shadow(0 0 2px #ff5a4f);
+  }
+  .xd-nav--starboard {
+    fill: #52ffa4;
+    filter: drop-shadow(0 0 2px #52ffa4);
+    animation-delay: 1.2s;
+  }
+  @keyframes xd-blink {
+    0%,
+    9% {
+      opacity: 1;
+    }
+    10%,
+    100% {
+      opacity: 0.2;
+    }
+  }
+
+  /* Exhaust. Drawn pointing left from its right edge; mirrored where needed. */
+  .xd-plume {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .xd-plume__in {
+    position: absolute;
+    inset: 0;
+    filter: url(#xd-haze);
+  }
+  .xd-plume__in > span {
+    position: absolute;
+    transform-origin: 100% 50%;
+  }
+  .xd-plume__glow {
+    inset: -40% -12% -40% 0;
+    background: radial-gradient(ellipse 72% 50% at 100% 50%, rgba(255, 196, 128, 0.6), rgba(255, 124, 44, 0.22) 45%, transparent 72%);
+    filter: blur(10px);
+  }
+  .xd-plume__body {
+    inset: 14% 0;
+    background: radial-gradient(
+      ellipse 100% 50% at 100% 50%,
+      rgba(255, 252, 246, 0.96) 0%,
+      rgba(188, 222, 255, 0.9) 16%,
+      rgba(120, 152, 255, 0.55) 38%,
+      rgba(255, 152, 82, 0.24) 64%,
+      transparent 80%
+    );
+    filter: blur(2.5px);
+    animation: xd-flick 0.13s linear infinite alternate;
+  }
+  .xd-plume__core {
+    right: 0;
+    top: 36%;
+    width: 46%;
+    height: 28%;
+    background: radial-gradient(ellipse 100% 50% at 100% 50%, #fff 0, rgba(255, 255, 255, 0.92) 28%, rgba(212, 234, 255, 0.45) 58%, transparent 76%);
+    filter: blur(1px);
+    animation: xd-flick 0.09s linear infinite alternate-reverse;
+  }
+  /* Shock diamonds in the core of the main engine's jet */
+  .xd-plume__shock {
+    right: 3%;
+    top: 41%;
+    width: 56%;
+    height: 18%;
+    background: repeating-linear-gradient(to left, transparent 0 7%, rgba(255, 246, 228, 0.95) 9.5%, transparent 12.5%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 50% at 100% 50%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(ellipse 100% 50% at 100% 50%, #000 30%, transparent 78%);
+    filter: blur(0.7px);
+  }
+  @keyframes xd-flick {
+    0% {
+      transform: scale(1, 1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(0.95, 1.05);
+      opacity: 0.86;
+    }
+    100% {
+      transform: scale(1.03, 0.96);
+      opacity: 1;
+    }
+  }
+  .xd-plume--main {
+    right: 98.6%;
+    top: 50%;
+    width: calc(var(--cw) * 1.15);
+    height: calc(var(--ch) * 0.72);
+    transform-origin: 100% 50%;
+    transform: translateY(-50%) scaleX(calc(0.25 + var(--main, 0) * 0.75));
+    opacity: var(--main, 0);
+  }
+  .xd-craft--r .xd-plume--main {
+    right: auto;
+    left: 98.6%;
+    transform-origin: 0 50%;
+  }
+  .xd-craft--r .xd-plume--main .xd-plume__in,
+  .xd-craft--l .xd-plume--rcs-up .xd-plume__in,
+  .xd-craft--l .xd-plume--rcs-down .xd-plume__in {
+    transform: scaleX(-1);
+  }
+  /* Forward thrusters at the docking collar, angled away from the hull */
+  .xd-plume--rcs-up,
+  .xd-plume--rcs-down {
+    left: 94.3%;
+    width: calc(var(--ch) * 0.85);
+    height: calc(var(--ch) * 0.24);
+    transform-origin: 0 50%;
+    opacity: var(--rcs, 0);
+  }
+  .xd-plume--rcs-up {
+    top: 36%;
+    transform: translateY(-50%) rotate(-38deg) scaleX(calc(0.3 + var(--rcs, 0) * 0.7));
+  }
+  .xd-plume--rcs-down {
+    top: 64%;
+    transform: translateY(-50%) rotate(38deg) scaleX(calc(0.3 + var(--rcs, 0) * 0.7));
+  }
+  .xd-craft--r .xd-plume--rcs-up,
+  .xd-craft--r .xd-plume--rcs-down {
+    left: auto;
+    right: 94.3%;
+    transform-origin: 100% 50%;
+  }
+  .xd-craft--r .xd-plume--rcs-up {
+    transform: translateY(-50%) rotate(38deg) scaleX(calc(0.3 + var(--rcs, 0) * 0.7));
+  }
+  .xd-craft--r .xd-plume--rcs-down {
+    transform: translateY(-50%) rotate(-38deg) scaleX(calc(0.3 + var(--rcs, 0) * 0.7));
+  }
+
+  /* Separation / capture flash at the collars */
+  .xd-flare {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .xd-flare > span {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .xd-flare__bloom {
+    width: calc(var(--cw) * 1.5);
+    aspect-ratio: 1;
+    border-radius: 9999px !important;
+    background: radial-gradient(circle, #fff 0, rgba(255, 244, 222, 0.92) 9%, rgba(255, 196, 120, 0.5) 26%, rgba(233, 150, 70, 0.18) 48%, transparent 68%);
+    transform: translate(-50%, -50%) scale(calc(0.35 + var(--flare, 0) * 0.85));
+    opacity: var(--flare, 0);
+    filter: url(#xd-haze);
+  }
+  .xd-flare__streak {
+    width: calc(var(--cw) * 4);
+    height: 2px;
+    background: linear-gradient(90deg, transparent 8%, rgba(255, 226, 175, 0.85) 46%, #fff 50%, rgba(255, 226, 175, 0.85) 54%, transparent 92%);
+    transform: translate(-50%, -50%) scaleX(calc(0.3 + var(--flare, 0) * 0.7));
+    opacity: var(--flare, 0);
+  }
+  .xd-flare__streak--wide {
+    height: 22px;
+    filter: blur(9px);
+    opacity: calc(var(--flare, 0) * 0.6);
+  }
+  .xd-flare__ring {
+    width: calc(var(--ch) * 0.7);
+    aspect-ratio: 1;
+    border-radius: 9999px !important;
+    border: 1.5px solid rgba(243, 211, 154, 0.95);
+    box-shadow: 0 0 14px rgba(233, 194, 122, 0.7), inset 0 0 10px rgba(233, 194, 122, 0.5);
+    transform: translate(-50%, -50%) scale(calc(0.2 + var(--ring, 0) * 2.6));
+    opacity: calc((1 - var(--ring, 0)) * min(1, var(--ring, 0) * 12));
+  }
+
+  .xd-kicker__dot {
+    width: 0.45em;
+    height: 0.45em;
+    flex: none;
+    border-radius: 9999px !important;
+    background: #f3d39a;
+    box-shadow: 0 0 8px #e9c27a;
+    animation: xd-pulse 1.6s ease-in-out infinite;
+  }
+
+  /* The message, unfolded between the two craft */
+  .xd-plate {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    width: var(--pw);
+    transform: translate(-50%, -50%);
+    padding: clamp(1.5rem, 3vw, 2.1rem) clamp(1.1rem, 3.4vw, 2.6rem) clamp(1.2rem, 2.6vw, 1.7rem);
+    text-align: center;
+    background:
+      radial-gradient(ellipse 80% 70% at 50% 0%, rgba(233, 194, 122, 0.14), transparent 70%),
+      linear-gradient(180deg, rgba(16, 20, 44, 0.9), rgba(6, 8, 20, 0.95));
+    border: 1px solid rgba(233, 194, 122, 0.4);
+    box-shadow:
+      0 30px 80px -24px rgba(0, 0, 0, 0.85),
+      0 0 70px -24px rgba(233, 194, 122, 0.45),
+      inset 0 1px 0 rgba(255, 241, 210, 0.12);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    visibility: hidden;
+    opacity: 0;
+  }
+  /* Power couplings: glowing seams where each craft meets the panel */
+  .xd-plate::before,
+  .xd-plate::after {
+    content: "";
+    position: absolute;
+    top: 16%;
+    bottom: 16%;
+    width: 2px;
+    background: linear-gradient(transparent, #f3d39a, transparent);
+    box-shadow: 0 0 12px rgba(233, 194, 122, 0.85);
+  }
+  .xd-plate::before {
+    left: -1px;
+  }
+  /* A slow sweep of light across the panel once it is lit */
+  .xd-plate__sheen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, rgba(255, 241, 210, 0.1) 50%, transparent 62%) no-repeat;
+    background-size: 260% 100%;
+    background-position: 130% 0;
+  }
+  .xd-plate.is-lit .xd-plate__sheen {
+    animation: xd-sweep 7s ease-in-out 0.3s infinite;
+  }
+  @keyframes xd-sweep {
+    0% {
+      background-position: 130% 0;
+    }
+    32%,
+    100% {
+      background-position: -30% 0;
+    }
+  }
+  .xd-plate::after {
+    right: -1px;
+  }
+  .xd-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid rgba(243, 217, 164, 0.35);
+    background: rgba(10, 12, 28, 0.6);
+    color: var(--color-gold-200);
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .xd-close svg {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+  .xd-close:hover,
+  .xd-close:focus-visible {
+    background: rgba(233, 194, 122, 0.16);
+    border-color: rgba(243, 217, 164, 0.8);
+  }
+  .xd-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: rgba(243, 211, 154, 0.88);
+  }
+  .xd-kicker__sep {
+    color: rgba(255, 255, 255, 0.35);
+  }
+  .xd-title {
+    margin-top: 0.9rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.6vw, 2.05rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: #f6f1e7;
+  }
+  .xd-hl {
+    white-space: nowrap;
+    background: linear-gradient(100deg, #fff1d2, #f3d39a 30%, #e9c27a 50%, #fff6e0 62%, #e9c27a 78%, #fbe4b0);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 14px rgba(233, 194, 122, 0.45));
+    animation: xd-shine 4.5s linear infinite;
+  }
+  @keyframes xd-shine {
+    to {
+      background-position: -220% 0;
+    }
+  }
+  .xd-sub {
+    margin-top: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    font-family: var(--font-display);
+    font-size: clamp(0.72rem, 1.3vw, 0.88rem);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-gold-200);
+  }
+  .xd-sub__rule {
+    flex: none;
+    width: clamp(1.2rem, 5vw, 3.2rem);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(243, 211, 154, 0.75));
+  }
+  .xd-sub__rule--r {
+    background: linear-gradient(-90deg, transparent, rgba(243, 211, 154, 0.75));
+  }
+  .xd-foot {
+    margin-top: 1.1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(233, 194, 122, 0.16);
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.52);
+  }
+  @media (max-width: 560px) {
+    .xd-plate {
+      padding-top: 2.9rem;
+    }
+    .xd-kicker {
+      font-size: 0.52rem;
+      letter-spacing: 0.24em;
+    }
+    .xd-sub {
+      letter-spacing: 0.2em;
+    }
+    .xd-sub__rule {
+      display: none;
+    }
+    .xd-foot {
+      letter-spacing: 0.18em;
+    }
+  }
+  .low-gfx .xd-plume__in,
+  .low-gfx .xd-flare__bloom {
+    filter: none;
+  }
+  .low-gfx .xd-craft {
+    filter: brightness(calc(1 + var(--lit, 0) * 0.4));
+  }
+  .low-gfx .xd-scrim,
+  .low-gfx .xd-plate {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .xd-craft__art,
+    .xd-plate__sheen,
+    .xd-nav,
+    .xd-hl,
+    .xd-kicker__dot,
+    .xd-plume__body,
+    .xd-plume__core {
+      animation: none !important;
+    }
+  }
+
   .low-gfx .ev-search,
   .low-gfx .ev-filter__btn,
   .low-gfx .ev-hud,

@@ -4,7 +4,7 @@ import SiteNav from '../ui/SiteNav';
 import Frame from '../ui/Frame';
 import Star from '../ui/Star';
 import Shuttle from './Shuttle';
-import { SCHEDULE_DAYS } from '../../config/schedule';
+import { SCHEDULE_DAYS, clock } from '../../config/schedule';
 import { EVENT, prefersReducedMotion } from '../../config/experience';
 import { createShaderLayer } from '../../lib/blackHole';
 import { MILKY_FRAG } from '../../lib/milkyWay';
@@ -57,7 +57,10 @@ function Stop({ item, index, x, y, up, on, L }) {
       <article className="sch-card" aria-hidden={!on}>
         <Frame size="sm" star={false} />
         <span className="sch-card__index">{pad(index + 1)}</span>
-        <time className="sch-card__time">{item.time}</time>
+        <time className="sch-card__time">
+          {clock(item.start)}
+          <small className="sch-card__until">until {clock(item.end)}</small>
+        </time>
         <h3 className="sch-card__title">{item.title}</h3>
         <p className="sch-card__venue">
           <svg viewBox="0 0 20 20" className="h-3 w-3 shrink-0" aria-hidden="true">

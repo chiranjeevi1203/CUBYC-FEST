@@ -56,7 +56,7 @@ export function buildKnowledge() {
       e.rules.forEach((r) => lines.push(`- ${r.replace(/\n/g, ' ')}`));
     }
   }
-  lines.push('\nSCHEDULE (provisional — final timings to be announced):');
+  lines.push('\nSCHEDULE (full and final):');
   for (const day of SCHEDULE_DAYS) {
     lines.push(`${day.label} (${day.date}) — ${day.title}: ${day.items.map((i) => `${i.time} ${i.title} @ ${i.venue}`).join('; ')}`);
   }

@@ -2,19 +2,65 @@ import { useEffect, useRef, useState } from 'react';
 import Frame from '../ui/Frame';
 import Star from '../ui/Star';
 import Shuttle from './Shuttle';
-import { SCHEDULE_DAYS } from '../../config/schedule';
+import { SCHEDULE_DAYS, clock } from '../../config/schedule';
 import { prefersReducedMotion } from '../../config/experience';
 
 const SCHEDULE_HREF = '#/schedule';
 // Routine slots (check-in, lunch) are left to the full page; the cards show the highlights.
 const highlights = (day) => day.items.filter((it) => it.tag !== 'All');
 const SLOT_COUNT = SCHEDULE_DAYS.reduce((n, d) => n + d.items.length, 0);
-const FIRST = SCHEDULE_DAYS[0].items[0]?.time;
-const LAST = SCHEDULE_DAYS[SCHEDULE_DAYS.length - 1].items.at(-1)?.time;
+const FIRST = clock(SCHEDULE_DAYS[0].items[0].start);
+const LAST = clock(SCHEDULE_DAYS.at(-1).items.reduce((m, it) => (it.end > m ? it.end : m), '00:00'));
+
+/**
+ * The rail fills as the page scrolls: a gold line grows down through the dots
+ * (its head following the middle of the screen) and each dot lights as the
+ * line reaches it. Scrolling back up empties it again.
+ */
+function useRailFill(listRef) {
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return undefined;
+    const dots = [...list.querySelectorAll('.sct-line__dot')];
+    const rail = list.querySelector('.sct-line__rail');
+    if (prefersReducedMotion()) {
+      list.style.setProperty('--fill', '1');
+      dots.forEach((d) => d.classList.add('is-lit'));
+      return undefined;
+    }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // Measured on the rail itself, which runs from the first dot's centre to the last's.
+      const r = rail.getBoundingClientRect();
+      const reach = window.innerHeight * 0.62; // the fill's head follows the screen's lower middle
+      const p = Math.min(Math.max((reach - r.top) / Math.max(r.height, 1), 0), 1);
+      list.style.setProperty('--fill', p.toFixed(4));
+      const headY = r.top + p * r.height;
+      dots.forEach((d) => {
+        const b = d.getBoundingClientRect();
+        d.classList.toggle('is-lit', b.top + b.height / 2 <= headY + 1);
+      });
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [listRef]);
+}
 
 /** A day of the flight plan: header, then a mini timeline of its highlights. */
 function DayCard({ day, index }) {
   const items = highlights(day);
+  const listRef = useRef(null);
+  useRailFill(listRef);
   return (
     <li className="sct-day" data-day={index}>
       <div className="glass group relative flex h-full flex-col rounded-3xl p-6 transition duration-500 hover:border-gold-400/30 sm:p-7" data-cursor="hover">
@@ -26,15 +72,19 @@ function DayCard({ day, index }) {
             <span className="font-mono text-[0.68rem] tracking-[0.24em] text-gold-200/90 uppercase">{day.date}</span>
           </span>
           <span className="sct-day__window ml-auto hidden font-mono text-[0.55rem] tracking-[0.24em] uppercase sm:inline">
-            {day.items[0]?.time} → {day.items.at(-1)?.time}
+            {clock(day.items[0].start)} → {clock(day.items.reduce((m, it) => (it.end > m ? it.end : m), '00:00'))}
           </span>
         </div>
         <h3 className="sct-day__title font-display text-2xl font-bold tracking-[0.08em] uppercase">{day.title}</h3>
 
-        <ol className="sct-line mt-5 flex-1">
+        <ol ref={listRef} className="sct-line mt-5 flex-1">
+          <li className="sct-line__rail" aria-hidden="true">
+            <span className="sct-line__fill" />
+            <span className="sct-line__head" />
+          </li>
           {items.map((it) => (
             <li key={`${it.time}-${it.title}`} className="sct-line__item">
-              <time className="sct-line__time">{it.time}</time>
+              <time className="sct-line__time">{clock(it.start)}</time>
               <span className="sct-line__dot" aria-hidden="true" />
               <span className="min-w-0">
                 <span className="block text-sm leading-snug text-white/85">{it.title}</span>

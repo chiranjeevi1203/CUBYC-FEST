@@ -84,7 +84,7 @@ const EVENT_ALIASES = {
   'best-manager-sustainaquest': ['best manager', 'sustainaquest', 'sustainability'],
   'percepta-hr': ['percepta', 'human resources', 'hr', 'shark tank'],
   '6-hour-filmithon': ['filmithon', 'filmathon', 'short film', 'film making', 'filmmaking', 'movie making'],
-  imposter: ['imposter', 'impostor', 'among us'],
+  'creative-curveball': ['creative curveball', 'curveball', 'curve ball', 'imposter', 'impostor', 'among us'],
   'literature-court-room': ['court room', 'courtroom', 'moot court', 'literature court', 'trial'],
   'convince-the-time-keeper': ['time keeper', 'timekeeper', 'literary character'],
   'brain-to-brand-pitching-event': ['brain to brand', 'pitching', 'pitch', 'startup', 'business plan'],
@@ -243,12 +243,12 @@ function eventWhen(e) {
   const hits = [];
   for (const day of SCHEDULE_DAYS) {
     for (const it of day.items) {
-      if (norm(it.title).includes(norm(short(e)).split(' ')[0])) hits.push(`• ${day.label} (${day.date}) · ${it.time} — ${it.title} @ ${it.venue}`);
+      if (it.event === e.slug) hits.push(`• ${day.label} (${day.date}) · ${it.time} — **${it.venue}**`);
     }
   }
   return {
     text: hits.length
-      ? [`**${e.name}** on the provisional schedule:`, ...hits, 'Final timings will be confirmed closer to the fest.'].join('\n')
+      ? [`**${e.name}**:`, ...hits, 'Report 15 minutes before your slot.'].join('\n')
       : `The exact slot for **${e.name}** isn't published yet. The fest runs **${FEST.dateLabel}**; detailed timings will be announced on the Schedule page.`,
     links: [{ label: 'Open schedule', href: '#/schedule' }, eventLink(e)],
   };
@@ -301,7 +301,6 @@ function scheduleAnswer(q) {
     lines.push(`**${d.label} · ${d.date} — ${d.title}**`);
     d.items.forEach((i) => lines.push(`• ${i.time} — ${i.title} (${i.venue})`));
   }
-  lines.push('_Provisional — final timings will be confirmed._');
   return { text: lines.join('\n'), links: [{ label: 'Open the Schedule', href: '#/schedule' }], chips: which === 0 ? ['Day 2 schedule'] : ['Day 1 schedule'] };
 }
 
@@ -447,7 +446,7 @@ Follow this website for updates.`, chips: ['How do I register?', 'General rules'
     }
     if (has(q, ['where', 'venue', 'location', 'address', 'campus', 'reach', 'directions', 'map', 'place', 'located'])) {
       return ok({
-        text: `The fest is at **${FEST.university}, ${FEST.campus}** (Yeshwanthpur, Bangalore). Event venues across campus will be shared with the final schedule.`,
+        text: `The fest is at **${FEST.university}, ${FEST.campus}** (Yeshwanthpur, Bangalore). Each event's room is on its page and on the Schedule — ask me about any event to get its venue.`,
         links: [{ label: 'Open in Maps', href: 'https://www.google.com/maps/search/?api=1&query=Christ+University+Yeshwanthpur+Campus' }],
       });
     }

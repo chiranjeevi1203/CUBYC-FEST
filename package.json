@@ -8,6 +8,7 @@
     "prebuild": "node scripts/build-knowledge.mjs",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "node --test",
     "knowledge": "node scripts/build-knowledge.mjs"
   },
   "dependencies": {

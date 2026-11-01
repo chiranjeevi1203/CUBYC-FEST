@@ -636,24 +636,57 @@
 
   /* Mini timeline: time · dot on a rail · title / venue */
   .sct-line {
+    /* time column + gap + half the dot column = the centre of the dots */
+    --time-col: 4.6rem;
+    --dot-col: 0.9rem;
+    --col-gap: 0.75rem;
+    --rail-x: calc(var(--time-col) + var(--col-gap) + var(--dot-col) / 2);
+    --fill: 0;
     position: relative;
     display: grid;
     gap: 0.85rem;
   }
-  .sct-line::before {
-    content: "";
+  /* The rail: a faint track, a gold fill that grows with the scroll, a glowing head */
+  .sct-line__rail {
     position: absolute;
-    top: 0.45rem;
-    bottom: 0.45rem;
-    left: 3.6rem;
-    width: 1px;
-    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--day) 45%, transparent) 12%, color-mix(in srgb, var(--day) 45%, transparent) 88%, transparent);
+    top: 0.63rem;
+    bottom: 0.63rem;
+    left: var(--rail-x);
+    width: 2px;
+    translate: -50% 0;
+    list-style: none;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--day) 22%, transparent) 8%, color-mix(in srgb, var(--day) 22%, transparent) 92%, transparent);
+  }
+  .sct-line__fill {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 100%;
+    transform: scaleY(var(--fill));
+    transform-origin: top;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--day) 40%, transparent), var(--day-hi));
+    box-shadow: 0 0 8px color-mix(in srgb, var(--day) 70%, transparent);
+  }
+  .sct-line__head {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--fill) * 100%);
+    width: 0.6rem;
+    height: 0.6rem;
+    translate: -50% -50%;
+    border-radius: 9999px !important;
+    background: #fff6e0;
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--day) 30%, transparent),
+      0 0 14px 3px var(--day);
+    opacity: calc(min(var(--fill) * 40, 1) * min((1 - var(--fill)) * 40, 1));
   }
   .sct-line__item {
+    position: relative;
     display: grid;
-    grid-template-columns: 2.9rem 0.9rem minmax(0, 1fr);
+    grid-template-columns: var(--time-col) var(--dot-col) minmax(0, 1fr);
     align-items: start;
-    column-gap: 0.75rem;
+    column-gap: var(--col-gap);
     list-style: none;
   }
   .sct-line__time {
@@ -662,24 +695,38 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
     color: var(--day-hi);
   }
   .sct-line__dot {
     position: relative;
+    z-index: 1;
     justify-self: center;
-    width: 0.5rem;
-    height: 0.5rem;
-    margin-top: 0.38rem;
+    width: 0.62rem;
+    height: 0.62rem;
+    margin-top: 0.32rem;
     border-radius: 9999px !important;
     background: #05060d;
-    border: 1px solid var(--day);
+    border: 1.5px solid color-mix(in srgb, var(--day) 70%, transparent);
     transition:
       background-color 0.35s ease,
-      box-shadow 0.35s ease;
+      border-color 0.35s ease,
+      box-shadow 0.35s ease,
+      transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .sct-line__dot.is-lit {
+    background: var(--day-hi);
+    border-color: var(--day-hi);
+    box-shadow: 0 0 10px var(--day);
   }
   .sct-line__item:hover .sct-line__dot {
-    background: var(--day);
-    box-shadow: 0 0 10px var(--day);
+    background: var(--day-hi);
+    box-shadow: 0 0 12px var(--day);
+    transform: scale(1.25);
+  }
+  .sct-line__item .sct-line__time,
+  .sct-line__item .sct-line__dot ~ span {
+    transition: opacity 0.4s ease;
   }
   .sct-line__tag {
     color: color-mix(in srgb, var(--day) 80%, transparent);
@@ -5392,6 +5439,17 @@
     color: var(--line-a);
     font-variant-numeric: tabular-nums;
     text-shadow: 0 0 18px color-mix(in srgb, var(--line-a) 45%, transparent);
+  }
+  .sch-card__until {
+    display: block;
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 400;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    text-shadow: none;
+    color: rgba(255, 255, 255, 0.55);
   }
   .sch-card__title {
     margin-top: 0.55rem;

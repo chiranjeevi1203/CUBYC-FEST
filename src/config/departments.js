@@ -394,7 +394,7 @@ export const DEPARTMENTS = {
     short: 'MEDIA',
     faculty: 'Dr. Julia Oinam',
     tagline: 'Stories That Travel Beyond Worlds.',
-    intro: 'The giant that pulls every story into orbit. Shoot a film on campus in six hours, then find the imposter hiding in your team.',
+    intro: 'The giant that pulls every story into orbit. Shoot a film on campus in six hours, then take on the Creative Curveball.',
     events: [
       {
         name: '6-Hour Filmithon',
@@ -417,7 +417,7 @@ export const DEPARTMENTS = {
         ],
       },
       {
-        name: 'Imposter',
+        name: 'Creative Curveball',
         prize: 32000,
         format: 'Team of 2–3',
         faculty: 'Dr. Manas K',

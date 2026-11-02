@@ -14,10 +14,15 @@ import { create } from 'zustand';
  * the college is checking them) → 'verified' (payment confirmed: the
  * registration is valid and the festival ticket is issued).
  *
- * During development (npm run dev) "Continue with Google" signs in a sample
- * participant and the payment can be verified by hand. On the live site sign-in
- * reports that it isn't open yet — nothing is ever faked there.
+ * Until the backend is connected, "Continue with Google" signs in a sample
+ * participant (kept only in this browser) on the live site too, so the
+ * dashboard can be opened and tried. Set PREVIEW_SIGN_IN to false to show
+ * "sign-in opens soon" instead. Payments are never marked verified on the live
+ * site — the "Mark as verified" preview button exists only in npm run dev.
  */
+
+/** Stand-in sign-in on the live site, until the real Google sign-in is wired up. */
+const PREVIEW_SIGN_IN = true;
 
 const KEY = 'cubyc-demo-user';
 // No look-alike characters (0/O, 1/I/L), so an ID read aloud is typed right.
@@ -57,7 +62,7 @@ export const useAuth = create((set, get) => ({
   signInWithGoogle: async () => {
     set({ status: 'signing-in', error: null });
     await new Promise((r) => setTimeout(r, 1200));
-    if (!import.meta.env.DEV) {
+    if (!import.meta.env.DEV && !PREVIEW_SIGN_IN) {
       set({ status: 'error', error: 'not_open' });
       return null;
     }

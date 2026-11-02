@@ -87,6 +87,41 @@ export const BACKGROUND_FRAG = /* glsl */ `${HEADER}
   }
 `;
 
+/**
+ * The gallery's sky without the hole (no lensing, no disk glow): the same
+ * violet / indigo nebula and three depths of twinkling stars, drifting slowly.
+ * Used behind the participant dashboard.
+ */
+export const SKY_FRAG = /* glsl */ `${HEADER}
+  float starLayer(vec2 q, float scale, float seed) {
+    vec2 g = q * scale;
+    vec2 id = floor(g);
+    vec2 f = fract(g) - 0.5;
+    float h = hash(id + seed);
+    vec2 o = vec2(hash(id + seed + 3.1), hash(id + seed + 7.7)) - 0.5;
+    float d = length(f - o * 0.7);
+    float on = step(0.93, h);
+    float tw = 0.65 + 0.35 * sin(uTime * (0.8 + h * 2.5) + h * 40.0);
+    return on * smoothstep(0.09, 0.0, d) * tw * (0.4 + (h - 0.93) * 9.0);
+  }
+
+  void main() {
+    vec2 frag = gl_FragCoord.xy;
+    vec2 sky = frag / uRes.y + vec2(uTime * 0.004, 0.0);
+    vec3 col = vec3(0.008, 0.01, 0.024);
+    float neb = fbm(sky * 2.2);
+    col += mix(vec3(0.01, 0.025, 0.08), vec3(0.02, 0.04, 0.12), sky.x * 0.5) * smoothstep(0.4, 0.9, neb) * 1.1;
+    // A second, softer bank of blue haze so the sky never sits flat.
+    float neb2 = fbm(sky * 1.1 + 31.0);
+    col += vec3(0.012, 0.035, 0.1) * smoothstep(0.45, 0.95, neb2) * 0.9;
+    float s = starLayer(sky, 140.0, 1.0) + starLayer(sky, 260.0, 7.0) * 0.7 + starLayer(sky, 520.0, 13.0) * 0.45;
+    col += mix(vec3(0.75, 0.86, 1.0), vec3(1.0, 0.98, 0.95), hash(floor(sky * 140.0))) * s;
+    vec2 v = frag / uRes - 0.5;
+    col *= 1.0 - dot(v, v) * 1.1;
+    gl_FragColor = vec4(col, 1.0);
+  }
+`;
+
 export const HOLE_FRAG = /* glsl */ `${HEADER}
   // Units: Schwarzschild radius = 1. Light orbits in the Schwarzschild metric
   // obey  d2x/dt2 = -1.5 h^2 x / r^5  (h = |x × v|, conserved), integrated per pixel.

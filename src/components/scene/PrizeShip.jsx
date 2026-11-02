@@ -84,7 +84,7 @@ const ADDITIVE = { transparent: true, depthWrite: false, blending: THREE.Additiv
 /** Landing page live, with nothing covering it? */
 const isLive = () => {
   const s = useExperience.getState();
-  return s.phase === PHASES.LANDING_IDLE && !s.dept && !s.galleryOpen && !s.scheduleOpen && !s.rulesOpen && !s.eventsOpen && !s.aboutOpen && !s.contactOpen && !s.sponsorsOpen && !s.notFound && !s.chatOpen;
+  return s.phase === PHASES.LANDING_IDLE && !s.dept && !s.galleryOpen && !s.scheduleOpen && !s.rulesOpen && !s.eventsOpen && !s.aboutOpen && !s.contactOpen && !s.sponsorsOpen && !s.loginOpen && !s.dashboardOpen && !s.notFound && !s.chatOpen;
 };
 
 export default function PrizeShip({ sunPos, visibility }) {

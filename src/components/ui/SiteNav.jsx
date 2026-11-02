@@ -2,6 +2,27 @@ import { useEffect, useState } from 'react';
 import BrandLogo from '../hud/BrandLogo';
 import FestMark from './FestMark';
 import { BRAND } from '../../config/experience';
+import { initialsOf, useAuth } from '../../store/useAuth';
+
+/** Login button: a person icon and "Login", or your initials and "Account" once signed in. */
+function LoginCta({ menu = false, onClick, style }) {
+  const user = useAuth((s) => s.user);
+  return (
+    <a href={user ? '#/dashboard' : '#/login'} className={`nv-cta ${menu ? 'nv-cta--menu' : ''}`} onClick={onClick} style={style} aria-label={user ? `Your account, ${user.name}` : 'Login'}>
+      {user ? (
+        <span className="nv-cta__initials" aria-hidden="true">
+          {initialsOf(user.name)}
+        </span>
+      ) : (
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <circle cx="10" cy="6.5" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M3.5 17c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      )}
+      <span>{user ? 'Account' : 'Login'}</span>
+    </a>
+  );
+}
 
 /**
  * Site links. `id` is the landing section (scroll-spy), `href` where the link goes.
@@ -21,7 +42,7 @@ export const MENU_LINKS = NAV_LINKS;
 const hrefOf = (l) => l.href ?? `#${l.id}`;
 
 /** Four-pointed star in a ring — the emblem on each menu plate. */
-function PlateStar() {
+export function PlateStar() {
   return (
     <svg viewBox="0 0 24 24" className="nv-plate__star" aria-hidden="true">
       <circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" strokeWidth="0.9" />
@@ -154,9 +175,7 @@ export default function SiteNav({ active, reveal = false }) {
         </ul>
 
         <div className="nv__end">
-          <a href="#contact" className="nv-cta" onClick={close}>
-            <span>Register</span>
-          </a>
+          <LoginCta onClick={close} />
           <span className="nv__sep" aria-hidden="true" />
           <BrandLogo className="h-9 sm:h-12" title={BRAND.universityFull} />
           <DialButton open={menuOpen} onClick={() => setMenuOpen((v) => !v)} />
@@ -180,9 +199,7 @@ export default function SiteNav({ active, reveal = false }) {
               </li>
             ))}
           </ul>
-          <a href="#contact" className="nv-cta nv-cta--menu" onClick={close} style={{ '--i': NAV_LINKS.length }}>
-            <span>Register</span>
-          </a>
+          <LoginCta menu onClick={close} style={{ '--i': NAV_LINKS.length }} />
         </div>
       </div>
     </header>

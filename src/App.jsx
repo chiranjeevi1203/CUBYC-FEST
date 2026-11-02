@@ -23,6 +23,8 @@ const PAGES = {
   about: () => import('./components/about/AboutPage'),
   contact: () => import('./components/contact/ContactPage'),
   sponsors: () => import('./components/sponsors/SponsorsPage'),
+  login: () => import('./components/login/LoginPage'),
+  dashboard: () => import('./components/dashboard/DashboardPage'),
   notFound: () => import('./components/system/NotFoundPage'),
 };
 const DepartmentView = lazy(PAGES.dept);
@@ -33,6 +35,8 @@ const EventsPage = lazy(PAGES.events);
 const AboutPage = lazy(PAGES.about);
 const ContactPage = lazy(PAGES.contact);
 const SponsorsPage = lazy(PAGES.sponsors);
+const LoginPage = lazy(PAGES.login);
+const DashboardPage = lazy(PAGES.dashboard);
 const NotFoundPage = lazy(PAGES.notFound);
 
 /** Mounts a code-split page once it is first needed, then keeps it (each page hides itself when closed). */
@@ -46,7 +50,7 @@ function OnDemand({ when, children }) {
 }
 
 /** Hash routes that open a page (department routes are checked by parseHash). */
-const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about', '#/contact', '#/sponsors'];
+const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about', '#/contact', '#/sponsors', '#/login'];
 
 /**
  * Layer stack (bottom → top):
@@ -113,7 +117,7 @@ export default function App() {
   useEffect(() => {
     if (!live) return undefined;
     const sync = () => {
-      const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen, setAboutOpen, setContactOpen, setSponsorsOpen, setNotFound } = useExperience.getState();
+      const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen, setAboutOpen, setContactOpen, setSponsorsOpen, setLoginOpen, setDashboardOpen, setNotFound } = useExperience.getState();
       setEventsOpen(window.location.hash === '#/events');
       setGalleryOpen(window.location.hash === '#/gallery');
       setScheduleOpen(window.location.hash === '#/schedule');
@@ -121,10 +125,13 @@ export default function App() {
       setAboutOpen(window.location.hash === '#/about');
       setContactOpen(window.location.hash === '#/contact');
       setSponsorsOpen(window.location.hash === '#/sponsors');
+      setLoginOpen(window.location.hash === '#/login');
+      const dash = window.location.hash === '#/dashboard' || window.location.hash.startsWith('#/dashboard/');
+      setDashboardOpen(dash);
       // Anything else that looks like a page address (or a path other than /) is lost in space.
       const hash = window.location.hash;
       const badPath = !['/', '/index.html'].includes(window.location.pathname);
-      const badHash = hash.startsWith('#/') && !PAGE_HASHES.includes(hash) && !parseHash(hash);
+      const badHash = hash.startsWith('#/') && !PAGE_HASHES.includes(hash) && !parseHash(hash) && !dash;
       setNotFound(badPath || badHash);
     };
     sync();
@@ -164,6 +171,12 @@ export default function App() {
       </OnDemand>
       <OnDemand when={(s) => s.sponsorsOpen}>
         <SponsorsPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.loginOpen}>
+        <LoginPage />
+      </OnDemand>
+      <OnDemand when={(s) => s.dashboardOpen}>
+        <DashboardPage />
       </OnDemand>
       <OnDemand when={(s) => s.notFound}>
         <NotFoundPage />

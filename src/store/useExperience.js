@@ -63,6 +63,10 @@ export const useExperience = create((set) => ({
   aboutOpen: false,
   contactOpen: false,
   sponsorsOpen: false,
+  // The sign-in page (#/login).
+  loginOpen: false,
+  // The participant dashboard (#/dashboard and #/dashboard/<section>).
+  dashboardOpen: false,
   notFound: false,
   eventsOpen: false,
   // The CUBYC Comms chatbot overlay.
@@ -78,6 +82,8 @@ export const useExperience = create((set) => ({
   setAboutOpen: (aboutOpen) => set((state) => (state.aboutOpen === aboutOpen ? state : { aboutOpen })),
   setContactOpen: (contactOpen) => set((state) => (state.contactOpen === contactOpen ? state : { contactOpen })),
   setSponsorsOpen: (sponsorsOpen) => set((state) => (state.sponsorsOpen === sponsorsOpen ? state : { sponsorsOpen })),
+  setLoginOpen: (loginOpen) => set((state) => (state.loginOpen === loginOpen ? state : { loginOpen })),
+  setDashboardOpen: (dashboardOpen) => set((state) => (state.dashboardOpen === dashboardOpen ? state : { dashboardOpen })),
   setNotFound: (notFound) => set((state) => (state.notFound === notFound ? state : { notFound })),
   setScheduleOpen: (scheduleOpen) => set((state) => (state.scheduleOpen === scheduleOpen ? state : { scheduleOpen })),
   setDeptCovered: (deptCovered) => set((state) => (state.deptCovered === deptCovered ? state : { deptCovered })),

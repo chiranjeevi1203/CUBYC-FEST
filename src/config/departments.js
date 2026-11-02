@@ -405,8 +405,8 @@ export const DEPARTMENTS = {
         summary: '6 hours. One story. One film — shot entirely on campus.',
         rules: [
           'Participation: Group event, maximum 5 members per team.',
-          'Theme & challenge: A surprise theme, element or prop is revealed to all teams at 9:00 AM on Day 1. The film must be based on it.',
-          'Time: The film must be conceived, shot, edited and submitted within 6 hours of the reveal — by 3:00 PM.',
+          'Theme & challenge: A surprise theme, element or prop is revealed to all teams at 10:30 AM on Day 1. The film must be based on it.',
+          'Time: The film must be conceived, shot, edited and submitted within 6 hours of the reveal — by 4:30 PM.',
           'Location: All footage must be shot on campus during the fest.',
           'Film duration: 3–5 minutes, including credits.',
           'Original footage: All footage must be captured during the Filmithon. Pre-recorded footage, including stock video, is not permitted.',

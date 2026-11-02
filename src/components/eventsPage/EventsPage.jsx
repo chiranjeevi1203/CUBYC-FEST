@@ -8,6 +8,7 @@ import Constellation from '../ui/Constellation';
 import OpenToAllDock from './OpenToAllDock';
 import SolarButton from '../ui/SolarButton';
 import { ALL_EVENTS } from '../../config/allEvents';
+import { scheduleFor } from '../../config/schedule';
 import { DEPARTMENTS, DEPT_ORDER } from '../../config/departments';
 import { prefersReducedMotion } from '../../config/experience';
 import { createShaderLayer } from '../../lib/blackHole';
@@ -129,6 +130,7 @@ function WorldOrb({ dept, label }) {
 
 function Brief({ e, onClose }) {
   const panel = useRef(null);
+  const slots = useMemo(() => scheduleFor(e.name), [e]);
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return;
     const card = panel.current.querySelector('.ev-brief__card');
@@ -203,6 +205,24 @@ function Brief({ e, onClose }) {
                 <span>Protocol</span>
                 <b>{e.rules.length} rules</b>
               </span>
+              {slots.length > 0 && (
+                <>
+                  <span className="ev-brief__stat">
+                    <span>When</span>
+                    <b>
+                      {slots.map((s) => `${s.day.replace('Day 0', 'Day ')} · ${s.date.split(' · ')[1]}`).join(' & ')}
+                    </b>
+                  </span>
+                  <span className="ev-brief__stat">
+                    <span>Time</span>
+                    <b>{slots.map((s) => s.time).join(' · ')}</b>
+                  </span>
+                  <span className="ev-brief__stat col-span-2">
+                    <span>Venue</span>
+                    <b>{[...new Set(slots.map((s) => s.venue))].join(' · ')}</b>
+                  </span>
+                </>
+              )}
               {e.faculty && (
                 <span className="ev-brief__stat col-span-2">
                   <span>Faculty in-charge</span>

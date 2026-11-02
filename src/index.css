@@ -4299,7 +4299,7 @@
     line-height: 1;
     letter-spacing: -0.02em;
     color: transparent;
-    -webkit-text-stroke: 1px rgba(243, 217, 164, 0.08);
+    -webkit-text-stroke: 1px rgba(243, 217, 164, 0.2);
     pointer-events: none;
   }
   .edk-hud {

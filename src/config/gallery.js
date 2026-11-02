@@ -13,7 +13,7 @@
  * uses the illustrated placeholders.
  *
  * Optional thumbnails: a same-named file in src/assets/gallery/thumbs/ (about
- * 960 px, e.g. cs-1.webp) is used for the small sliding tiles on the landing
+ * 720 px, e.g. cs-01.webp) is used for the small sliding tiles on the landing
  * page, so they load fast; the gallery page keeps the full photo. Without one,
  * the tile simply uses the full photo.
  */
@@ -71,17 +71,37 @@ const sorted = Object.entries(files)
   .map(([path, src]) => ({ src, thumb: THUMBS[baseName(path)] ?? src, group: path.split('/').pop().replace(/[-_\s]*\d*\.[^.]+$/, '').toLowerCase(), ...describe(path) }));
 
 /**
- * Round-robin across groups (cs-1, psy-1, cs-2, psy-2 …) so photos from the same
- * department never arrive back to back — including when the list wraps around.
+ * A fresh random mix on every visit: each department's photos are shuffled,
+ * then photos are drawn at random — weighted by how many each department has
+ * left — never taking the same department twice in a row, so the gallery
+ * always looks varied and every department is spread through it.
  */
-function interleave(items) {
+function shuffleMix(items) {
+  const shuffle = (list) => {
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  };
   const groups = new Map();
   items.forEach((it) => groups.set(it.group, [...(groups.get(it.group) ?? []), it]));
-  const queues = [...groups.values()].sort((a, b) => b.length - a.length);
+  const queues = [...groups.values()].map(shuffle);
   const out = [];
-  while (queues.some((q) => q.length)) queues.forEach((q) => q.length && out.push(q.shift()));
+  let last = null;
+  while (queues.some((q) => q.length)) {
+    const open = queues.filter((q) => q.length && q[0].group !== last);
+    // Only one department left: its photos have to sit together at the end.
+    const pool = open.length ? open : queues.filter((q) => q.length);
+    // Departments with more photos left are much likelier, so none piles up at the end.
+    let r = Math.random() * pool.reduce((n, q) => n + q.length ** 2, 0);
+    const pick = pool.find((q) => (r -= q.length ** 2) < 0) ?? pool[pool.length - 1];
+    const item = pick.shift();
+    out.push(item);
+    last = item.group;
+  }
   return out;
 }
 
 /** The campus photos (empty until images are added — callers fall back to the illustrations). */
-export const CAMPUS_PHOTOS = interleave(sorted);
+export const CAMPUS_PHOTOS = shuffleMix(sorted);

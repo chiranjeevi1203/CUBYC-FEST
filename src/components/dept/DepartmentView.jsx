@@ -15,7 +15,6 @@ const pad = (n) => String(n).padStart(2, '0');
 const indexOf = (k) => ORDER.indexOf(k);
 const neighbour = (k, d) => ORDER[(indexOf(k) + d + ORDER.length) % ORDER.length];
 const placeOf = (k) => (k === 'sun' ? 'The Sun' : k === 'moon' ? 'The Moon' : k === 'station' ? 'The Space Station' : BODY_BY_KEY[k].name);
-const kindOf = (k) => (k === 'sun' ? 'Host star' : k === 'moon' ? 'Moon of Earth' : k === 'station' ? 'Orbital stage' : 'Planet');
 
 /**
  * The "Enter" button takes each world's colours (from its look in the scene):
@@ -416,7 +415,7 @@ export default function DepartmentView() {
           <div ref={infoRef} className="flex w-full flex-col items-center">
             <p data-rise className="inline-flex items-center gap-3 font-mono text-[0.58rem] tracking-[0.38em] text-white/60 uppercase sm:text-[0.64rem]">
               <Star className="h-2 w-2 text-gold-400/80" />
-              {kindOf(key)} · {place}
+              Hosted by
               <Star className="h-2 w-2 text-gold-400/80" />
             </p>
             <h1

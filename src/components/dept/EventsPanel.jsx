@@ -441,7 +441,7 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
       value: slots.length ? unique(slots.map((s) => s.venue)).join(' · ') : 'CHRIST (Deemed to be University)',
       sub: 'CHRIST (Deemed to be University) · Yeshwanthpur Campus',
     },
-    { icon: 'dept', label: 'Domain', value: dept.name, sub: `${world} · ${dept.org ?? 'CUBYC — Fest’2027'}` },
+    { icon: 'dept', label: 'Domain', value: 'Open to all', sub: 'Students from every domain can take part' },
   ];
 
   // Selection changed → the old brief slips out under a sweep of light, then swap.
@@ -497,14 +497,14 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
 
       <div className="edk-main">
         <header className="edk-head">
-          <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/85 uppercase">
+          <p className="inline-flex items-center gap-3 font-display text-[0.72rem] font-bold tracking-[0.4em] text-gold-200 uppercase">
             <Star className="h-2 w-2 text-gold-400/70" />
-            Inside {place}
+            {world}
             <Star className="h-2 w-2 text-gold-400/70" />
           </p>
-          <h2 className="title-cosmic mt-3 font-display text-[clamp(1.6rem,4.4vw,3rem)] font-bold leading-[1.04] tracking-[0.08em] uppercase">{dept.name}</h2>
+          <h2 className="title-cosmic mt-3 font-display text-[clamp(1.6rem,4.4vw,3rem)] font-bold leading-[1.04] tracking-[0.08em] uppercase">CUBYC — Fest’2027</h2>
           <p className="mt-2 font-mono text-[0.6rem] tracking-[0.3em] text-white/55 uppercase">
-            {dept.org ?? 'Domain'} · {pad(events.length)} event{events.length === 1 ? '' : 's'}
+            {pad(events.length)} event{events.length === 1 ? '' : 's'} · Open to all
           </p>
         </header>
 
@@ -520,9 +520,7 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
               <span className="edk-led" aria-hidden="true" />
               Event {pad(shown + 1)} / {pad(events.length)}
             </span>
-            <span className="hidden sm:inline">
-              {dept.short} · {world}
-            </span>
+            <span className="hidden sm:inline">Open to all · {world}</span>
           </div>
 
           <div className="edk-hero">
@@ -588,7 +586,6 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
                 <div className="min-w-0">
                   <dt>Faculty in-charge</dt>
                   <dd>{event.faculty}</dd>
-                  <dd className="edk-tile__sub">{dept.name}</dd>
                 </div>
               </div>
             )}

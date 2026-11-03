@@ -129,14 +129,15 @@ function AboutView({ open, onGone }) {
             About the campus
             <Star className="h-2 w-2 text-gold-400/70" />
           </p>
-          {/* The university leads; the campus sits beneath it, smaller and in gold */}
-          {/* One line from tablets up (sized to the screen); phones wrap after the comma */}
+          {/* The university leads; the city and campus sit beneath it, smaller and in gold */}
+          {/* One line from tablets up (sized to the screen) */}
           <h1 data-hero className="title-cosmic mt-4 font-display text-[clamp(1.5rem,6.6vw,2.2rem)] font-bold leading-[1.1] tracking-[0.06em] uppercase sm:text-[clamp(1rem,3.8vw,3.4rem)] sm:whitespace-nowrap">
-            {BRAND.university}, <span className="whitespace-nowrap">Bangalore</span>
+            {BRAND.university}
           </h1>
           <p data-hero className="mt-4 inline-flex items-center gap-3 sm:mt-5 sm:gap-4">
             <span className="h-px w-8 bg-gradient-to-r from-transparent to-gold-300/70 sm:w-14" aria-hidden="true" />
-            <span className="bg-[linear-gradient(100deg,#fff1d2,#f3d39a_35%,#e9c27a_60%,#fbe4b0)] bg-clip-text text-transparent font-display text-[clamp(0.95rem,2.6vw,1.6rem)] font-bold [filter:drop-shadow(0_2px_8px_rgba(0,0,0,0.85))] tracking-[0.3em] whitespace-nowrap uppercase [margin-right:-0.3em]">
+            <span className="bg-[linear-gradient(100deg,#fff1d2,#f3d39a_35%,#e9c27a_60%,#fbe4b0)] bg-clip-text text-transparent font-display text-[clamp(0.95rem,2.6vw,1.6rem)] font-bold [filter:drop-shadow(0_2px_8px_rgba(0,0,0,0.85))] tracking-[0.24em] text-center uppercase [margin-right:-0.24em] sm:tracking-[0.3em] sm:whitespace-nowrap sm:[margin-right:-0.3em]">
+              Bangalore <br className="sm:hidden" />
               {BRAND.campus}
             </span>
             <span className="h-px w-8 bg-gradient-to-l from-transparent to-gold-300/70 sm:w-14" aria-hidden="true" />

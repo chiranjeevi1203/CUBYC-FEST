@@ -220,6 +220,7 @@ export default function LandingPage({ landingRef }) {
 
           <p data-reveal className="hero-affil font-mono text-[0.56rem] leading-relaxed tracking-[0.34em] uppercase sm:text-[0.7rem] sm:tracking-[0.42em]">
             <span className="hero-affil__sheen" aria-hidden="true" />
+            <Frame size="sm" />
             <Star className="hero-affil__star hidden h-2 w-2 text-gold-400 sm:block" />
             <span className="block text-white/90 sm:inline">{BRAND.universityFull}</span>
             <span className="mx-3 hidden text-gold-400/80 sm:inline">·</span>

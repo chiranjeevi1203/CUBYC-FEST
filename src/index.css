@@ -846,7 +846,7 @@
     align-items: center;
     gap: 0.15rem;
     max-width: calc(100vw - 2rem);
-    padding: 0.6rem 1.3rem;
+    padding: 1.05rem 1.6rem;
     overflow: hidden;
     border: 1px solid rgba(243, 217, 164, 0.42);
     background:
@@ -865,7 +865,7 @@
     .hero-affil {
       flex-direction: row;
       gap: 0;
-      padding: 0.7rem 1.6rem;
+      padding: 1.05rem 2rem;
     }
   }
   .hero-affil__star {

@@ -1,4 +1,6 @@
 import { useAuth } from '../store/useAuth';
+import { REGISTRATION_OPEN } from '../config/features';
+import { showComingSoon } from './comingSoon';
 
 /*
  * Every "Register" button on the site goes through here. Signed in → the
@@ -9,8 +11,15 @@ import { useAuth } from '../store/useAuth';
 
 const KEY = 'cubyc-after-login';
 export const REGISTER_HASH = '#/dashboard/events';
+/** What a Register link points to (no dashboard address while registration is closed). */
+export const REGISTER_HREF = REGISTRATION_OPEN ? REGISTER_HASH : '#contact';
 
 export function goRegister() {
+  // Registration not open yet: just say so.
+  if (!REGISTRATION_OPEN) {
+    showComingSoon('register');
+    return;
+  }
   if (useAuth.getState().user) {
     window.location.hash = REGISTER_HASH;
     return;

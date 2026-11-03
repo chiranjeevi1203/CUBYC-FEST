@@ -13,3 +13,8 @@ CLAUDE.local.md
 # Firebase deploy cache
 .firebase
 firebase-debug.log
+
+# Local settings and secrets (e.g. VITE_REGISTRATION_OPEN, API keys) — never committed
+.env
+.env.*
+!.env.example

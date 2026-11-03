@@ -3,12 +3,31 @@ import BrandLogo from '../hud/BrandLogo';
 import FestMark from './FestMark';
 import { BRAND } from '../../config/experience';
 import { initialsOf, useAuth } from '../../store/useAuth';
+import { REGISTRATION_OPEN } from '../../config/features';
+import { showComingSoon } from '../../lib/comingSoon';
 
-/** Login button: a person icon and "Login", or your initials and "Account" once signed in. */
+/**
+ * Login button: a person icon and "Login", or your initials and "Account" once signed in.
+ * While registration is closed it always reads "Login" and just says "Coming soon".
+ */
 function LoginCta({ menu = false, onClick, style }) {
-  const user = useAuth((s) => s.user);
+  const signedIn = useAuth((s) => s.user);
+  const user = REGISTRATION_OPEN ? signedIn : null;
+  const press = (e) => {
+    onClick?.(e);
+    if (REGISTRATION_OPEN) return;
+    e.preventDefault();
+    showComingSoon('login');
+  };
   return (
-    <a href={user ? '#/dashboard' : '#/login'} className={`nv-cta ${menu ? 'nv-cta--menu' : ''}`} onClick={onClick} style={style} aria-label={user ? `Your account, ${user.name}` : 'Login'}>
+    <a
+      href={REGISTRATION_OPEN ? (user ? '#/dashboard' : '#/login') : '#home'}
+      role={REGISTRATION_OPEN ? undefined : 'button'}
+      className={`nv-cta ${menu ? 'nv-cta--menu' : ''}`}
+      onClick={press}
+      style={style}
+      aria-label={user ? `Your account, ${user.name}` : 'Login'}
+    >
       {user ? (
         <span className="nv-cta__initials" aria-hidden="true">
           {initialsOf(user.name)}

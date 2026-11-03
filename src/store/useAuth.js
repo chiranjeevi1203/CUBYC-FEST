@@ -15,14 +15,13 @@ import { create } from 'zustand';
  * registration is valid and the festival ticket is issued).
  *
  * Until the backend is connected, "Continue with Google" signs in a sample
- * participant (kept only in this browser) on the live site too, so the
- * dashboard can be opened and tried. Set PREVIEW_SIGN_IN to false to show
- * "sign-in opens soon" instead. Payments are never marked verified on the live
+ * participant (kept only in this browser) during development only; the live
+ * site reports that sign-in isn't open (PREVIEW_SIGN_IN = false). Payments are never marked verified on the live
  * site — the "Mark as verified" preview button exists only in npm run dev.
  */
 
-/** Stand-in sign-in on the live site, until the real Google sign-in is wired up. */
-const PREVIEW_SIGN_IN = true;
+/** Stand-in sign-in on the live site: off. Only `npm run dev` can use the sample participant. */
+const PREVIEW_SIGN_IN = false;
 
 const KEY = 'cubyc-demo-user';
 // No look-alike characters (0/O, 1/I/L), so an ID read aloud is typed right.

@@ -5,6 +5,8 @@ import CometCursor from './components/CometCursor';
 import LandingPage from './pages/LandingPage';
 import SpaceOverlays from './components/ui/SpaceOverlays';
 import ChatBot from './components/chat/ChatBot';
+import ComingSoon from './components/ui/ComingSoon';
+import { REGISTRATION_OPEN } from './config/features';
 import ScrollShip from './components/ui/ScrollShip';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
@@ -14,6 +16,19 @@ import { parseHash, syncFromLocation } from './lib/deptRoute';
  * opened (or earlier, in the background — see the prefetch below), so the first visit only
  * downloads the intro and the landing page.
  */
+// While registration is closed, clear anything the old preview left in this browser
+// (a sample account, its registrations, a pending "log in first").
+if (!REGISTRATION_OPEN) {
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k === 'cubyc-demo-user' || k.startsWith('cubyc-fest-'))
+      .forEach((k) => localStorage.removeItem(k));
+    sessionStorage.removeItem('cubyc-after-login');
+  } catch {
+    /* storage blocked: nothing stored either */
+  }
+}
+
 const PAGES = {
   dept: () => import('./components/dept/DepartmentView'),
   gallery: () => import('./components/gallery/GalleryPage'),
@@ -23,8 +38,9 @@ const PAGES = {
   about: () => import('./components/about/AboutPage'),
   contact: () => import('./components/contact/ContactPage'),
   sponsors: () => import('./components/sponsors/SponsorsPage'),
-  login: () => import('./components/login/LoginPage'),
-  dashboard: () => import('./components/dashboard/DashboardPage'),
+  // Registration pages exist in the build only when registration is open (config/features.js).
+  login: REGISTRATION_OPEN ? () => import('./components/login/LoginPage') : null,
+  dashboard: REGISTRATION_OPEN ? () => import('./components/dashboard/DashboardPage') : null,
   notFound: () => import('./components/system/NotFoundPage'),
 };
 const DepartmentView = lazy(PAGES.dept);
@@ -35,8 +51,8 @@ const EventsPage = lazy(PAGES.events);
 const AboutPage = lazy(PAGES.about);
 const ContactPage = lazy(PAGES.contact);
 const SponsorsPage = lazy(PAGES.sponsors);
-const LoginPage = lazy(PAGES.login);
-const DashboardPage = lazy(PAGES.dashboard);
+const LoginPage = REGISTRATION_OPEN ? lazy(PAGES.login) : null;
+const DashboardPage = REGISTRATION_OPEN ? lazy(PAGES.dashboard) : null;
 const NotFoundPage = lazy(PAGES.notFound);
 
 /** Mounts a code-split page once it is first needed, then keeps it (each page hides itself when closed). */
@@ -50,7 +66,7 @@ function OnDemand({ when, children }) {
 }
 
 /** Hash routes that open a page (department routes are checked by parseHash). */
-const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about', '#/contact', '#/sponsors', '#/login'];
+const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about', '#/contact', '#/sponsors', ...(REGISTRATION_OPEN ? ['#/login'] : [])];
 
 /**
  * Layer stack (bottom → top):
@@ -125,8 +141,9 @@ export default function App() {
       setAboutOpen(window.location.hash === '#/about');
       setContactOpen(window.location.hash === '#/contact');
       setSponsorsOpen(window.location.hash === '#/sponsors');
-      setLoginOpen(window.location.hash === '#/login');
-      const dash = window.location.hash === '#/dashboard' || window.location.hash.startsWith('#/dashboard/');
+      // While registration is closed, #/login and #/dashboard are just unknown addresses (404).
+      setLoginOpen(REGISTRATION_OPEN && window.location.hash === '#/login');
+      const dash = REGISTRATION_OPEN && (window.location.hash === '#/dashboard' || window.location.hash.startsWith('#/dashboard/'));
       setDashboardOpen(dash);
       // Anything else that looks like a page address (or a path other than /) is lost in space.
       const hash = window.location.hash;
@@ -172,15 +189,20 @@ export default function App() {
       <OnDemand when={(s) => s.sponsorsOpen}>
         <SponsorsPage />
       </OnDemand>
-      <OnDemand when={(s) => s.loginOpen}>
-        <LoginPage />
-      </OnDemand>
-      <OnDemand when={(s) => s.dashboardOpen}>
-        <DashboardPage />
-      </OnDemand>
+      {REGISTRATION_OPEN && (
+        <OnDemand when={(s) => s.loginOpen}>
+          <LoginPage />
+        </OnDemand>
+      )}
+      {REGISTRATION_OPEN && (
+        <OnDemand when={(s) => s.dashboardOpen}>
+          <DashboardPage />
+        </OnDemand>
+      )}
       <OnDemand when={(s) => s.notFound}>
         <NotFoundPage />
       </OnDemand>
+      <ComingSoon />
       <ChatBot />
       <ScrollShip />
       {hudMounted && <LoaderHUD landingRef={landingRef} />}

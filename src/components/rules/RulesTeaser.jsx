@@ -37,6 +37,8 @@ function Module({ section, index, className = '' }) {
     <li className={`rlt-mod ${index < 3 ? 'md:col-span-2' : 'md:col-span-3'} ${className}`}>
       <div className="glass group relative flex h-full flex-col rounded-3xl p-6 transition duration-500 hover:border-gold-400/30" data-cursor="hover">
         <Frame />
+        {/* The whole card opens the full rules */}
+        <a href={RULES_HREF} className="rlt-mod__link" aria-label={`${section.title}: read the full rules`} />
         <span className="rlt-mod__scan" aria-hidden="true" />
         <div className="mb-4 flex items-center gap-3">
           <span className="rlt-mod__icon grid h-10 w-10 flex-none place-items-center">
@@ -77,7 +79,7 @@ export default function RulesTeaser() {
   const vm = useViewMore(RULE_SECTIONS.length, 3);
   return (
     <>
-      <ul className="mb-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[0.58rem] tracking-[0.3em] text-white/50 uppercase sm:mb-10">
+      <ul className="teaser-stats">
         <li>
           <b className="text-gold-200">{RULE_COUNT}</b> rules
         </li>

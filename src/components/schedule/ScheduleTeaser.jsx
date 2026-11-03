@@ -4,8 +4,12 @@ import Star from '../ui/Star';
 import Shuttle from './Shuttle';
 import { SCHEDULE_DAYS, clock } from '../../config/schedule';
 import { prefersReducedMotion } from '../../config/experience';
+import { ALL_EVENTS } from '../../config/allEvents';
 
 const SCHEDULE_HREF = '#/schedule';
+// Each scheduled event links to its own event page.
+const DEPT_OF = Object.fromEntries(ALL_EVENTS.map((e) => [e.slug, e.dept]));
+const eventHref = (slug) => (DEPT_OF[slug] ? `#/dept/${DEPT_OF[slug]}/events/${slug}` : null);
 // Routine slots (check-in, lunch) are left to the full page; the cards show the highlights.
 const highlights = (day) => day.items.filter((it) => it.tag !== 'All');
 const SLOT_COUNT = SCHEDULE_DAYS.reduce((n, d) => n + d.items.length, 0);
@@ -82,18 +86,22 @@ function DayCard({ day, index }) {
             <span className="sct-line__fill" />
             <span className="sct-line__head" />
           </li>
-          {items.map((it) => (
-            <li key={`${it.time}-${it.title}`} className="sct-line__item">
-              <time className="sct-line__time">{clock(it.start)}</time>
-              <span className="sct-line__dot" aria-hidden="true" />
-              <span className="min-w-0">
-                <span className="block text-sm leading-snug text-white/85">{it.title}</span>
-                <span className="mt-0.5 block font-mono text-[0.55rem] tracking-[0.22em] text-white/40 uppercase">
-                  {it.venue} · <span className="sct-line__tag">{it.tag}</span>
-                </span>
-              </span>
-            </li>
-          ))}
+          {items.map((it) => {
+            const href = it.event ? eventHref(it.event) : null;
+            const Body = href ? 'a' : 'span';
+            return (
+              <li key={`${it.time}-${it.title}`} className="sct-line__item">
+                <time className="sct-line__time">{clock(it.start)}</time>
+                <span className="sct-line__dot" aria-hidden="true" />
+                <Body className={`min-w-0 ${href ? 'sct-line__link' : ''}`} href={href ?? undefined} data-cursor={href ? 'hover' : undefined}>
+                  <span className="sct-line__title block text-sm leading-snug text-white/85">{it.title}</span>
+                  <span className="mt-0.5 block font-mono text-[0.55rem] tracking-[0.22em] text-white/40 uppercase">
+                    {it.venue} · <span className="sct-line__tag">{it.tag}</span>
+                  </span>
+                </Body>
+              </li>
+            );
+          })}
         </ol>
         <p className="mt-5 border-t border-white/[0.07] pt-4 font-mono text-[0.55rem] tracking-[0.26em] text-white/35 uppercase">
           + {day.items.length - items.length} more on the full flight plan
@@ -173,7 +181,7 @@ function LaunchButton() {
 export default function ScheduleTeaser() {
   return (
     <>
-      <ul className="sct-stats mb-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[0.58rem] tracking-[0.3em] text-white/50 uppercase sm:mb-10">
+      <ul className="teaser-stats sct-stats">
         <li>
           <b className="text-gold-200">{String(SCHEDULE_DAYS.length).padStart(2, '0')}</b> days
         </li>

@@ -63,7 +63,7 @@ const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about'
  *   <RulesPage/>    the spacecraft bridge; rules on a hologram — #/rules
  *   <EventsPage/>   all 27 events as a fan of glass cards — #/events
  *   <AboutPage/>    the campus floating in space + the dignitaries — #/about
- *   <ContactPage/>  coordinators, student core heads and the campus map — #/contact
+ *   <ContactPage/>  faculty and student coordinators and the campus map — #/contact
  *   <SponsorsPage/> the sponsor tiers, revealed on scroll — #/sponsors
  *   <NotFoundPage/> lost in space: any unknown #/… address or path
  *   <ChatBot/>      CUBYC Comms: floating freighter (every page) → chat overlay

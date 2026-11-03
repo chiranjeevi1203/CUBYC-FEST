@@ -191,12 +191,13 @@ const deptLink = (key) => ({ label: `Visit ${DEPARTMENTS[key].name}`, dept: key 
 function eventOverview(e) {
   const people = [];
   if (e.faculty) people.push(`Faculty in-charge: **${e.faculty}**`);
-  if (e.student) people.push(`Student in-charge: **${e.student.name}** (${formatPhone(e.student.phone)})`);
+  if (e.student) people.push(`Student in-charge: **${e.student.name}** (${[e.student.phone, e.student.phone2].filter(Boolean).map(formatPhone).join(' / ')})`);
   return {
     text: [
       `**${e.name}** — ${e.deptName} · ${e.world}`,
       e.summary,
       `Format: **${e.format}**`,
+      e.prize ? `Prize pool: **₹${e.prize.toLocaleString('en-IN')}**${e.prizes ? ` (1st ₹${e.prizes[0].toLocaleString('en-IN')} · 2nd ₹${e.prizes[1].toLocaleString('en-IN')} · 3rd ₹${e.prizes[2].toLocaleString('en-IN')}${e.prizeNote ? `, ${e.prizeNote.toLowerCase()}` : ''})` : ''}` : '',
       ...people,
       `It has ${e.rules.length} rules — ask me "rules" for the details, or open the event page.`,
     ].join('\n'),
@@ -227,7 +228,7 @@ function eventPeople(e) {
     text: [
       `**${e.name}** contacts:`,
       e.faculty ? `• Faculty in-charge: **${e.faculty}**` : '',
-      e.student ? `• Student in-charge: **${e.student.name}** — ${formatPhone(e.student.phone)}` : '',
+      e.student ? `• Student in-charge: **${e.student.name}** — ${[e.student.phone, e.student.phone2].filter(Boolean).map(formatPhone).join(' / ')}` : '',
     ]
       .filter(Boolean)
       .join('\n'),
@@ -422,8 +423,8 @@ export function createBrain() {
       [['parking', 'park', 'vehicle', 'bike', 'car'], 'Parking', 'Parking arrangements for visitors will be shared with registration details.'],
       [['accommodation', 'stay', 'hostel', 'room', 'lodging'], 'Accommodation', 'Accommodation details for outstation participants will be announced with registration.'],
       [['certificate', 'certificates', 'certification'], 'Certificates', 'Participation and winner certificate details will be announced closer to the fest.'],
-      [['prize', 'prizes', 'cash', 'reward', 'rewards', 'winner', 'winners', 'trophy'], 'Prizes', 'Prizes and recognition for winners will be announced with each event; some events also have individual awards (e.g. Battle of Bands).'],
-      [['other college', 'other colleges', 'outside', 'outsiders', 'inter college', 'intercollege', 'eligible', 'eligibility', 'who can participate'], 'Eligibility', 'Eligibility details will be published with the registration form. A valid college ID is mandatory for entry.'],
+      [['prize', 'prizes', 'cash', 'reward', 'rewards', 'winner', 'winners', 'trophy'], 'Prizes', 'CUBYC Fest 2027 has a prize pool of ₹10L+ across all 27 events. Each event page shows its own prize pool — ask me about any event. The Battles of Bands also give individual awards.'],
+      [['other college', 'other colleges', 'outside', 'outsiders', 'inter college', 'intercollege', 'eligible', 'eligibility', 'who can participate'], 'Eligibility', 'The fest is open to all colleges and universities across India, and every event is open to students from every domain. A valid college ID is mandatory for entry on both days.'],
       [['dress code', 'wear', 'attire', 'uniform'], 'Dress code', 'No general dress code is announced. Some performance events ask for modest costumes — check each event’s rules.'],
       [['wifi', 'wi fi', 'internet', 'charging'], 'Connectivity', 'Events that need laptops or internet say so in their rules (e.g. the CTF allows internet for research).'],
     ];

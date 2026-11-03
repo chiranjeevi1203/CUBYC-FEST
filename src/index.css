@@ -2539,8 +2539,11 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-content: flex-start;
     gap: 0.4rem 0.45rem;
     margin-top: 0.6rem;
+    /* room for the phone line and the mail / LinkedIn row, so every card in a row lines up */
+    min-height: 3.4rem;
   }
   .gcard__contact a {
     display: grid;
@@ -2600,6 +2603,7 @@
     stroke-linejoin: round;
   }
   .gcard__contact--soon {
+    min-height: 0;
     font-family: var(--font-mono);
     font-size: 0.5rem;
     letter-spacing: 0.26em;
@@ -4734,6 +4738,13 @@
     50% {
       box-shadow: 0 0 18px rgba(255, 196, 96, 0.75);
     }
+  }
+  .edk-tile .edk-tile--prize__split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.7rem;
+    margin-top: 0.25rem;
+    color: rgba(247, 231, 196, 0.8);
   }
   .edk-tile--prize dt {
     color: rgba(247, 231, 196, 0.85);

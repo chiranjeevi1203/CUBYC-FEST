@@ -1,6 +1,7 @@
 /**
  * Departments, their worlds and their events — transcribed from the
- * "CUBYC Fest 2027 · Departmental Events" sheet.
+ * "CUBYC FEST 2027" handbook (event overview, event-wise rules, event-wise
+ * coordination and the department-wise prize pool).
  *
  * Each key is the body the department lives on (a planet, the Moon or the space station).
  * The sun is CUBYC itself — the host campus — and its page is the hub of every department.
@@ -8,9 +9,11 @@
  *
  * Event fields:
  *   format   team size / participation
- *   prize    cash prize pool in rupees (e.g. 32000), shown big on the event page
+ *   prize    cash prize pool in rupees (e.g. 37000), shown big on the event page
+ *   prizes   [first, second, third] in rupees (the breakdown under the pool)
+ *   prizeNote  optional line under the breakdown (e.g. "Per category")
  *   faculty  event faculty in-charge          (optional)
- *   student  student in-charge + phone        (optional)
+ *   student  student in-charge: { name, phone, phone2? }   (optional)
  *   summary  one-line pitch shown on cards
  *   rules    'Label: text' strings — the label renders as a heading.
  *            Lines starting with '- ' render as a bullet list.
@@ -33,17 +36,19 @@ export const DEPARTMENTS = {
   station: {
     name: 'Cultural Events',
     short: 'SWO',
-    org: 'Conducted by SWO',
+    org: 'Conducted by the Student Welfare Office (SWO)',
     facultyLabel: 'Coordinating office',
-    faculty: 'SWO',
+    faculty: 'Student Welfare Office (SWO)',
     tagline: 'Let every talent light up the stage.',
     intro: 'Every world tunes in to the station. Six cultural events: two Battles of Bands, Indian group dance, street play, mime and solo dance.',
     events: [
       {
         name: 'Battle of Bands (Western)',
-        prize: 32000,
+        prize: 52000,
+        prizes: [20000, 17000, 15000],
         format: 'Band of 5–9',
-        student: { name: 'Deberko Das', phone: '9391253577' },
+        faculty: 'Mr. Nikhil Sebastian',
+        student: { name: 'Blesson Varghese', phone: '7483628213' },
         summary: 'Up to three songs, no backing tracks — just your band, live.',
         rules: [
           'Time: 12 + 3 minutes (from sound check).',
@@ -58,8 +63,11 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Battle of Bands (Indian)',
-        prize: 32000,
+        prize: 52000,
+        prizes: [20000, 17000, 15000],
         format: 'Band of 5–10',
+        faculty: 'Mr. Nikhil Sebastian',
+        student: { name: 'Reyna', phone: '8754239088' },
         summary: 'Three songs, one Indian instrument at the core, zero backing tracks.',
         rules: [
           'Time: 12 + 3 minutes (from sound check).',
@@ -75,8 +83,11 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Indian Group Dance (Non-Theme)',
-        prize: 32000,
+        prize: 52000,
+        prizes: [20000, 17000, 15000],
         format: 'Team of 8–15',
+        faculty: 'Mr. Sumanth SY',
+        student: { name: 'Shubhadarshini', phone: '9597239400' },
         summary: 'Indian dance forms, Bollywood and contemporary — up to three songs, one stage.',
         rules: [
           'Team size: Minimum 8 and maximum 15 members per team.',
@@ -90,8 +101,11 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Street Play',
-        prize: 32000,
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
         format: 'Team of 8–25',
+        faculty: 'Mr. Rohit Xavier',
+        student: { name: 'Adrika Saxena', phone: '9958132543' },
         summary: 'An English street play with multilingual jingles — no loudspeakers, all voice.',
         rules: [
           'Duration: 8 + 2 minutes (including performance-area entry and exit).',
@@ -111,8 +125,11 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Mime',
-        prize: 32000,
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
         format: 'Team of 6–8',
+        faculty: 'Mr. Rohit Xavier',
+        student: { name: 'Saakshi G', phone: '8080428690' },
         summary: 'Say everything without a word — and without props.',
         rules: [
           'Team size: Maximum 8 members per team, including the musicians.',
@@ -124,8 +141,12 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Indian Film and Folk Dance Solo',
-        prize: 9000,
+        prize: 30000,
+        prizes: [7000, 5000, 3000],
+        prizeNote: 'Per category · Film/Folk and Western',
         format: 'Individual',
+        faculty: 'Mr. Sumanth SY',
+        student: { name: 'Kinjal', phone: '9058999868' },
         summary: 'One dancer, one song, two categories: Film/Folk and Western.',
         rules: [
           'Time: 2 + 1 minutes.',
@@ -148,28 +169,31 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Bulls and Bears (Mock Stock)',
-        prize: 9000,
-        format: 'Individual',
+        prize: 15000,
+        prizes: [7000, 5000, 3000],
+        format: 'Team of 2–3',
         faculty: 'Dr. Edith Jacob',
-        student: { name: 'Parth Dhawan', phone: '7016212215' },
-        summary: 'Trade ₹10,00,000 of virtual capital through two news-driven sessions.',
+        student: { name: 'Stavya Basu', phone: '7669807999' },
+        summary: 'Bid for companies, then trade ₹10,00,000 of virtual capital across two sessions.',
         rules: [
-          'Participation: Individual.',
-          "Capital: Virtual capital of ₹10,00,000 on the organisers' simulation platform (on your own phone or laptop).",
-          'Format: Two trading sessions of 45 minutes each, with a 10-minute break. News flashes every 5 minutes move prices.',
-          'Trading rules: Buy and sell only (no short selling). Maximum 30% of capital in any single stock. Brokerage of 0.1% per trade. Minimum 5 trades to qualify.',
-          'Prohibited: Multiple logins, collusion between participants, and the use of outside apps or help.',
-          'Winning: Highest portfolio value (cash + holdings) at the close of session 2.',
-          'Tie-break: Higher portfolio value at the end of session 1.',
+          'Team size: 2–3 members. Individual participation is not allowed.',
+          'Format: A team-based mock stock trading event with virtual capital of ₹10,00,000.',
+          'Event structure:\n- Commencement: 30 minutes.\n- Rules briefing: 30 minutes.\n- Auction round: 45 minutes.\n- Trading Session 1: 60 minutes.\n- Break: 25 minutes.\n- Trading Session 2: 60 minutes.\n- Results and closing: 35 minutes.',
+          'Auction: Teams bid for companies using their virtual capital. The highest bidder wins the company.',
+          'Trading rules: Teams may buy, sell and short-sell stocks. There is no cap on investment in any single stock or company. A minimum of 5 trades is required to qualify.',
+          'Prohibited: Multiple logins, collusion and external assistance.',
+          'Winning: The team with the highest net portfolio value (cash + holdings − short positions) at the end of Session 2 wins.',
+          'Tie-breaker: Higher net portfolio value at the end of Session 1.',
           'General: All general rules of the fest apply.',
         ],
       },
       {
         name: 'Plot Twist (Pop Culture Quiz)',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 2–3',
         faculty: 'Dr. Neelu S Kumar',
-        student: { name: 'Parv Saxena', phone: '9993848992' },
+        student: { name: 'Praket Khandelwal', phone: '7996663641' },
         summary: 'Pop culture from the 1990s to today — read through an economist’s lens.',
         rules: [
           'Team size: 2–3 members.',
@@ -196,8 +220,11 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Case 404',
-        prize: 32000,
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
         format: 'Team of 4–6',
+        faculty: 'Dr. Kriti Bhargava',
+        student: { name: 'Garima Kantanath Jain', phone: '9310205487' },
         summary: 'Follow the clue trail, profile the suspects and name the culprit, motive and method.',
         rules: [
           'Overview: Case 404 is a high-stakes investigative challenge where teams follow clues, analyse suspects and piece together evidence to identify the culprit, motive and method within a limited time.',
@@ -213,7 +240,10 @@ export const DEPARTMENTS = {
       {
         name: 'Crack the Psyche',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 2–3',
+        faculty: 'Dr. Kashish Pandey',
+        student: { name: 'Vasanth Kumar', phone: '9606577555' },
         summary: 'Draw, act and decode emotions, thrillers and psychological concepts.',
         rules: [
           'Overview: An exciting psychology-based challenge where teams draw, act and decode their way through emotions, thriller movies and psychological concepts.',
@@ -239,17 +269,18 @@ export const DEPARTMENTS = {
     short: 'CS',
     faculty: 'Dr. Kokilavani T & Dr. Stephen R',
     tagline: 'Create what the world has never seen.',
-    intro: 'The world that runs on signal. Esports on the big screen, a three-hour Capture the Flag and a six-hour AI Battle of Prompts.',
+    intro: 'The world that runs on signal. Esports on the big screen, a three-hour Capture the Flag and a six-hour AI prompt-engineering challenge.',
     events: [
       {
         name: 'Cybertronian Wars (Gaming)',
-        prize: 32000,
-        format: 'Valorant · Squad of 5 (+1)',
+        prize: 52000,
+        prizes: [20000, 17000, 15000],
+        format: 'Team of 4',
         faculty: 'Dr. Kokilavani T & Dr. Stephen R',
         student: { name: 'Aarav Chawla', phone: '9617345111' },
         summary: 'Valorant custom rooms, with the finals streamed on the big screen.',
         rules: [
-          'Team size: Squad of 5 (+1 substitute).',
+          'Team size: 4 members.',
           'Game title: Valorant.',
           'Devices: Bring your own laptop and charger.',
           'Format: Prelims of 2 matches. The top 8 teams play 3 final matches in custom rooms created by the organisers.',
@@ -261,6 +292,7 @@ export const DEPARTMENTS = {
       {
         name: 'Transwarp Protocol (Capture the Flag)',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 3',
         faculty: 'Dr. Kokilavani T & Dr. Stephen R',
         student: { name: 'Alex', phone: '8778616699' },
@@ -280,15 +312,18 @@ export const DEPARTMENTS = {
       {
         name: 'Prime Prompt (AI Battle of Prompts)',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 2',
-        summary: 'Six hours of prompt engineering, creative AI and constraint-based challenges.',
+        faculty: 'Dr. Kokilavani T & Dr. Stephen R',
+        student: { name: 'Suhani Todkar', phone: '7249751465' },
+        summary: 'A six-hour prompt-engineering and AI application development challenge.',
         rules: [
-          'Team size: 2 members.',
+          'Team size: Exactly 2 members per team.',
           'Duration: 6 hours.',
-          'Categories: Prompt Engineering, Creative AI Challenge, Constraint-Based Prompting, Prompt Optimisation.',
+          'Format: A prompt-engineering and AI application development challenge.',
+          'Rules:\n- Participants must bring their own laptops.\n- AI tools and permitted AI-based application development platforms may be used.\n- Solutions must be developed within the allotted time.\n- Prompt history must be maintained and submitted.\n- Teams must develop their own solutions. Copying other teams’ work is prohibited.\n- Teams must explain their applications and demonstrate functionality.',
           'Evaluation: Output accuracy & relevance 30%, prompt quality 25%, problem solving 20%, creativity 15%, efficiency 10%.',
-          'Rules: Use your own laptops. AI tools are allowed. Sharing prompts or solutions is prohibited. Pre-prepared prompts are restricted.',
-          'Winning: Highest points. Ties are settled on completion time, output quality and prompt efficiency.',
+          'Winning: Highest points. Ties are resolved using completion time, output quality and prompt efficiency. The judges\' decisions are final.',
           'General: All general rules of the fest apply.',
         ],
       },
@@ -300,33 +335,34 @@ export const DEPARTMENTS = {
     short: 'MATH',
     faculty: 'Dr. Rohith Raja M',
     tagline: 'Logic is the strongest gravity.',
-    intro: 'The quiet companion that moves the tides. A maths-themed Monopoly and a Sudoku event with a bidding twist.',
+    intro: 'The quiet companion that moves the tides. A maths-themed Monopoly board and a Sudoku event with a bidding twist.',
     events: [
       {
         name: 'Monomatics',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 3',
-        faculty: 'Rohith Raja',
+        faculty: 'Dr. Arulpandy P',
         student: { name: 'Parvathy Sudheer', phone: '9074796572' },
         summary: 'Monopoly meets mathematics — answer to buy, out-think to win.',
         rules: [
           'Team size: 3 members.',
-          'Concept: A mathematics-based competitive event combining problem-solving, strategic decision-making, property acquisition and financial management.',
-          'Format: The event lasts 2 hours and each team goes twice around the Monopoly board. Teams start with 1,500 points and aim to accumulate the highest wealth.',
-          'Gameplay: Teams roll a die to move around a maths-themed board. To purchase an unowned property, teams must correctly answer a maths question within 60 seconds. Teams landing on owned properties pay rent.',
-          'UNO cards: Chance spaces feature attack and movement effects, while Community Chest spaces bring financial gains or losses through rewards and maintenance fees.',
-          'Bonus: Teams receive 200 points after completing one full round of the board.',
-          'Evaluation: The winner has the highest final wealth — remaining cash plus the value of owned properties. In a tie, the team with more properties wins.',
-          "Rules: Participants must adhere to the timings and game instructions. The event heads' decisions on disputes and clarifications are final and binding.",
-          'General: Participants are expected to maintain fair play, teamwork and proper conduct throughout the event.',
+          'Format: A mathematics-based competition combining problem-solving, strategic decision-making, property acquisition and financial management.',
+          'Duration: 4 hours, including an elimination round. Shortlisted teams play 2 rounds around the Monopoly board.',
+          'Elimination round: Teams are shortlisted through challenges testing logical reasoning, problem-solving and overall performance.',
+          'Gameplay:\n- One member acts as the pawn and moves according to the die roll.\n- Each property represents a mathematical topic.\n- Teams must answer a related question within 60 seconds to acquire an unowned property.\n- Teams landing on owned properties must pay rent.\n- Challenge spaces allow teams to challenge property owners.\n- Chance spaces feature UNO-inspired power-ups.\n- Community Chest spaces involve financial gains and losses.\n- A bonus is awarded for completing a full round.',
+          'Evaluation: Final Wealth = Cash + Property Value − Outstanding Debt. The team with the highest final wealth wins.',
+          'Tie-breaker: More properties, followed by a tie-breaker challenge if required.',
+          'Rules: Teams must follow the timings and game instructions. The event heads\' decisions are final.',
         ],
       },
       {
         name: 'Auction Sudoku',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 3',
-        faculty: 'Rohith Raja',
-        student: { name: 'Vansh Modi', phone: '9000248110' },
+        faculty: 'Dr. Thriveni K',
+        student: { name: 'Naren T K', phone: '9363421778' },
         summary: 'Killer Sudoku, rapid fire and a topic auction where you bid with time.',
         rules: [
           'Team size: 3 members.',
@@ -353,25 +389,28 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Best Manager (SustainaQuest)',
-        prize: 9000,
+        prize: 15000,
+        prizes: [7000, 5000, 3000],
         format: 'Individual',
-        faculty: 'Dr. Kamatchi Preethi',
+        faculty: 'Dr. Kamatchi Preethi V',
         student: { name: 'Kabeer Shobhit Vaish', phone: '7830404016' },
         summary: 'Quiz, crisis response, crisis defence and a stage final — over two days.',
         rules: [
           'Participation: Individual.',
-          'Day 1 · Round 1 (30 min): An objective test on business general knowledge, management aptitude and sustainability, including scenario-based questions. The top 30% qualify for Round 2A. Scores are used only for shortlisting.',
-          'Day 1 · Round 2A — Written Crisis Response (15 min): All shortlisted participants receive the same business crisis and independently submit a written response with their decision, justification and practical action plan, considering sustainability implications. The top 12% qualify for Round 2B. Judging: decision quality 40, reasoning & justification 30, feasibility of action plan 30 (total 100). Scores are used only for shortlisting.',
-          'Day 1 · Round 2B — Crisis Defence: Participants defend their Round 2A response — 3 minutes of presentation and 2 minutes of questions from the judges on feasibility, business impact and sustainability. The top 6% qualify for the stage final. Judging: decision quality 40, reasoning & justification 30, communication 30 (total 100).',
-          'Day 2 · Round 3 — Stage Final: The six finalists compete in two on-stage challenges. A. Rapid-fire questions (2 min per participant) on business awareness, management knowledge and sustainability — 50 marks. B. Surprise management task (2 min per participant), revealed on stage, judged on decision-making, reasoning, adaptability and communication — 50 marks.',
-          'Final score: Round 2B + Round 3, out of 200. The highest combined score is declared Best Manager – SustainaQuest. Ties are resolved with an additional rapid-fire set.',
-          'Deadlines and deliverables: Completing and submitting each round you are eligible for is compulsory; failure to submit means disqualification. Late submissions attract progressive deductions announced before the round. Presentations and stage tasks stop at the time limit. Relevant additional deliverables are encouraged where the round permits, within the allotted time and published criteria.',
+          'Day 1 · Round 1 — Preliminary Test (30 min): An objective test covering business general knowledge, management aptitude and sustainability awareness, including scenario-based questions. The top 30% qualify for Round 2A. Scores are used only for shortlisting.',
+          'Day 1 · Round 2A — Written Crisis Response (15 min): Participants independently respond to a common business crisis by presenting their decision, justification and practical action plan, considering sustainability implications. Judging (100): decision quality 40, reasoning & justification 30, feasibility of action plan 30. The top participants qualify for Round 2B. Scores are used only for shortlisting.',
+          'Day 1 · Round 2B — Crisis Defence: Participants defend their written responses through a 3-minute presentation followed by 2 minutes of questions from the judges. Judging (100): decision quality 40, reasoning & justification 30, communication 30. The top 6 participants qualify for the stage final. Round 2B scores count towards the final ranking.',
+          'Day 2 · Round 3 — Stage Final: Six finalists compete in two challenges. A. Rapid-fire questions: 2 minutes per participant, testing business awareness, management knowledge and sustainability understanding. B. Surprise management task: 5–6 minutes per participant; the task is revealed on stage.',
+          'Judging — Round 3 (100): Rapid-fire questions 50; decision-making 12.5; reasoning 12.5; adaptability 12.5; communication 12.5.',
+          'Final score: Round 2B + Round 3, out of 200 marks. Ties are resolved through additional rapid-fire questions.',
+          'Rules: Completion and submission of every qualifying round is compulsory. Late submissions attract deductions according to the announced penalty schedule.',
           'General: All general rules of the fest apply.',
         ],
       },
       {
         name: 'Percepta (HR)',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 2',
         faculty: 'Dr. Rekha N',
         student: { name: 'Harishna K L', phone: '9944156149' },
@@ -379,9 +418,10 @@ export const DEPARTMENTS = {
         rules: [
           'Team size: 2 members.',
           'Day 1 · Round 1 — HRX, a competitive HR quiz: 20 written multiple-choice questions in 20 minutes, 5 each on HR Core, HR in Action, People & Organisation and HR Dilemmas. The top 12 teams qualify.',
-          'Day 1 · Round 2 — HR War Room: “You are the HR leadership team. The organisation is in trouble. Fix it.” Teams receive a complex organisational crisis with multiple HR problems: 20 minutes to solve the case, 8 minutes to prepare, 7 minutes to present and 2 minutes of Q&A. Judging (5 marks each): problem identification, HR knowledge & application, practicality of solutions, presentation & teamwork, rebuttal.',
-          'Day 1 · Round 3 — HR Trap: “The obvious answer is not always the right answer.” Teams are shuffled and given two situations to role-play, with roles shuffled among members. Individuals are ranked on performance and HR relevance. 7 minutes to prepare + 3 minutes per scenario. Judging (5 marks each): understanding the situation, application of HR concepts, critical thinking, communication & role portrayal, adaptability & spontaneity.',
-          'Day 2 · Round 4 — HR Shark Tank: “Pitch the next big HR innovation.” Develop an HR product or service that solves HR functions. 5-minute pitch + 3 minutes Q&A, covering the HR problem, target users, solution, unique value proposition, business model, implementation, ethical concerns and ROI. Judging (5 marks each): problem relevance, innovation & originality, feasibility & business model, solution & value proposition, pitch delivery & Q&A.',
+          'Day 1 · Round 2 — HR War Room: “You are the HR leadership team. The organisation is in trouble. Fix it.” Teams receive a complex organisational crisis with multiple HR problems: 20 minutes to solve the case, 8 minutes to prepare, 7 minutes to present and 2 minutes of Q&A. Judging (25 marks): problem identification, HR knowledge & application, practicality of solutions, presentation & teamwork, rebuttal. The top 6 teams qualify.',
+          'Day 1 · Round 3 — HR Trap: “The obvious answer is not always the right answer.” Teams are shuffled and given two situations to role-play, with roles shuffled among members. Individuals are ranked on performance and HR relevance. 7 minutes to prepare + 3 minutes per scenario. Judging (25 marks): understanding the situation, application of HR concepts, critical thinking, communication & role portrayal, adaptability & spontaneity.',
+          'Day 2 · Round 4 — HR Shark Tank: “Pitch the next big HR innovation.” Develop an HR product or service that solves HR functions. 5-minute pitch + 3 minutes Q&A, covering the HR problem, target users, solution, unique value proposition, business model, implementation, ethical concerns and ROI. Judging (25 marks): problem identification, innovation, feasibility, unique value proposition, pitch delivery and Q&A.',
+          'Final score: Round 2 + Round 3 + Round 4, out of 75 marks. Round 1 is used only for shortlisting. Ties are resolved through an additional rapid-fire HR question set.',
           'Rules: No phones or laptops during the quiz and role-play. Laptops may be used to prepare the case presentation.',
           'General: All general rules of the fest apply.',
         ],
@@ -394,19 +434,20 @@ export const DEPARTMENTS = {
     short: 'MEDIA',
     faculty: 'Dr. Julia Oinam',
     tagline: 'Stories That Travel Beyond Worlds.',
-    intro: 'The giant that pulls every story into orbit. Shoot a film on campus in six hours, then take on the Creative Curveball.',
+    intro: 'The giant that pulls every story into orbit. Shoot a film on campus in six hours, then brand a mystery product through the Creative Curveball.',
     events: [
       {
         name: '6-Hour Filmithon',
-        prize: 32000,
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
         format: 'Group · up to 5',
         faculty: 'Dr. Rajashekar D',
         student: { name: 'Promod Komanduri', phone: '9014778837' },
         summary: '6 hours. One story. One film — shot entirely on campus.',
         rules: [
           'Participation: Group event, maximum 5 members per team.',
-          'Theme & challenge: A surprise theme, element or prop is revealed to all teams at 10:30 AM on Day 1. The film must be based on it.',
-          'Time: The film must be conceived, shot, edited and submitted within 6 hours of the reveal — by 4:30 PM.',
+          'Theme & challenge: A surprise theme, element or prop is revealed to all teams at 9:00 AM on Day 1. The film must be based on it.',
+          'Time: The film must be conceived, shot, edited and submitted within 6 hours — by 3:00 PM.',
           'Location: All footage must be shot on campus during the fest.',
           'Film duration: 3–5 minutes, including credits.',
           'Original footage: All footage must be captured during the Filmithon. Pre-recorded footage, including stock video, is not permitted.',
@@ -418,29 +459,29 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Creative Curveball',
-        prize: 32000,
-        format: 'Team of 2–3',
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
+        format: 'Team of 3–4',
         faculty: 'Dr. Manas K',
         student: { name: 'Kanishka Sharma', phone: '9306115754' },
-        summary: 'One team. One mission. One imposter.',
+        summary: 'Brand a mystery product on video — while four curveballs change the brief.',
         rules: [
-          'Participation: Group event. Players are divided into teams.',
-          'Roles: One or more players are secretly assigned as imposters.',
-          'Missions: Imposters receive a hidden identity or mission. All other players receive the common task.',
-          'Gameplay: Teams complete a series of creative challenges, discussing, performing and completing each one while watching for suspicious behaviour. Imposters must blend in, deceive and subtly disrupt the team without being caught.',
-          'Time limit: Each round has a strict time limit.',
-          'Secrecy: Players cannot reveal their assigned role. Secret signalling is not allowed.',
-          'Voting: At the end of each round, players vote to eliminate the suspected imposter.',
-          'Imposter wins: By surviving the rounds or successfully sabotaging the task.',
-          'Team wins: By exposing all imposters before the final round.',
-          "Fair play: No cheating, secret signalling or outside assistance. The Game Master's decision is final.",
+          'Team size: 3–4 members per team.',
+          'Format: A creative branding and video communication challenge involving a randomly selected mystery product.',
+          'Duration: 4 hours overall, including briefing, product selection, planning, video production and final submission. Actual time allotted to teams: 3 hours.',
+          'Curveballs: Four surprise instructions are introduced at 30-minute intervals through the designated WhatsApp group. These may include changes to the target audience, a mandatory dialogue or tagline, specific objects or visual elements, a change in tone or creative restrictions.',
+          'Final submission: One original, edited promotional video of 2–3 minutes.',
+          'Equipment:\n- Teams must use their own smartphones for filming.\n- Editing may be done on a phone or laptop.\n- Basic props are permitted.',
+          'Rules:\n- Pre-recorded footage and previously completed projects are prohibited.\n- AI use for editing or any other purpose is prohibited.\n- External assistance and collaboration between teams are prohibited.\n- Filming is permitted in designated campus spaces.\n- Consent must be obtained before filming identifiable individuals.',
+          'Judging (100): Creativity & originality 25; brand identity & communication 20; integration of curveballs 25; video execution & technical quality 20; overall impact 10.',
+          'Late submission: Up to 5 minutes late — 5-mark deduction. 5–10 minutes late — 10-mark deduction. Beyond 10 minutes — disqualification.',
         ],
       },
     ],
   },
 
   saturn: {
-    name: 'Cultural Studies & Languages',
+    name: 'English & Cultural Studies',
     short: 'ENG',
     faculty: 'Dr. Rima Bhattacharya',
     tagline: 'Where Words Create Worlds.',
@@ -449,12 +490,13 @@ export const DEPARTMENTS = {
       {
         name: 'Literature Court Room',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 3',
         faculty: 'Dr. Rima Bhattacharya',
         student: { name: 'Jowin Joice', phone: '8281153955' },
         summary: 'Case analysis, a simulated high-court trial and a press conference.',
         rules: [
-          'Participation: Team event.',
+          'Participation: Team of 3.',
           'Format: Three rounds, each scored out of 25 marks — Round 1: Case Analysis; Round 2: The Courtroom Trial; Round 3: The Press Conference.',
           'Round 1 — Case Analysis (25 marks): Teams review the given case details or questions, diagnose the core legal issues and submit structured solutions within the stipulated time, testing analytical skill, legal reasoning and domain knowledge.',
           'Judging — Round 1: Analytical accuracy & legal reasoning 5; clarity of problem identification 5; depth of research & argument framing 5; feasibility & structure of solutions 5; timeliness & presentation 5.',
@@ -467,6 +509,7 @@ export const DEPARTMENTS = {
       {
         name: 'Convince the Time Keeper',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 2',
         faculty: 'Dr. Rima Bhattacharya',
         student: { name: 'Greeshma G', phone: '9843092000' },
@@ -493,11 +536,14 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Brain to Brand (Pitching Event)',
-        prize: 32000,
-        format: 'Team of 2–4',
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
+        format: 'Team of 3',
+        faculty: 'Dr. Sekarini S',
+        student: { name: 'Rishabh Khianra', phone: '8431441310' },
         summary: 'Build a product overnight, face the investors and win the industry rivalry.',
         rules: [
-          'Participation: Team event.',
+          'Participation: Team of 3.',
           "Format: Four rounds, each scored out of 25 marks — Round 1: The Overnight Innovation Challenge; Round 2: Industry IQ; Round 3: The Investor's Room; Round 4: Industry Rivalry, The Final Showdown.",
           'Round 1 — The Overnight Innovation Challenge (25 marks): The night before the main event, each team is assigned an industry (such as real estate, healthcare, agriculture, education, transportation or energy). Teams identify a serious problem in that industry and develop a new product or innovative solution, with a basic prototype, within the given time.',
           'Round 1 submissions:\n- A product prototype or working model.\n- A short video demonstrating the product and how it works.\n- A presentation on the problem, proposed solution and target customers.\n- An investor presentation covering the business model and market opportunity.\n- A marketing and launch strategy.\n- A financial plan: startup costs, production expenses, pricing, revenue and expected profitability.\n- A share-distribution plan: founder ownership, equity offered and investment required.\n- A production, transportation and distribution plan.\n- A competitive strategy explaining how the product stands out.',
@@ -507,12 +553,16 @@ export const DEPARTMENTS = {
           "Round 4 — Industry Rivalry, The Final Showdown (25 marks): Teams with products in the same industry go head-to-head, defending their product, questioning competitors' strategies and arguing why their solution offers greater value.",
           'Round 4 surprise challenges: Judges may introduce rising costs, a new competitor, supply-chain disruptions or a sudden change in demand, and teams must respond immediately.',
           "Round 4 evaluation: Innovation, competitive strategy, financial and operational feasibility, quality of arguments and handling of surprises. Rubric (5 each): advantage over competitors, industry & competitor knowledge, arguments & rebuttals, response to surprise challenges, confidence & communication.",
+          'General: Teams must follow all time limits and organiser instructions. Late submissions may be rejected.',
         ],
       },
       {
         name: 'Meme Battle',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 3',
+        faculty: 'Dr. Jovita Shanta Job',
+        student: { name: 'Jiya Mohan', phone: '9962989060' },
         summary: 'From online prelims to a live meme face-off — humour under pressure.',
         rules: [
           'Team size: Each team must have exactly three members.',
@@ -530,10 +580,13 @@ export const DEPARTMENTS = {
       {
         name: 'Escape Room',
         prize: 22000,
+        prizes: [10000, 7000, 5000],
         format: 'Team of 2',
+        faculty: 'Dr. Urmila Menon',
+        student: { name: 'Bhumika Singhania', phone: '9933380500' },
         summary: 'The CEO has vanished before the big deal. You have 20 minutes.',
         rules: [
-          'Team size: Each team consists of 2 members.',
+          'Team size: Exactly 2 members per team.',
           'Overview: A management-themed puzzle challenge — solve clues, crack codes and complete a mission in limited time, testing logic, observation, communication and teamwork.',
           "Theme — The Missing CEO: A company's CEO disappears just before an important deal. Uncover what happened by solving clues tied to different domains; the final clues lead to a code that unlocks the exit.",
           'Puzzle stages: The Locked Briefcase (a business riddle), The Finance File (spot the wrong figure), The Marketing Mystery (decode a brand clue), The HR Investigation (find the person connected to the mystery) and The Final Unlock (combine every clue for the final code).',
@@ -541,14 +594,15 @@ export const DEPARTMENTS = {
           "Hints: A maximum of 2 hints per team. Each hint adds a 2-minute penalty to the team's final time.",
           'Rules: Mobile phones are not allowed. Do not force locks, damage props or move objects not marked as clues.',
           'Ranking: Teams that escape are ranked by adjusted completion time (time taken + penalties). If no team escapes, the team that solves the most puzzles in the least adjusted time ranks highest.',
-          'Twist — The Double Agent: Two conflicting pieces of information may appear; use evidence from earlier stages to decide which clue is false.',
-          'Prizes: Recognition for the top 3 teams.',
         ],
       },
       {
         name: 'Capture the Assets',
-        prize: 32000,
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
         format: 'Team of 6 (+2 subs)',
+        faculty: 'Dr. Arun',
+        student: { name: 'Priyanshu Parida', phone: '9337613414' },
         summary: 'Capture the Flag with a business twist — every asset has a hidden value.',
         rules: [
           'Description: An outdoor field game inspired by Capture the Flag. Collect mystery assets from a central neutral zone and bring them safely back to base without being tagged. Each asset has a hidden point value revealed only at the end — the most assets does not guarantee victory.',
@@ -577,8 +631,11 @@ export const DEPARTMENTS = {
     events: [
       {
         name: 'Air Crash',
-        prize: 9000,
+        prize: 15000,
+        prizes: [7000, 5000, 3000],
         format: 'Individual',
+        faculty: 'Dr. Narasimha Murthy',
+        student: { name: 'Dhruv Bid & Jaclyn Ann Thomas', phone: '8669154258', phone2: '6238056902' },
         summary: 'The plane is going down and there is one parachute left. Make your case.',
         rules: [
           'Participation: Individual.',
@@ -593,11 +650,14 @@ export const DEPARTMENTS = {
       },
       {
         name: 'Clash of Councils',
-        prize: 32000,
+        prize: 37000,
+        prizes: [15000, 12000, 10000],
         format: 'Team of 5–8',
+        faculty: 'Dr. Kantharaju KP',
+        student: { name: 'Manas & Tanya', phone: '9209852886', phone2: '9900009546' },
         summary: 'Domains go head-to-head across team events for the overall championship.',
         rules: [
-          'Eligibility: Open to students from domains or campus factions approved by the organisers. Team size: 5–8. Each domain nominates a team captain.',
+          'Eligibility: Open to students from domains or campus factions approved by the organisers. Team size: 5–8 members. Each team must nominate a captain.',
           'Registration: Register before the deadline, carry a valid university ID and meet the event-specific eligibility and team-size criteria. Changes to registered participants need prior approval.',
           'Format: Multiple team events under the Clash of Councils programme. Schedules, venues, participant limits and event-specific rules are announced in advance.',
           'Points: Awarded by final position in each event — First 10, Second 7, Third 5, Fourth 3, Fifth 2, Sixth 1. Bonus or spirit points are announced in advance.',

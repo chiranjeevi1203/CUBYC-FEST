@@ -19,6 +19,20 @@ const STATS = [
   { value: '₹10L+', label: 'Prize pool' },
 ];
 
+// About the university and the campus (from the CUBYC FEST 2027 handbook).
+const ABOUT = [
+  {
+    title: 'About the',
+    accent: 'University',
+    text: 'CHRIST (Deemed to be University), established in 1969 as Christ College and declared a Deemed to be University in 2008, is a multidisciplinary institution rooted in the educational vision of St. Kuriakose Elias Chavara. With a strong emphasis on academic excellence, research, holistic education and social engagement, the University offers programmes across the humanities, social sciences, sciences, commerce, management, engineering, architecture, education and law. Its diverse academic community, comprising students from across India and around the world, reflects a culture of multiculturalism, inclusivity and shared learning. Beyond academics, the University encourages active participation in sports, music, literary pursuits and creative activities, recognising their role in shaping well-rounded individuals. Guided by its vision of Excellence and Service, its mission is to nurture individuals capable of making meaningful contributions to society.',
+  },
+  {
+    title: 'About the',
+    accent: 'Campus',
+    text: 'Established in 2022, CHRIST (Deemed to be University), Bangalore Yeshwanthpur Campus, is a contemporary, multidisciplinary learning environment located at Nagasandra, near Tumkur Road, Bengaluru. Spread across 9.4 acres, the campus features a ten-storey infrastructure spanning over 1.6 million square feet, where architecture, technology and art come together to create a future-oriented space for education. It offers undergraduate, postgraduate and doctoral programmes across seven academic schools, bringing together diverse disciplines and perspectives. Equipped with modern classrooms, specialised laboratories, seminar halls, a state-of-the-art auditorium, library and recreational facilities, the campus supports academic inquiry, research, innovation and extracurricular engagement. Guided by its vision of creating a joyful campus that nurtures excellence, enriches lives and transforms futures, it strives to foster an inclusive and vibrant community where students explore their potential and emerge as responsible, innovative and globally competitive individuals.',
+  },
+];
+
 // The university's vision, mission and core values (as published by CHRIST).
 const CARDS = [
   {
@@ -150,14 +164,15 @@ function AboutView({ open, onGone }) {
           <div data-rise className="sp-panel mx-auto max-w-4xl text-center">
             <OrnateCorners />
             <OrnateDivider className="mx-auto mb-5 w-56 text-gold-300/70" />
-            <h2 className="font-display text-2xl font-bold tracking-[0.08em] uppercase sm:text-3xl">
-              A campus <span className="text-gold-gradient">in orbit</span>
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-[0.98rem] leading-relaxed text-white/70 sm:text-[1.05rem]">
-              {BRAND.campus} of {BRAND.universityFull} is where {BRAND.fest} lifts off — a place of learning, culture and ambition that, for two days,
-              becomes the centre of its own small universe. Every domain is a world, every event a mission, and the campus is the launch pad they all
-              orbit.
-            </p>
+            {ABOUT.map((a, i) => (
+              <div key={a.accent} className={i ? 'mt-10' : ''}>
+                {i > 0 && <OrnateDivider className="mx-auto mb-8 w-40 text-gold-300/50" />}
+                <h2 className="font-display text-2xl font-bold tracking-[0.08em] uppercase sm:text-3xl">
+                  {a.title} <span className="text-gold-gradient">{a.accent}</span>
+                </h2>
+                <p className="mx-auto mt-5 max-w-3xl text-justify text-[0.98rem] leading-relaxed text-white/70 [hyphens:auto] sm:text-[1.05rem]" lang="en">{a.text}</p>
+              </div>
+            ))}
             <ul className="sp-stats mt-8">
               {STATS.map((s) => (
                 <li key={s.label}>

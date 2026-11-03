@@ -113,7 +113,7 @@ function rewardBurst(tile) {
 }
 
 /** The prize pool tile: same shape as the other tiles, in gold; click (or Enter / Space) for the reward burst. */
-function PrizeTile({ amount }) {
+function PrizeTile({ amount, prizes, note }) {
   const ref = useRef(null);
   const celebrate = () => {
     const tile = ref.current;
@@ -159,7 +159,16 @@ function PrizeTile({ amount }) {
       <div className="min-w-0">
         <dt>Prize pool</dt>
         <dd className="edk-tile--prize__amount">₹{amount.toLocaleString('en-IN')}</dd>
-        <dd className="edk-tile__sub">Plus gift hampers for the winners</dd>
+        {prizes?.length ? (
+          <dd className="edk-tile__sub edk-tile--prize__split">
+            {prizes.map((v, i) => (
+              <span key={i}>
+                {['1st', '2nd', '3rd'][i]} ₹{v.toLocaleString('en-IN')}
+              </span>
+            ))}
+          </dd>
+        ) : null}
+        <dd className="edk-tile__sub">{note ? `${note} · ` : ''}Plus gift hampers for the winners</dd>
       </div>
     </div>
   );
@@ -597,18 +606,20 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
                 <dt>Student in-charge</dt>
                 <dd>{event.student?.name ?? 'To be announced'}</dd>
                 {event.student?.phone ? (
-                  <dd>
-                    <a href={`tel:+91${event.student.phone}`} className="edk-tile__phone">
-                      +91 {formatPhone(event.student.phone)}
-                    </a>
-                  </dd>
+                  [event.student.phone, event.student.phone2].filter(Boolean).map((ph) => (
+                    <dd key={ph}>
+                      <a href={`tel:+91${ph}`} className="edk-tile__phone">
+                        +91 {formatPhone(ph)}
+                      </a>
+                    </dd>
+                  ))
                 ) : (
                   <dd className="edk-tile__sub">Contact shared before the fest</dd>
                 )}
               </div>
             </div>
             {/* The prize pool closes the tiles: same tile, in warm gold with a shimmering amount */}
-            {event.prize ? <PrizeTile amount={event.prize} /> : null}
+            {event.prize ? <PrizeTile amount={event.prize} prizes={event.prizes} note={event.prizeNote} /> : null}
           </dl>
 
           {/* Rules */}

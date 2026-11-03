@@ -25,7 +25,8 @@ const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${enc
 const people = (key) => TEAM_SECTIONS.find((s) => s.key === key)?.people ?? [];
 const GROUPS = [
   { key: 'faculty-core', title: 'Faculty Coordinators', kicker: 'Mission control', side: 'left', people: people('faculty-core'), moduleOf: (j) => MODULES - 1 - j },
-  { key: 'student-committee', title: 'Student Core Heads', kicker: 'The command deck', side: 'right', people: people('student-committee'), moduleOf: (j) => j },
+  // The ring has six modules a side: the first six students link to theirs, the rest are plain cards.
+  { key: 'student-committee', title: 'Student Coordinators', kicker: 'The command deck', side: 'right', people: people('student-committee'), moduleOf: (j) => (j < MODULES / 2 ? j : null) },
 ];
 
 const formatPhone = (p) => (p.length === 10 ? `+91 ${p.slice(0, 5)} ${p.slice(5)}` : p);
@@ -64,18 +65,19 @@ function SectionHead({ kicker, title, count }) {
 /** A contact card wired to its station module (hover/focus lights both). */
 function LinkedCard({ person, j, g, focus, setFocus, compact, className }) {
   const k = g.moduleOf(j);
+  const linked = k != null;
   return (
     <ContactCard
       person={person}
       index={j}
       compact={compact}
-      active={focus?.k === k}
+      active={linked && focus?.k === k}
       className={className}
-      data-module={k}
-      onPointerEnter={() => setFocus({ k, from: 'card', side: g.side })}
-      onPointerLeave={() => setFocus(null)}
-      onFocus={() => setFocus({ k, from: 'card', side: g.side })}
-      onBlur={() => setFocus(null)}
+      data-module={linked ? k : undefined}
+      onPointerEnter={linked ? () => setFocus({ k, from: 'card', side: g.side }) : undefined}
+      onPointerLeave={linked ? () => setFocus(null) : undefined}
+      onFocus={linked ? () => setFocus({ k, from: 'card', side: g.side }) : undefined}
+      onBlur={linked ? () => setFocus(null) : undefined}
     />
   );
 }

@@ -38,8 +38,8 @@ export const SCHEDULE_DAYS = [
     date: EVENT.days[0],
     title: 'Ignition',
     items: [
-      slot('08:00', '09:00', 'Registration & Reporting', 'In front of the Turf', null, 'All'),
-      slot('09:00', '10:30', 'Inauguration', 'Main Auditorium'),
+      slot('08:00', '09:30', 'Registration & Reporting', 'In front of the Turf', null, 'All'),
+      slot('09:30', '10:30', 'Inauguration', 'Main Auditorium'),
       slot('10:30', '13:00', 'Sustain-A-Quest (Best Manager)', 'B-614, B-613 (B-611)', 'best-manager-sustainaquest'),
       slot('10:30', '13:00', 'Air Crash', 'C-616, C-615', 'air-crash'),
       slot('10:30', '13:00', 'Literature Court Room', 'Seminar Hall 1, A-Block', 'literature-court-room'),

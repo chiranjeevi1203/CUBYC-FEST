@@ -1,5 +1,5 @@
 /**
- * The fest's general rules (provisional — confirm with the organising committee).
+ * The fest's general rules, from the CUBYC FEST 2027 handbook.
  * Wrap a key phrase in **double asterisks** to highlight it on the hologram.
  * Event-specific rules live with each event in ./departments.js.
  */
@@ -8,6 +8,7 @@ export const RULE_SECTIONS = [
     key: 'entry',
     title: 'Eligibility & Registration',
     rules: [
+      'The fest is **open to all colleges and universities across India**.',
       'A **valid college ID card is mandatory** for entry on both days of the fest.',
       'Registrations are **confirmed only after the official form is completed** and acknowledged by the organisers.',
       'Register **before the published deadline**. Changes to registered participants need **prior approval**.',

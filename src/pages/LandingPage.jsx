@@ -54,7 +54,7 @@ const FEST_DATES = (() => {
   };
 })();
 
-// Core Students: the contacts shown on the landing page (edit in config/team.js).
+// Student Coordinators: the contacts shown on the landing page (edit in config/team.js).
 const STUDENT_CORE = TEAM_SECTIONS.find((s) => s.key === 'student-committee')?.people ?? [];
 
 // The four forces of the fest (About section).
@@ -404,21 +404,36 @@ export default function LandingPage({ landingRef }) {
           <SectionHeading eyebrow="About the fest">
             One fest, <span className="text-gold-gradient">one orbit</span>
           </SectionHeading>
-          <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr]">
-            <div className="space-y-5 text-center text-base leading-relaxed text-white/65 sm:text-lg lg:text-left">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+            <div className="space-y-5 text-justify text-base leading-relaxed text-white/65 [hyphens:auto] sm:text-lg" lang="en">
               <p>
-                {BRAND.fest} is the flagship annual fest of {BRAND.universityFull}, {BRAND.campus} — two days where
-                code, culture, art and ambition share one sky.
+                The inaugural edition of {BRAND.fest} Fest 2027 is two days of exploration, expression and collective celebration. Bringing together{' '}
+                {DEPT_ORDER.length} domains and {EVENT_COUNT} events, the fest creates a dynamic platform for intellectual engagement, creative
+                expression, innovation and healthy competition. It encourages participants from diverse backgrounds to step beyond their disciplines,
+                exchange perspectives and embrace collaboration and mutual respect.
               </p>
               <p>
-                {DEPT_ORDER.length} domains, {EVENT_COUNT} events, one gravitational pull. Find your world, gather your crew and launch with us on{' '}
-                {EVENT.dateLabel}.
+                As the first edition, it marks the beginning of a shared tradition built on excellence, integrity and collective growth, where ambition
+                meets humility and competition is guided by sportsmanship. One campus, diverse possibilities, and the beginning of a tradition of
+                excellence.
               </p>
               <p>
-                From esports arenas and capture-the-flag labs to bands, stages and boardroom pitches, every world hosts its own missions — with
-                a <span className="text-gold-200">₹10L+ prize pool</span> waiting for the crews who conquer them.
+                Open to all colleges and universities across India, with a <span className="text-gold-200">₹10L+ prize pool</span> waiting for the
+                crews who conquer them. Launch with us on <span className="whitespace-nowrap">{EVENT.dateLabel}</span>.
               </p>
-              <ul className="about-pillars">
+            </div>
+            {/* The numbers, with the fest's four forces beneath them */}
+            <div className="flex flex-col gap-5">
+              <div className="glass relative grid grid-cols-2 gap-px overflow-hidden rounded-3xl">
+                <Frame />
+                {STATS.map((s) => (
+                  <div key={s.label} className={`flex flex-col items-center gap-1 bg-white/[0.01] px-4 py-8 text-center ${s.featured ? 'about-prize' : ''}`}>
+                    <span className="text-gold-gradient font-display text-4xl font-semibold sm:text-5xl">{s.value}</span>
+                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-white/50 uppercase">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+              <ul className="about-pillars !mt-0">
                 {PILLARS.map((p) => (
                   <li key={p.name} className="about-pillar">
                     <span className="about-pillar__icon" aria-hidden="true">
@@ -433,15 +448,6 @@ export default function LandingPage({ landingRef }) {
                   </li>
                 ))}
               </ul>
-            </div>
-            <div className="glass relative grid grid-cols-2 gap-px overflow-hidden rounded-3xl">
-              <Frame />
-              {STATS.map((s) => (
-                <div key={s.label} className={`flex flex-col items-center gap-1 bg-white/[0.01] px-4 py-8 text-center ${s.featured ? 'about-prize' : ''}`}>
-                  <span className="text-gold-gradient font-display text-4xl font-semibold sm:text-5xl">{s.value}</span>
-                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-white/50 uppercase">{s.label}</span>
-                </div>
-              ))}
             </div>
           </div>
           <div className="mt-12 flex justify-center">
@@ -487,7 +493,7 @@ export default function LandingPage({ landingRef }) {
             <div className="relative mt-12 border-t border-white/[0.08] pt-10">
               <p className="inline-flex items-center gap-3 font-mono text-[0.6rem] tracking-[0.4em] text-gold-300/80 uppercase">
                 <Star className="h-2 w-2 text-gold-400/70" />
-                Reach the student core
+                Reach the student coordinators
                 <Star className="h-2 w-2 text-gold-400/70" />
               </p>
               <ul className="ct-grid ct-grid--landing text-left">

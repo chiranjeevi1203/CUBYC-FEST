@@ -25,10 +25,10 @@ export const DEPARTMENTS = {
     hub: true,
     name: 'CUBYC',
     short: 'CUBYC',
-    org: 'CHRIST (Deemed to be University) Yeshwanthpur Campus',
+    org: 'CHRIST (Deemed to be University) Bangalore Yeshwanthpur Campus',
     facultyLabel: 'Host',
-    faculty: 'CHRIST (Deemed to be University) · Yeshwanthpur Campus',
-    tagline: 'CHRIST (Deemed to be University) Yeshwanthpur Campus',
+    faculty: 'CHRIST (Deemed to be University) · Bangalore Yeshwanthpur Campus',
+    tagline: 'CHRIST (Deemed to be University) Bangalore Yeshwanthpur Campus',
     intro: 'The star every world orbits. Our flagship fest brings ten domains and one orbital stage together for two days of competition, culture and ambition.',
     events: [],
   },
@@ -37,8 +37,6 @@ export const DEPARTMENTS = {
     name: 'Cultural Events',
     short: 'SWO',
     org: 'Conducted by the Student Welfare Office (SWO)',
-    facultyLabel: 'Coordinating office',
-    faculty: 'Student Welfare Office (SWO)',
     tagline: 'Let every talent light up the stage.',
     intro: 'Every world tunes in to the station. Six cultural events: two Battles of Bands, Indian group dance, street play, mime and solo dance.',
     events: [
@@ -163,7 +161,6 @@ export const DEPARTMENTS = {
   mercury: {
     name: 'Economics',
     short: 'ECO',
-    faculty: 'Dr. Sajitha A',
     tagline: 'Turn knowledge into economic power.',
     intro: 'The fastest world in the system. Trade a live mock-stock floor and take on a pop-culture quiz where every answer hides an economic idea.',
     events: [
@@ -214,7 +211,6 @@ export const DEPARTMENTS = {
   venus: {
     name: 'Psychology',
     short: 'PSY',
-    faculty: 'Dr. Athira OS',
     tagline: 'Understand what makes us human.',
     intro: 'The brightest world hides the deepest secrets. Solve a campus-wide case, then draw, act and decode your way through the human mind.',
     events: [
@@ -267,7 +263,6 @@ export const DEPARTMENTS = {
   earth: {
     name: 'Computer Science',
     short: 'CS',
-    faculty: 'Dr. Kokilavani T & Dr. Stephen R',
     tagline: 'Create what the world has never seen.',
     intro: 'The world that runs on signal. Esports on the big screen, a three-hour Capture the Flag and a six-hour AI prompt-engineering challenge.',
     events: [
@@ -333,7 +328,6 @@ export const DEPARTMENTS = {
   moon: {
     name: 'Mathematics',
     short: 'MATH',
-    faculty: 'Dr. Rohith Raja M',
     tagline: 'Logic is the strongest gravity.',
     intro: 'The quiet companion that moves the tides. A maths-themed Monopoly board and a Sudoku event with a bidding twist.',
     events: [
@@ -383,7 +377,6 @@ export const DEPARTMENTS = {
   mars: {
     name: 'Commerce',
     short: 'COM',
-    faculty: 'Dr. Sudha E',
     tagline: 'Build success through every decision.',
     intro: 'The red planet tests nerve. A sustainability-driven hunt for the best manager and a four-round HR challenge across two days.',
     events: [
@@ -432,7 +425,6 @@ export const DEPARTMENTS = {
   jupiter: {
     name: 'Media Studies',
     short: 'MEDIA',
-    faculty: 'Dr. Julia Oinam',
     tagline: 'Stories That Travel Beyond Worlds.',
     intro: 'The giant that pulls every story into orbit. Shoot a film on campus in six hours, then brand a mystery product through the Creative Curveball.',
     events: [
@@ -483,7 +475,6 @@ export const DEPARTMENTS = {
   saturn: {
     name: 'English & Cultural Studies',
     short: 'ENG',
-    faculty: 'Dr. Rima Bhattacharya',
     tagline: 'Where Words Create Worlds.',
     intro: 'The ringed world of stories. Argue literature in a mock high court, then convince the Time Keeper whether a character should return or remain.',
     events: [
@@ -530,7 +521,6 @@ export const DEPARTMENTS = {
   uranus: {
     name: 'Management',
     short: 'SBM',
-    faculty: null,
     tagline: 'Great leaders create new possibilities.',
     intro: 'The world tilted toward the future. Four events, from an overnight startup challenge to an outdoor game of capture the assets.',
     events: [
@@ -625,7 +615,6 @@ export const DEPARTMENTS = {
   neptune: {
     name: 'Professional Studies',
     short: 'Professional Studies',
-    faculty: 'Dr. Deon Bablu Thomas',
     tagline: 'Let confidence lead every word.',
     intro: 'The far edge of the system, where only the persuasive survive. Talk your way onto the last parachute, then lead your domain in the Clash of Councils.',
     events: [
@@ -672,6 +661,19 @@ export const DEPARTMENTS = {
     ],
   },
 };
+
+/*
+ * A department's faculty in-charges are the faculty in-charges of its events
+ * (from the handbook's event-wise coordination), listed once each — so the
+ * department page and its event pages always agree.
+ */
+const joinNames = (names) => (names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} & ${names.at(-1)}`);
+Object.values(DEPARTMENTS).forEach((d) => {
+  if (d.hub) return;
+  const names = [...new Set(d.events.flatMap((e) => (e.faculty ? e.faculty.split(/\s*&\s*/) : [])))];
+  d.faculty = names.length ? joinNames(names) : null;
+  d.facultyLabel = names.length > 1 ? 'Faculty in-charges' : 'Faculty in-charge';
+});
 
 /** Tour order for the pages: the sun (CUBYC), then outward by orbit — the station sits between Mars and Jupiter. */
 export const ORDER = ['sun', 'mercury', 'venus', 'earth', 'moon', 'mars', 'station', 'jupiter', 'saturn', 'uranus', 'neptune'];

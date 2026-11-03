@@ -113,7 +113,7 @@ function rewardBurst(tile) {
 }
 
 /** The prize pool tile: same shape as the other tiles, in gold; click (or Enter / Space) for the reward burst. */
-function PrizeTile({ amount, prizes, note }) {
+function PrizeTile({ amount, note }) {
   const ref = useRef(null);
   const celebrate = () => {
     const tile = ref.current;
@@ -159,15 +159,6 @@ function PrizeTile({ amount, prizes, note }) {
       <div className="min-w-0">
         <dt>Prize pool</dt>
         <dd className="edk-tile--prize__amount">₹{amount.toLocaleString('en-IN')}</dd>
-        {prizes?.length ? (
-          <dd className="edk-tile__sub edk-tile--prize__split">
-            {prizes.map((v, i) => (
-              <span key={i}>
-                {['1st', '2nd', '3rd'][i]} ₹{v.toLocaleString('en-IN')}
-              </span>
-            ))}
-          </dd>
-        ) : null}
         <dd className="edk-tile__sub">{note ? `${note} · ` : ''}Plus gift hampers for the winners</dd>
       </div>
     </div>
@@ -448,7 +439,7 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
       icon: 'venue',
       label: 'Venue',
       value: slots.length ? unique(slots.map((s) => s.venue)).join(' · ') : 'CHRIST (Deemed to be University)',
-      sub: 'CHRIST (Deemed to be University) · Yeshwanthpur Campus',
+      sub: 'CHRIST (Deemed to be University) · Bangalore Yeshwanthpur Campus',
     },
     { icon: 'dept', label: 'Domain', value: 'Open to all', sub: 'Students from every domain can take part' },
   ];
@@ -619,7 +610,7 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
               </div>
             </div>
             {/* The prize pool closes the tiles: same tile, in warm gold with a shimmering amount */}
-            {event.prize ? <PrizeTile amount={event.prize} prizes={event.prizes} note={event.prizeNote} /> : null}
+            {event.prize ? <PrizeTile amount={event.prize} note={event.prizeNote} /> : null}
           </dl>
 
           {/* Rules */}

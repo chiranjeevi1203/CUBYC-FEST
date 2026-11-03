@@ -3732,8 +3732,12 @@
 
   .dept-chip {
     display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: 0.6rem;
+    max-width: 100%;
+    text-align: center;
+    gap: 0.25rem 0.6rem;
     padding: 0.45rem 0.95rem;
     border-radius: 9999px;
     border: 1px solid rgba(233, 194, 122, 0.3);

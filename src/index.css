@@ -708,10 +708,11 @@
     border-radius: 9999px !important;
     background: #05060d;
     border: 1.5px solid color-mix(in srgb, var(--day) 70%, transparent);
+    /* lights up the instant the line reaches it, so it keeps pace with the scroll */
     transition:
-      background-color 0.35s ease,
-      border-color 0.35s ease,
-      box-shadow 0.35s ease,
+      background-color 0.06s linear,
+      border-color 0.06s linear,
+      box-shadow 0.06s linear,
       transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .sct-line__dot.is-lit {

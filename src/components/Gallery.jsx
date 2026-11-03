@@ -204,7 +204,7 @@ export const GALLERY_ITEMS = CAMPUS_PHOTOS.length ? CAMPUS_PHOTOS : GALLERY;
 const GALLERY_HREF = '#/gallery';
 const COPIES = 4; // each row repeats its set so it always overfills the screen while it slides
 const AUTO_SPEED = 26; // px/s the rows glide on their own
-const SCROLL_FACTOR = 0.45; // px of extra travel per px scrolled
+const SCROLL_FACTOR = 0.45; // px of extra travel per px scrolled (either way — it only ever speeds the rows up)
 
 // The two layers: front (larger, nearer) and back (smaller, further). The photo
 // list alternates departments, so taking them in pairs (0,3 | 1,2 | 4,7 | 5,6 …)
@@ -252,10 +252,10 @@ function Tile({ item, uid, hidden, soft }) {
 
 /**
  * "Moments from past orbits": a full-screen section with two rows of campus photos
- * that glide in opposite directions (front row left, back row right). Scrolling
- * pushes them further apart, scrolling back pulls them back, and each photo also
- * drifts inside its frame for depth. Every photo, and the "Travel back in
- * time" button, opens the black-hole gallery page.
+ * that glide steadily — the first row to the right, the second to the left.
+ * Scrolling (up or down) speeds them along in those same directions; they never
+ * turn back. Every photo, and the "Travel to the moments" button, opens the
+ * black-hole gallery page.
  */
 function Gallery({ quality }) {
   // Illustrations sit soft until hovered; real photos are shown sharp.
@@ -307,17 +307,13 @@ function Gallery({ quality }) {
     document.fonts?.ready.then(fit);
 
     const apply = () => {
-      const r = stage.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const p = Math.min(Math.max((vh - r.top) / (vh + r.height), 0), 1); // section progress through the screen
       rows.forEach((row, i) => {
         const w = sets[i];
         if (!w) return;
         const o = ((travel % w) + w) % w;
-        // Front row runs left, back row runs right; both stay inside [-2w, -w] so the screen is always covered.
-        const x = i === 0 ? -w - o : -2 * w + o;
+        // First row runs right, second row runs left; both stay inside [-2w, -w] so the screen is always covered.
+        const x = i === 0 ? -2 * w + o : -w - o;
         row.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
-        row.style.setProperty('--drift', `${((p - 0.5) * (i === 0 ? -34 : 34)).toFixed(1)}px`);
       });
     };
 
@@ -327,8 +323,8 @@ function Gallery({ quality }) {
       speed += ((hovering ? 0.12 : 1) - speed) * (1 - Math.exp(-dt * 4));
       const before = scroll;
       scroll += (window.scrollY - scroll) * (1 - Math.exp(-dt * 3.2)); // eased, so the push glides
-      // Steady glide + the scroll pushing the rows further apart (scrolling up pulls them back).
-      travel += AUTO_SPEED * speed * dt + (scroll - before) * SCROLL_FACTOR;
+      // Steady glide, plus a push from scrolling in either direction (never a reversal).
+      travel += AUTO_SPEED * speed * dt + Math.abs(scroll - before) * SCROLL_FACTOR;
       apply();
       raf = visible ? requestAnimationFrame(tick) : 0;
     };

@@ -21,6 +21,15 @@ import melvin from '../assets/team/core-faculty/Dr MELVIN VICTOR.jpg';
 import prashanth from '../assets/team/core-faculty/Dr PRASHANTH A S.jpg';
 import shinto from '../assets/team/core-faculty/Dr SHINTO THOMAS.jpg';
 import sumanth from '../assets/team/core-faculty/Mr Sumanth  S Y.jpg';
+import deberko from '../assets/team/core-students/Deberko Das.jpg';
+import kavyaS from '../assets/team/core-students/Kavya M Singhani.jpg';
+import shreya from '../assets/team/core-students/Shreya Vishwanath.jpg';
+import gauri from '../assets/team/core-students/Gauri Joshi.jpg';
+import devansh from '../assets/team/core-students/Devansh Das.jpg';
+import vansh from '../assets/team/core-students/Vansh Modi.jpg';
+import vaieshnu from '../assets/team/core-students/Vaieshnu CV.jpg';
+import krishna from '../assets/team/core-students/Krishna Khandelwal.jpg';
+import sarang from '../assets/team/core-students/Sarang Pillai.jpg';
 import chiranjeevi from '../assets/team/website/Chiranjeevi P (Lead Developer & Designer).jpg';
 import jeevan from '../assets/team/website/P B Jeevan (Developer).jpg';
 import athreya from '../assets/team/website/Athreya S Parande (Developer).jpg';
@@ -119,6 +128,7 @@ export const TEAM_SECTIONS = [
       {
         name: 'Deberko Das',
         role: 'Student Coordinator',
+        photo: deberko,
         phone: '9391253577',
         email: 'deberko.das@bbafmah.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/deberkodas',
@@ -126,6 +136,7 @@ export const TEAM_SECTIONS = [
       {
         name: 'Kavya M Singhani',
         role: 'Student Coordinator',
+        photo: kavyaS,
         phone: '8247541692',
         email: 'kavyam.singhani@bscpsyh.christuniversity.in',
         linkedin: 'https://in.linkedin.com/in/kavya-singhani-1295a6352',
@@ -133,6 +144,7 @@ export const TEAM_SECTIONS = [
       {
         name: 'Shreya Vishwanath',
         role: 'Student Coordinator',
+        photo: shreya,
         phone: '7019839595',
         email: 'shreya.vishwanath@bcomafh.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/shreya-v-670ab9374',
@@ -140,6 +152,7 @@ export const TEAM_SECTIONS = [
       {
         name: 'Gauri Joshi',
         role: 'Student Coordinator',
+        photo: gauri,
         phone: '8263035599',
         email: 'gauri.joshi@bacph.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/gauri-joshi-45b06b399',
@@ -147,6 +160,7 @@ export const TEAM_SECTIONS = [
       {
         name: 'Devansh Das',
         role: 'Student Coordinator',
+        photo: devansh,
         phone: '7853920991',
         email: 'devansh.das@baecoh.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/das-devansh',
@@ -154,13 +168,14 @@ export const TEAM_SECTIONS = [
       {
         name: 'Vansh Modi',
         role: 'Student Coordinator',
+        photo: vansh,
         phone: '9000248110',
         email: 'vansh.modi@bscemsh.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/vansh-modi',
       },
-      { name: 'Vaieshnu CV', role: 'Student Coordinator', phone: '9578615005' },
-      { name: 'Krishna Khandelwal', role: 'Student Coordinator', phone: '9890993838' },
-      { name: 'Sarang Pillai', role: 'Student Coordinator', phone: '9496996661' },
+      { name: 'Vaieshnu CV', role: 'Student Coordinator', photo: vaieshnu, phone: '9578615005' },
+      { name: 'Krishna Khandelwal', role: 'Student Coordinator', photo: krishna, phone: '9890993838' },
+      { name: 'Sarang Pillai', role: 'Student Coordinator', photo: sarang, phone: '9496996661' },
     ],
   },
   {

@@ -6,6 +6,7 @@ import { useMountedWhile, usePageShell } from '../about/usePageShell';
 import { prefersReducedMotion } from '../../config/experience';
 import { useExperience } from '../../store/useExperience';
 import { initialsOf, useAuth } from '../../store/useAuth';
+import { loginForRegister, takeAfterLogin } from '../../lib/registerNav';
 
 /*
  * Sign-in (#/login): a frosted-glass card, in the landing page's gold frame, in
@@ -211,13 +212,18 @@ function Card({ cardRef }) {
           <h1 id="lg-title" className="lg-card__title">
             Sign in to <span className="text-gold-gradient">CUBYC</span>
           </h1>
-          <p className="lg-card__sub">Register for events, build your team and track every registration in one place.</p>
+          {loginForRegister() ? (
+            <p className="lg-card__sub lg-card__note" role="note">Please log in first to register for events. You’ll go straight to them after signing in.</p>
+          ) : (
+            <p className="lg-card__sub">Register for events, build your team and track every registration in one place.</p>
+          )}
           <button
             type="button"
             className="lg-google"
             onClick={async () => {
               // Signed in: straight on to the dashboard.
-              if (await signInWithGoogle()) window.location.hash = '#/dashboard';
+              // Signed in: on to the dashboard (its Events, if a Register button sent you here).
+              if (await signInWithGoogle()) window.location.hash = takeAfterLogin() ?? '#/dashboard';
             }}
             disabled={busy}
             aria-busy={busy}

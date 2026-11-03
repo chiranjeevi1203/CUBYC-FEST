@@ -9302,6 +9302,14 @@
     color: rgba(255, 255, 255, 0.7);
   }
 
+  /* "Please log in first" when a Register button sent the visitor here */
+  .lg-card__note {
+    padding: 0.6rem 0.85rem;
+    border: 1px solid rgba(243, 217, 164, 0.4);
+    background: rgba(243, 217, 164, 0.07);
+    color: #f7e7c4;
+  }
+
   /* Continue with Google, with a thin gold light orbiting its edge on hover */
   .lg-google {
     position: relative;

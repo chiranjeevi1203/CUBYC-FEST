@@ -271,7 +271,7 @@ export const DEPARTMENTS = {
         prize: 52000,
         prizes: [20000, 17000, 15000],
         format: 'Team of 4',
-        faculty: 'Dr. Kokilavani T & Dr. Stephen R',
+        faculty: 'Dr. Rajasekhar',
         student: { name: 'Aarav Chawla', phone: '9617345111' },
         summary: 'Valorant custom rooms, with the finals streamed on the big screen.',
         rules: [
@@ -289,7 +289,7 @@ export const DEPARTMENTS = {
         prize: 22000,
         prizes: [10000, 7000, 5000],
         format: 'Team of 3',
-        faculty: 'Dr. Kokilavani T & Dr. Stephen R',
+        faculty: 'Dr. Jayapriya',
         student: { name: 'Alex', phone: '8778616699' },
         summary: 'A three-hour Jeopardy-style CTF — web, crypto, forensics, OSINT and reversing.',
         rules: [
@@ -309,7 +309,7 @@ export const DEPARTMENTS = {
         prize: 22000,
         prizes: [10000, 7000, 5000],
         format: 'Team of 2',
-        faculty: 'Dr. Kokilavani T & Dr. Stephen R',
+        faculty: 'Dr. Stephen R',
         student: { name: 'Suhani Todkar', phone: '7249751465' },
         summary: 'A six-hour prompt-engineering and AI application development challenge.',
         rules: [

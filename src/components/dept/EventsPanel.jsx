@@ -4,7 +4,7 @@ import { DEPARTMENTS, eventSlug } from '../../config/departments';
 import { BODY_BY_KEY, EVENT, prefersReducedMotion } from '../../config/experience';
 import { ALL_EVENTS } from '../../config/allEvents';
 import { scheduleFor } from '../../config/schedule';
-import { navigate } from '../../lib/deptRoute';
+import { goRegister } from '../../lib/registerNav';
 import Star from '../ui/Star';
 import Frame from '../ui/Frame';
 import Constellation from '../ui/Constellation';
@@ -181,21 +181,10 @@ function SplitTitle({ text }) {
   ));
 }
 
-/**
- * Register: opens the registration form (EVENT.registerUrl) in a new tab, or —
- * until that link is set — returns to the landing page's registration section.
- */
+/** Register: the dashboard's Events when signed in, otherwise log in first (see lib/registerNav). */
 function RegisterButton({ event, wide = false }) {
-  const go = () => {
-    if (EVENT.registerUrl) {
-      window.open(EVENT.registerUrl, '_blank', 'noopener');
-      return;
-    }
-    navigate(null);
-    window.setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 900);
-  };
   return (
-    <button type="button" onClick={go} className={`edk-register ${wide ? 'edk-register--wide' : ''}`} data-ev-anim aria-label={`Register for ${event.name}`}>
+    <button type="button" onClick={goRegister} className={`edk-register ${wide ? 'edk-register--wide' : ''}`} data-ev-anim aria-label={`Register for ${event.name}`}>
       <span className="edk-register__text">
         <b>Register</b>
       </span>

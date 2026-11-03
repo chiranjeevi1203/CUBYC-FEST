@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Gallery from '../components/Gallery';
+import { REGISTER_HASH, goRegister } from '../lib/registerNav';
 import ScheduleTeaser from '../components/schedule/ScheduleTeaser';
 import RulesTeaser from '../components/rules/RulesTeaser';
 import FestMark from '../components/ui/FestMark';
@@ -261,7 +262,9 @@ export default function LandingPage({ landingRef }) {
           </div>
 
           <div data-reveal className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
-            <SolarButton href="#contact" royal bare>Register Now</SolarButton>
+            <SolarButton href={REGISTER_HASH} onClick={(e) => (e.preventDefault(), goRegister())} royal bare>
+                Register Now
+              </SolarButton>
             <SolarButton href="#cosmos" variant="ghost" royal>
               Explore
               <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" aria-hidden="true">
@@ -486,7 +489,9 @@ export default function LandingPage({ landingRef }) {
               Registrations for {BRAND.fest} open soon. {EVENT.dateLabel} · {BRAND.campus}.
             </p>
             <div className="relative mt-9 flex justify-center">
-              <SolarButton href="#contact" royal bare>Register Now</SolarButton>
+              <SolarButton href={REGISTER_HASH} onClick={(e) => (e.preventDefault(), goRegister())} royal bare>
+                Register Now
+              </SolarButton>
             </div>
 
             {/* Student core: who to reach */}

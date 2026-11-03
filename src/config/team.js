@@ -173,9 +173,9 @@ export const TEAM_SECTIONS = [
         email: 'vansh.modi@bscemsh.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/vansh-modi',
       },
-      { name: 'Vaieshnu CV', role: 'Student Coordinator', photo: vaieshnu, phone: '9578615005' },
-      { name: 'Krishna Khandelwal', role: 'Student Coordinator', photo: krishna, phone: '9890993838' },
-      { name: 'Sarang Pillai', role: 'Student Coordinator', photo: sarang, phone: '9496996661' },
+      { name: 'Vaieshnu CV', role: 'Student Coordinator', photo: vaieshnu, phone: '9578615005', email: 'vaieshnu.c@bscpsyh.christuniversity.in', linkedin: 'https://www.linkedin.com/in/vaieshnu-cv-5568a7336' },
+      { name: 'Krishna Khandelwal', role: 'Student Coordinator', photo: krishna, phone: '9890993838', email: 'krishna.jitendra@bbafeh.christuniversity.in', linkedin: 'https://www.linkedin.com/in/krishna-khandelwal-13129a331' },
+      { name: 'Sarang Pillai', role: 'Student Coordinator', photo: sarang, phone: '9496996661', email: 'sarang.pillai@bbafeh.christuniversity.in', linkedin: 'https://www.linkedin.com/in/sarang-pillai-7293aa261' },
     ],
   },
   {

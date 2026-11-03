@@ -63,7 +63,7 @@ department: Media Studies
 name:	    DR. NIRMALA MN
 photo:      DR. NIRMALA MN (HOD, MEDIA STUDIES).jpg
 
-department: Cultural Studies & Languages
+department: English & Cultural Studies
 name:       DR. ARUN D M 
 photo:      DR. ARUN D M (HOD, CULTURAL STUDIES & LANGUAGES).jpg
 
@@ -80,55 +80,76 @@ name:       Mr Sumanth S Y
 photo:      core-faculty/Mr Sumanth  S Y.jpg
 
 
-CORE STUDENTS  (6 blocks; top to bottom = order on the page)
--------------
+STUDENT COORDINATORS  (9 blocks; top to bottom = order on the page)
+--------------------
 Photos -> src/assets/team/core-students/   (same photo rules as above)
 phone:    10-digit mobile number, no +91 or spaces (e.g. 9876543210)
 email:    full email address
 linkedin: full profile link (e.g. https://www.linkedin.com/in/your-name)
 Leave any line blank to hide it on the card.
 
-name:	   Deberko Das
-role:      Core Student
-photo:		
+name:      Deberko Das
+role:      Student Coordinator
+photo:     Deberko Das.jpg
 phone:     9391253577
 email:     deberko.das@bbafmah.christuniversity.in
-linkedin:  https://www.linkedin.com/in/deberkodas?utm_source=share_via&utm_content=profile&utm_medium=member_ios
+linkedin:  https://www.linkedin.com/in/deberkodas
 
 name:      Kavya M Singhani
-role:      Core Student
-photo:
+role:      Student Coordinator
+photo:     Kavya M Singhani.jpg
 phone:     8247541692
 email:     kavyam.singhani@bscpsyh.christuniversity.in
 linkedin:  https://in.linkedin.com/in/kavya-singhani-1295a6352
 
-name:      Shreya Vishwanath 
-role:      Core Student
-photo:
+name:      Shreya Vishwanath
+role:      Student Coordinator
+photo:     Shreya Vishwanath.jpg
 phone:     7019839595
-email:     shreya.vishwanath@bcomafh.christuniversity.in 
-linkedin:  https://www.linkedin.com/in/shreya-v-670ab9374?utm_source=share_via&utm_content=profile&utm_medium=member_ios
+email:     shreya.vishwanath@bcomafh.christuniversity.in
+linkedin:  https://www.linkedin.com/in/shreya-v-670ab9374
 
 name:      Gauri Joshi
-role:      Core Student
-photo:
+role:      Student Coordinator
+photo:     Gauri Joshi.jpg
 phone:     8263035599
 email:     gauri.joshi@bacph.christuniversity.in
-linkedin:  https://www.linkedin.com/in/gauri-joshi-45b06b399?utm_source=share_via&utm_content=profile&utm_medium=member_ios
+linkedin:  https://www.linkedin.com/in/gauri-joshi-45b06b399
 
 name:      Devansh Das
-role:      Core Student
-photo:
+role:      Student Coordinator
+photo:     Devansh Das.jpg
 phone:     7853920991
 email:     devansh.das@baecoh.christuniversity.in
-linkedin:  www.linkedin.com/in/das-devansh
+linkedin:  https://www.linkedin.com/in/das-devansh
 
-name:      Vansh Modi 
-role:      Core Student
-photo:
+name:      Vansh Modi
+role:      Student Coordinator
+photo:     Vansh Modi.jpg
 phone:     9000248110
-email:     vansh.modi@bscemsh.christuniversity.in 
+email:     vansh.modi@bscemsh.christuniversity.in
 linkedin:  https://www.linkedin.com/in/vansh-modi
+
+name:      Vaieshnu CV
+role:      Student Coordinator
+photo:     Vaieshnu CV.jpg
+phone:     9578615005
+email:     vaieshnu.c@bscpsyh.christuniversity.in
+linkedin:  https://www.linkedin.com/in/vaieshnu-cv-5568a7336?utm_source=share_via&utm_content=profile&utm_medium=member_android
+
+name:      Krishna Khandelwal
+role:      Student Coordinator
+photo:     Krishna Khandelwal.jpg
+phone:     9890993838
+email:     krishna.jitendra@bbafeh.christuniversity.in
+linkedin:  https://www.linkedin.com/in/krishna-khandelwal-13129a331?utm_source=share_via&utm_content=profile&utm_medium=member_ios
+
+name:      Sarang Pillai
+role:      Student Coordinator
+photo:     Sarang Pillai.jpg
+phone:     9496996661
+email:     sarang.pillai@bbafeh.christuniversity.in
+linkedin:  https://www.linkedin.com/in/sarang-pillai-7293aa261?utm_source=share_via&utm_content=profile&utm_medium=member_ios
 
 
 WEBSITE TEAM  (add or remove blocks as needed; top to bottom = order on the page)

@@ -502,7 +502,7 @@ export default function EventsPanel({ deptKey, selected, onSelect }) {
             {world}
             <Star className="h-2 w-2 text-gold-400/70" />
           </p>
-          <h2 className="title-cosmic mt-3 font-display text-[clamp(1.6rem,4.4vw,3rem)] font-bold leading-[1.04] tracking-[0.08em] uppercase">CUBYC — Fest’2027</h2>
+          <h2 className="title-cosmic mt-3 font-display text-[clamp(1.6rem,4.4vw,3rem)] font-bold leading-[1.04] tracking-[0.08em] uppercase">CUBYC Fest 2027</h2>
           <p className="mt-2 font-mono text-[0.6rem] tracking-[0.3em] text-white/55 uppercase">
             {pad(events.length)} event{events.length === 1 ? '' : 's'} · Open to all
           </p>

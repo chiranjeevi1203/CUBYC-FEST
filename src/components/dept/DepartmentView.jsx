@@ -415,7 +415,8 @@ export default function DepartmentView() {
           <div ref={infoRef} className="flex w-full flex-col items-center">
             <p data-rise className="inline-flex items-center gap-3 font-mono text-[0.58rem] tracking-[0.38em] text-white/60 uppercase sm:text-[0.64rem]">
               <Star className="h-2 w-2 text-gold-400/80" />
-              Hosted by
+              {/* The hub is the host itself; cultural events are run by the Student Welfare Office */}
+              {d.hub ? 'Hosted by' : key === 'station' ? 'Hosted by Student Welfare Office' : 'Hosting Department'}
               <Star className="h-2 w-2 text-gold-400/80" />
             </p>
             <h1

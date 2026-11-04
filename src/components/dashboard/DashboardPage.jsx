@@ -11,7 +11,9 @@ import Register from './Register';
 import Events from './Events';
 import MyEvents from './MyEvents';
 import MyTeam from './MyTeam';
-import { Icon, PageHead, SoonSection, SpaceBackdrop } from './ui';
+import { LiveEvents, LiveMyEvents, LiveMyTeam } from './Live';
+import { useRegs } from '../../store/useRegs';
+import { Icon, PageHead, SpaceBackdrop } from './ui';
 
 /*
  * The participant dashboard (#/dashboard, #/dashboard/<section>). A framed
@@ -32,7 +34,31 @@ const SECTIONS = [
 const KEYS = SECTIONS.map((s) => s.key);
 const sectionFromHash = () => {
   const k = window.location.hash.replace(/^#\/dashboard\/?/, '');
+  if (BACKEND && /^join\/[\w-]{1,16}$/.test(k)) return 'my-team';
   return KEYS.includes(k) ? k : 'overview';
+};
+// A team invite link (#/dashboard/join/TM-XXXXXX) → the code, kept through sign-in.
+const JOIN_KEY = 'cubyc-join';
+const joinFromHash = () => {
+  const m = window.location.hash.match(/^#\/dashboard\/join\/([\w-]{1,16})$/);
+  if (m) {
+    try {
+      sessionStorage.setItem(JOIN_KEY, m[1]);
+    } catch {
+      /* storage blocked */
+    }
+    return m[1];
+  }
+  return '';
+};
+const takeSavedJoin = () => {
+  try {
+    const c = sessionStorage.getItem(JOIN_KEY) ?? '';
+    sessionStorage.removeItem(JOIN_KEY);
+    return c;
+  } catch {
+    return '';
+  }
 };
 const fmtDate = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -145,6 +171,10 @@ function DashboardView({ open, onGone }) {
   const regsCount = useFest((s) => s.regs.length);
   const teamsCount = useFest((s) => Object.keys(s.teams).length);
   const [active, setActive] = useState(sectionFromHash);
+  const [joinCode, setJoinCode] = useState(joinFromHash);
+  const watchRegs = useRegs((s) => s.watch);
+  const liveRegs = useRegs((s) => s.regs.length);
+  const liveTeams = useRegs((s) => Object.keys(s.teams).length);
   const [drawer, setDrawer] = useState(false);
   const [askOut, setAskOut] = useState(false);
   const rootRef = usePageShell({
@@ -162,12 +192,22 @@ function DashboardView({ open, onGone }) {
   });
 
   useEffect(() => {
-    loadFest(user?.email ?? null);
+    if (!BACKEND) loadFest(user?.email ?? null);
   }, [user?.email, loadFest]);
+  useEffect(() => {
+    if (BACKEND) watchRegs(user?.uid ?? null);
+  }, [user?.uid, watchRegs]);
+  // Signed in after following an invite link: take them to that team.
+  useEffect(() => {
+    if (!BACKEND || !user) return;
+    const saved = takeSavedJoin();
+    if (saved && !window.location.hash.startsWith('#/dashboard/join/')) window.location.hash = `#/dashboard/join/${saved}`;
+  }, [user]);
   useEffect(() => {
     const onHash = () => {
       if (!window.location.hash.startsWith('#/dashboard')) return;
       setActive(sectionFromHash());
+      setJoinCode(joinFromHash());
       setDrawer(false);
       rootRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -188,12 +228,13 @@ function DashboardView({ open, onGone }) {
   const logOut = () => {
     setAskOut(false);
     signOut();
-    loadFest(null);
+    if (BACKEND) watchRegs(null);
+    else loadFest(null);
     window.location.hash = '#/login';
   };
 
   const current = SECTIONS.find((s) => s.key === active);
-  const badges = !user ? {} : BACKEND ? { register: user.profileComplete ? 0 : '!' } : { register: user.pass.status === 'none' ? '!' : 0, 'my-events': regsCount, 'my-team': teamsCount };
+  const badges = !user ? {} : BACKEND ? { register: user.profileComplete ? 0 : '!', 'my-events': liveRegs, 'my-team': liveTeams } : { register: user.pass.status === 'none' ? '!' : 0, 'my-events': regsCount, 'my-team': teamsCount };
 
   return (
     <div ref={rootRef} className="space-page cd-page fixed inset-0 z-40 overflow-y-auto overflow-x-hidden overscroll-contain" data-no-orbit>
@@ -230,13 +271,9 @@ function DashboardView({ open, onGone }) {
             <main className="cd-main" key={active}>
               {active === 'overview' && <Overview user={user} />}
               {active === 'register' && <Register user={user} />}
-              {/* On the live site, event registration and teams open in the next phase. */}
-              {active === 'events' &&
-                (BACKEND ? <SoonSection title="Events" lead="Every event, laid out by the schedule.">Event registration opens soon. Your CUBYC ID and details are ready — you’ll pick your events here.</SoonSection> : <Events user={user} />)}
-              {active === 'my-events' &&
-                (BACKEND ? <SoonSection title="My Events" lead="Where to be and when.">Your registered events will appear here once event registration opens.</SoonSection> : <MyEvents user={user} />)}
-              {active === 'my-team' &&
-                (BACKEND ? <SoonSection title="My Team" lead="Your teams, their codes and members.">Team building opens with event registration. Your teammates will add you using your CUBYC ID.</SoonSection> : <MyTeam user={user} />)}
+              {active === 'events' && (BACKEND ? <LiveEvents user={user} /> : <Events user={user} />)}
+              {active === 'my-events' && (BACKEND ? <LiveMyEvents user={user} /> : <MyEvents user={user} />)}
+              {active === 'my-team' && (BACKEND ? <LiveMyTeam user={user} joinCode={joinCode} /> : <MyTeam user={user} />)}
               {active === 'announcements' && <Announcements />}
             </main>
           </div>

@@ -9119,6 +9119,66 @@
   .cd-team__count.is-short {
     color: var(--cd-warn);
   }
+  .cd-team__note {
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--cd-mute);
+  }
+
+  /* Live registration: the invite, joining a team, confirming a registration */
+  .cd-invite {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1rem 0 0.5rem;
+  }
+  .cd-invite__code {
+    justify-self: start;
+  }
+  .cd-invite__msg {
+    max-height: 15rem;
+    overflow: auto;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(186, 212, 255, 0.22);
+    border-left: 3px solid var(--cd-gold);
+    background: rgba(6, 14, 30, 0.55);
+    font-family: inherit;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: rgba(236, 242, 255, 0.9);
+  }
+  .cd-joincard {
+    margin-top: 1rem;
+    padding: 1rem 1.1rem;
+    border: 1px dashed rgba(243, 217, 164, 0.45);
+    background: rgba(243, 217, 164, 0.04);
+  }
+  .cd-joincard h3 {
+    margin: 0.15rem 0 0.4rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: #ffffff;
+    overflow-wrap: anywhere;
+  }
+  .cd-joincard__lead {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--cd-mute);
+  }
+  .cd-joincard__lead b {
+    color: #ffffff;
+  }
+  .cd-ev__ask {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+  }
+  a.cd-ev__state {
+    text-decoration: none;
+  }
   .cd-crew {
     display: grid;
     gap: 0.5rem;

@@ -6,6 +6,7 @@ import { CATALOG } from '../../lib/registration/catalog';
 import { whenKey, whenOf } from '../../lib/fest/when';
 import { useFest } from '../../store/useFest';
 import { BACKEND } from '../../store/useAuth';
+import { useRegs } from '../../store/useRegs';
 import { Icon, PageHead, PayNotice, useCopy } from './ui';
 
 /*
@@ -16,7 +17,9 @@ import { Icon, PageHead, PayNotice, useCopy } from './ui';
 const PAY = { none: 'Not paid yet', pending: 'Being checked', verified: 'Verified' };
 
 export default function Overview({ user }) {
-  const regs = useFest((s) => s.regs);
+  const demoRegs = useFest((s) => s.regs);
+  const liveRegs = useRegs((s) => s.regs);
+  const regs = BACKEND ? liveRegs.filter((r) => CATALOG[r.slug]) : demoRegs;
   const [copied, copy] = useCopy();
   const days = Math.max(0, Math.ceil((Date.parse(EVENT.start) - Date.now()) / 864e5));
   const pass = user.pass.status;
@@ -28,9 +31,7 @@ export default function Overview({ user }) {
 
   const steps = [
     { done: Boolean(p.agree), title: 'Fill in your details', sub: p.agree ? 'Done' : 'Name, college, course and contact', href: '#/dashboard/register', cta: p.agree ? 'Edit' : 'Start' },
-    BACKEND
-      ? { done: false, title: 'Pick your events', sub: 'Opens soon', href: '#/dashboard/events', cta: null }
-      : { done: regs.length > 0, title: 'Pick your events', sub: regs.length ? `${regs.length} event${regs.length === 1 ? '' : 's'} registered` : 'Individual or with a team', href: '#/dashboard/events', cta: regs.length ? 'Add more' : 'Browse' },
+    { done: regs.length > 0, title: 'Pick your events', sub: regs.length ? `${regs.length} event${regs.length === 1 ? '' : 's'} registered` : 'Individual or with a team', href: '#/dashboard/events', cta: regs.length ? 'Add more' : 'Browse' },
     { done: pass === 'verified', wait: pass === 'pending', title: `Pay the ₹${PAYMENT.amount} fest pass`, sub: BACKEND && pass === 'none' ? 'Opens soon' : PAY[pass], href: '#/dashboard/register', cta: BACKEND && pass === 'none' ? null : pass === 'none' ? 'Pay' : 'View' },
     { done: pass === 'verified', title: 'Get your festival ticket', sub: pass === 'verified' ? 'Ready — show it at the registration desk' : 'Issued once your payment is verified', href: '#/dashboard/register', cta: pass === 'verified' ? 'Open' : null },
   ];
@@ -57,7 +58,7 @@ export default function Overview({ user }) {
               <i /> Payment · {PAY[pass]}
             </span>
           </div>
-          <p className="cd-id__hint">Share this ID with your team leader, and write it in the remarks when you pay.</p>
+          <p className="cd-id__hint">{BACKEND ? 'Your permanent ID for the fest. To join a team, use the team code your leader sends you.' : 'Share this ID with your team leader, and write it in the remarks when you pay.'}</p>
         </div>
         <div className="cd-id__count">
           <b>{days}</b>
@@ -111,21 +112,10 @@ export default function Overview({ user }) {
             </div>
           ) : (
             <div className="cd-empty">
-              {BACKEND ? (
-                <>
-                  <p>Event registration opens soon. Meanwhile, explore every event on the site.</p>
-                  <a href="#/events" className="cd-btn">
-                    See all events
-                  </a>
-                </>
-              ) : (
-                <>
-                  <p>You haven’t picked any events yet.</p>
-                  <a href="#/dashboard/events" className="cd-btn cd-btn--gold">
-                    Browse events
-                  </a>
-                </>
-              )}
+              <p>You haven’t picked any events yet.</p>
+              <a href="#/dashboard/events" className="cd-btn cd-btn--gold">
+                Browse events
+              </a>
             </div>
           )}
         </section>

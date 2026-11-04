@@ -81,8 +81,8 @@ export function PayNotice({ user, compact = false }) {
       <div className={`cd-notice is-pending ${compact ? 'is-compact' : ''}`} role="note" data-hero>
         <Icon name="clock" className="cd-notice__icon" />
         <p>
-          <b>Event registration and payment open soon.</b>{' '}
-          {user.profileComplete ? 'Your details are complete — you’re all set for when they do.' : 'Complete your details now so you’re ready when they do.'}
+          <b>Fest pass payment opens soon.</b>{' '}
+          {user.profileComplete ? 'Your details are complete. Pick your events meanwhile — they count once your pass is paid.' : 'Complete your details now — then you can pick your events.'}
         </p>
         {!user.profileComplete && (
           <a href="#/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">

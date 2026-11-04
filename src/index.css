@@ -9200,6 +9200,13 @@
     min-height: 100%;
     padding: calc(var(--cd-nav) + 2rem) 1rem 3rem;
   }
+  .cd-gate__loading {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--cd-mute);
+  }
   .cd-gate__card {
     display: grid;
     justify-items: center;

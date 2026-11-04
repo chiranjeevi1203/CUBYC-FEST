@@ -1,36 +1,32 @@
 import { create } from 'zustand';
+import { REGISTRATION_OPEN } from '../config/features';
 
 /*
- * Who is signed in, their profile and their fest pass. A STAND-IN until the
- * backend is connected: screens only call these actions and read `user`, so
- * swapping this file for the real Google sign-in and payment check leaves every
- * screen untouched.
+ * Who is signed in, their account and their fest pass. Screens only read `user`
+ * and call these actions, so they don't care where the account lives:
  *
- * Every participant gets their CUBYC ID the moment they sign in. With it they
- * can pick events and build teams straight away, and pay the ₹500 fest pass on
- * the bank portal whenever they're ready.
+ *   BACKEND (registration open + VITE_FIREBASE_PROJECT_ID set)
+ *     Firebase: Google sign-in, the account and its permanent CUBYC ID created by
+ *     the server, the profile saved to Firestore (checked by the security rules).
+ *     The Firebase code is loaded on demand (lib/firebase), never on the public site
+ *     while registration is closed.
  *
- * Fest pass: status 'none' (not paid yet) → 'pending' (payment details sent,
- * the college is checking them) → 'verified' (payment confirmed: the
- * registration is valid and the festival ticket is issued).
+ *   otherwise (plain `npm run dev`)
+ *     an offline stand-in: a sample participant kept in this browser only.
  *
- * Until the backend is connected, "Continue with Google" signs in a sample
- * participant (kept only in this browser) during development only; the live
- * site reports that sign-in isn't open (PREVIEW_SIGN_IN = false). Payments are never marked verified on the live
- * site — the "Mark as verified" preview button exists only in npm run dev.
+ * user: { uid, name, email, cubycId, profile, profileComplete, status, pass, role }
+ * ready: false until the sign-in state is known (avoid flashing "signed out").
  */
 
-/** Stand-in sign-in on the live site: off. Only `npm run dev` can use the sample participant. */
-const PREVIEW_SIGN_IN = false;
+export const BACKEND = REGISTRATION_OPEN && Boolean(import.meta.env.VITE_FIREBASE_PROJECT_ID);
+const loadAccount = () => (BACKEND ? import('../lib/firebase/account') : Promise.reject(new Error('no backend')));
 
-const KEY = 'cubyc-demo-user';
 // No look-alike characters (0/O, 1/I/L), so an ID read aloud is typed right.
 const ID_CHARS = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 const randomCode = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map((b) => ID_CHARS[b % ID_CHARS.length]).join('');
 
-/** A participant's CUBYC ID, e.g. CB27-7K4Q. (The real one will be issued by the server.) */
-export const makeCubycId = () => `CB27-${randomCode(4)}`;
-
+/* ---------- offline stand-in (development only) ---------- */
+const KEY = 'cubyc-demo-user';
 const save = (user) => {
   try {
     if (user) localStorage.setItem(KEY, JSON.stringify(user));
@@ -39,73 +35,116 @@ const save = (user) => {
     /* storage blocked: kept for this visit only */
   }
 };
-const load = () => {
+const loadLocal = () => {
+  if (BACKEND) return null;
   try {
-    const user = JSON.parse(localStorage.getItem(KEY) ?? 'null');
-    // Accounts saved before IDs were issued at sign-in get theirs now.
-    if (user && !user.cubycId) {
-      user.cubycId = makeCubycId();
-      save(user);
-    }
-    return user;
+    return JSON.parse(localStorage.getItem(KEY) ?? 'null');
   } catch {
     return null;
   }
 };
 
+/** Friendly words for sign-in and saving errors. */
+function explain(err) {
+  const code = err?.code ?? '';
+  if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return 'cancelled';
+  if (code === 'auth/popup-blocked') return 'Your browser blocked the Google sign-in window. Allow pop-ups for this site and try again.';
+  if (code === 'auth/network-request-failed' || code === 'functions/unavailable') return 'No connection. Check your internet and try again.';
+  if (code === 'permission-denied' || code === 'functions/permission-denied') return 'That isn’t allowed for your account.';
+  return 'Something went wrong. Please try again.';
+}
+
+let started = false;
+
 export const useAuth = create((set, get) => ({
-  user: load(),
+  user: loadLocal(),
+  ready: !BACKEND,
   status: 'idle', // idle | signing-in | error
   error: null,
 
+  /** Start following the signed-in account (Firebase). Called once by the app. */
+  init: async () => {
+    if (!BACKEND || started) return;
+    started = true;
+    const { watchAccount } = await loadAccount();
+    watchAccount((user, err) => set({ user, ready: true, ...(err ? { status: 'error', error: explain(err) } : {}) }));
+  },
+
+  /** Google sign-in. Resolves with the account once it is ready (or null). */
   signInWithGoogle: async () => {
     set({ status: 'signing-in', error: null });
-    await new Promise((r) => setTimeout(r, 1200));
-    if (!import.meta.env.DEV && !PREVIEW_SIGN_IN) {
-      set({ status: 'error', error: 'not_open' });
+    if (!BACKEND) {
+      await new Promise((r) => setTimeout(r, 900));
+      if (!import.meta.env.DEV) {
+        set({ status: 'error', error: 'not_open' });
+        return null;
+      }
+      const user = { name: 'Demo Participant', email: 'demo.participant@gmail.com', cubycId: `CB27-${randomCode(6)}`, profile: {}, pass: { status: 'none' }, status: 'active' };
+      save(user);
+      set({ user, status: 'idle' });
+      return user;
+    }
+    try {
+      get().init();
+      const account = await loadAccount();
+      await account.signInWithGoogle();
+      // Wait for the server to set up the account (first sign-in) and the record to arrive.
+      const user = await new Promise((resolve) => {
+        if (get().user) return resolve(get().user);
+        const stop = useAuth.subscribe((s) => {
+          if (s.user || s.status === 'error') {
+            stop();
+            resolve(s.user);
+          }
+        });
+      });
+      set({ status: user ? 'idle' : 'error' });
+      return user;
+    } catch (err) {
+      const msg = explain(err);
+      set({ status: msg === 'cancelled' ? 'idle' : 'error', error: msg === 'cancelled' ? null : msg });
       return null;
     }
-    const user = {
-      name: 'Demo Participant',
-      email: 'demo.participant@gmail.com',
-      cubycId: makeCubycId(),
-      profile: {},
-      pass: { status: 'none' },
-    };
-    save(user);
-    set({ user, status: 'idle' });
-    return user;
   },
 
-  /** Save the registration form. */
-  saveProfile: (profile) => {
-    const user = { ...get().user, name: profile.name || get().user.name, profile: { ...get().user.profile, ...profile } };
-    save(user);
-    set({ user });
+  /** Save the details form. Throws a friendly message if it can't be saved. */
+  saveProfile: async (profile) => {
+    const u = get().user;
+    if (!BACKEND) {
+      const user = { ...u, name: profile.name || u.name, profile: { ...u.profile, ...profile } };
+      save(user);
+      set({ user });
+      return;
+    }
+    try {
+      const { saveProfile } = await loadAccount();
+      await saveProfile(u.uid, profile);
+    } catch (err) {
+      throw new Error(explain(err));
+    }
   },
 
-  /**
-   * The participant has paid on the bank portal and sends the details:
-   * { utr, receipt } — the transaction ID and/or the name of the receipt file
-   * (PDF or screenshot) they attached. The college checks them in the backend.
-   */
+  /* Payments: offline stand-in only for now (the real payment flow comes later). */
   submitPayment: ({ utr = '', receipt = '' }) => {
+    if (BACKEND) return;
     const u = get().user;
     const user = { ...u, pass: { ...u.pass, status: 'pending', utr, receipt, submittedAt: new Date().toISOString() } };
     save(user);
     set({ user });
   },
-
-  /** The college confirms the payment: the registration is valid and the ticket issued. (Admin-side in the real system.) */
   verifyPass: () => {
+    if (BACKEND) return;
     const u = get().user;
     const user = { ...u, pass: { ...u.pass, status: 'verified', ticket: u.pass.ticket ?? `TKT-${randomCode(6)}`, verifiedAt: new Date().toISOString() } };
     save(user);
     set({ user });
   },
 
-  signOut: () => {
-    save(null);
+  signOut: async () => {
+    if (BACKEND) {
+      const { signOut } = await loadAccount();
+      await signOut();
+    } else save(null);
     set({ user: null, status: 'idle', error: null });
   },
 }));

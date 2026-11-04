@@ -18,3 +18,4 @@ firebase-debug.log
 .env
 .env.*
 !.env.example
+!.env.emulator

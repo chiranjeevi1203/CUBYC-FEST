@@ -4,14 +4,14 @@ import Frame from '../ui/Frame';
 import { useMountedWhile, usePageShell } from '../about/usePageShell';
 import { ANNOUNCEMENTS } from '../../config/announcements';
 import { useExperience } from '../../store/useExperience';
-import { useAuth } from '../../store/useAuth';
+import { BACKEND, useAuth } from '../../store/useAuth';
 import { useFest } from '../../store/useFest';
 import Overview from './Overview';
 import Register from './Register';
 import Events from './Events';
 import MyEvents from './MyEvents';
 import MyTeam from './MyTeam';
-import { Icon, PageHead, SpaceBackdrop } from './ui';
+import { Icon, PageHead, SoonSection, SpaceBackdrop } from './ui';
 
 /*
  * The participant dashboard (#/dashboard, #/dashboard/<section>). A framed
@@ -139,6 +139,7 @@ function ConfirmLogout({ user, onCancel, onConfirm }) {
 
 function DashboardView({ open, onGone }) {
   const user = useAuth((s) => s.user);
+  const ready = useAuth((s) => s.ready);
   const signOut = useAuth((s) => s.signOut);
   const loadFest = useFest((s) => s.load);
   const regsCount = useFest((s) => s.regs.length);
@@ -192,13 +193,28 @@ function DashboardView({ open, onGone }) {
   };
 
   const current = SECTIONS.find((s) => s.key === active);
-  const badges = user ? { register: user.pass.status === 'none' ? '!' : 0, 'my-events': regsCount, 'my-team': teamsCount } : {};
+  const badges = !user ? {} : BACKEND ? { register: user.profileComplete ? 0 : '!' } : { register: user.pass.status === 'none' ? '!' : 0, 'my-events': regsCount, 'my-team': teamsCount };
 
   return (
     <div ref={rootRef} className="space-page cd-page fixed inset-0 z-40 overflow-y-auto overflow-x-hidden overscroll-contain" data-no-orbit>
       <SpaceBackdrop />
       <SiteNav />
-      {user ? (
+      {!ready ? (
+        <main className="cd-gate" aria-busy="true">
+          <p className="cd-gate__loading">Opening your dashboard…</p>
+        </main>
+      ) : user?.status === 'suspended' ? (
+        <main className="cd-gate">
+          <section className="cd-panel cd-gate__card" data-hero>
+            <Frame />
+            <h2>Your account is on hold</h2>
+            <p>Please contact the CUBYC team from the Contact page.</p>
+            <button type="button" className="cd-btn" onClick={logOut}>
+              Log out
+            </button>
+          </section>
+        </main>
+      ) : user ? (
         <>
           <Sidebar user={user} active={active} open={drawer} onClose={() => setDrawer(false)} onLogout={() => (setDrawer(false), setAskOut(true))} badges={badges} />
           <button type="button" className={`cd-scrim ${drawer ? 'is-open' : ''}`} aria-label="Close menu" tabIndex={drawer ? 0 : -1} onClick={() => setDrawer(false)} />
@@ -214,9 +230,13 @@ function DashboardView({ open, onGone }) {
             <main className="cd-main" key={active}>
               {active === 'overview' && <Overview user={user} />}
               {active === 'register' && <Register user={user} />}
-              {active === 'events' && <Events user={user} />}
-              {active === 'my-events' && <MyEvents user={user} />}
-              {active === 'my-team' && <MyTeam user={user} />}
+              {/* On the live site, event registration and teams open in the next phase. */}
+              {active === 'events' &&
+                (BACKEND ? <SoonSection title="Events" lead="Every event, laid out by the schedule.">Event registration opens soon. Your CUBYC ID and details are ready — you’ll pick your events here.</SoonSection> : <Events user={user} />)}
+              {active === 'my-events' &&
+                (BACKEND ? <SoonSection title="My Events" lead="Where to be and when.">Your registered events will appear here once event registration opens.</SoonSection> : <MyEvents user={user} />)}
+              {active === 'my-team' &&
+                (BACKEND ? <SoonSection title="My Team" lead="Your teams, their codes and members.">Team building opens with event registration. Your teammates will add you using your CUBYC ID.</SoonSection> : <MyTeam user={user} />)}
               {active === 'announcements' && <Announcements />}
             </main>
           </div>

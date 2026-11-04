@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import Frame from '../ui/Frame';
 import { PAYMENT } from '../../config/payment';
-import { useAuth } from '../../store/useAuth';
+import { BACKEND, useAuth } from '../../store/useAuth';
 import { useFest } from '../../store/useFest';
 import { Icon, PageHead, Ticket } from './ui';
 
@@ -14,7 +14,11 @@ import { Icon, PageHead, Ticket } from './ui';
  */
 
 const PHONE = /^[6-9]\d{9}$/;
-const phoneOk = (v) => PHONE.test(String(v).replace(/\D/g, '').replace(/^91(?=\d{10}$)/, ''));
+/** '+91 98765 43210' → '9876543210' (how phones are stored). */
+const digits10 = (v) => String(v).replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
+const phoneOk = (v) => PHONE.test(digits10(v));
+// Longest value per field (the database refuses anything longer).
+const MAX = { name: 80, college: 120, department: 80, course: 60, collegeId: 40, city: 60, state: 60, emergencyName: 80 };
 const UTR = /^[A-Z0-9]{8,22}$/;
 const RECEIPT_TYPES = '.pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png';
 const MAX_RECEIPT = 5 * 1024 * 1024;
@@ -75,6 +79,8 @@ function DetailsForm({ user, onDone, onCancel }) {
   const [form, setForm] = useState(() => ({ ...Object.fromEntries(FIELDS.map((f) => [f.key, ''])), name: user.name, ...user.profile }));
   const [agree, setAgree] = useState(Boolean(user.profile?.agree));
   const [tried, setTried] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const errors = useMemo(() => {
     const e = {};
     FIELDS.forEach((f) => {
@@ -85,7 +91,7 @@ function DetailsForm({ user, onDone, onCancel }) {
     return e;
   }, [form]);
   const bad = tried && (Object.keys(errors).length > 0 || !agree);
-  const submit = (ev) => {
+  const submit = async (ev) => {
     ev.preventDefault();
     setTried(true);
     if (Object.keys(errors).length || !agree) {
@@ -93,8 +99,18 @@ function DetailsForm({ user, onDone, onCancel }) {
       if (first) document.getElementById(`rg-${first.key}`)?.focus();
       return;
     }
-    saveProfile({ ...Object.fromEntries(Object.entries(form).map(([k, v]) => [k, String(v).trim()])), agree: true });
-    onDone();
+    // Only the form's own fields are sent, trimmed; phones as 10 digits.
+    const profile = Object.fromEntries(FIELDS.map((f) => [f.key, f.phone ? digits10(form[f.key] ?? '') : String(form[f.key] ?? '').trim()]));
+    setSaving(true);
+    setSaveError('');
+    try {
+      await saveProfile({ ...profile, agree: true });
+      onDone();
+    } catch (err) {
+      setSaveError(err.message || 'Could not save. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -127,7 +143,7 @@ function DetailsForm({ user, onDone, onCancel }) {
                       ))}
                     </select>
                   ) : (
-                    <input {...common} type={f.type ?? 'text'} placeholder={f.placeholder} inputMode={f.inputMode} />
+                    <input {...common} type={f.type ?? 'text'} placeholder={f.placeholder} inputMode={f.inputMode} maxLength={MAX[f.key] ?? (f.phone ? 16 : undefined)} />
                   )}
                   {err && <small className="cd-field__err">{errors[f.key]}</small>}
                 </label>
@@ -141,15 +157,17 @@ function DetailsForm({ user, onDone, onCancel }) {
         <span>I confirm these details are correct and agree to CUBYC’s rules and the use of my details for the fest.</span>
       </label>
       <div className="cd-formbar">
-        <p className={bad ? 'is-bad' : ''}>{bad ? 'Please complete the highlighted fields.' : 'Fields marked * are required.'}</p>
+        <p className={bad || saveError ? 'is-bad' : ''} role={saveError ? 'alert' : undefined}>
+          {saveError || (bad ? 'Please complete the highlighted fields.' : 'Fields marked * are required.')}
+        </p>
         <div className="cd-actions">
           {onCancel && (
-            <button type="button" className="cd-btn" onClick={onCancel}>
+            <button type="button" className="cd-btn" onClick={onCancel} disabled={saving}>
               Cancel
             </button>
           )}
-          <button type="submit" className="cd-btn cd-btn--gold">
-            Save details
+          <button type="submit" className="cd-btn cd-btn--gold" disabled={saving}>
+            {saving ? 'Saving…' : 'Save details'}
           </button>
         </div>
       </div>
@@ -345,6 +363,9 @@ export default function Register({ user }) {
           </p>
         ) : pass === 'pending' ? (
           <Pending user={user} />
+        ) : BACKEND ? (
+          // The real payment flow is the next phase of the backend.
+          <p className="cd-step__lead">{hasDetails ? 'Payment opens soon. We’ll let you know here as soon as it does.' : 'Fill in your details first. Payment opens soon after.'}</p>
         ) : (
           <PayForm user={user} hasDetails={hasDetails} />
         )}

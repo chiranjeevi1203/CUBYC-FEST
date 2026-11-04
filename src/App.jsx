@@ -7,6 +7,7 @@ import SpaceOverlays from './components/ui/SpaceOverlays';
 import ChatBot from './components/chat/ChatBot';
 import ComingSoon from './components/ui/ComingSoon';
 import { REGISTRATION_OPEN } from './config/features';
+import { useAuth } from './store/useAuth';
 import ScrollShip from './components/ui/ScrollShip';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
@@ -28,6 +29,9 @@ if (!REGISTRATION_OPEN) {
     /* storage blocked: nothing stored either */
   }
 }
+
+// Registration open: follow the signed-in account (loads Firebase on demand).
+if (REGISTRATION_OPEN) useAuth.getState().init();
 
 const PAGES = {
   dept: () => import('./components/dept/DepartmentView'),

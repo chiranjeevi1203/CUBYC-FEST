@@ -233,7 +233,7 @@ function Card({ cardRef }) {
             <span>{busy ? 'Signing in…' : 'Continue with Google'}</span>
           </button>
           <p className="lg-status" role="status" aria-live="polite">
-            {error === 'not_open' ? 'Sign-in opens with registrations — very soon. Watch this space.' : ''}
+            {error === 'not_open' ? 'Sign-in opens with registrations — very soon. Watch this space.' : error || ''}
           </p>
         </>
       )}

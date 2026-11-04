@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { prefersReducedMotion, EVENT } from '../../config/experience';
 import { PAYMENT } from '../../config/payment';
+import { BACKEND } from '../../store/useAuth';
 import { SKY_FRAG, createShaderLayer } from '../../lib/blackHole';
 
 /*
@@ -74,6 +75,23 @@ export function useCopy() {
 export function PayNotice({ user, compact = false }) {
   const status = user.pass.status;
   if (status === 'verified') return null;
+  if (BACKEND) {
+    // Live site, first phase: accounts and details are open; events and payment come next.
+    return (
+      <div className={`cd-notice is-pending ${compact ? 'is-compact' : ''}`} role="note" data-hero>
+        <Icon name="clock" className="cd-notice__icon" />
+        <p>
+          <b>Event registration and payment open soon.</b>{' '}
+          {user.profileComplete ? 'Your details are complete — you’re all set for when they do.' : 'Complete your details now so you’re ready when they do.'}
+        </p>
+        {!user.profileComplete && (
+          <a href="#/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">
+            Your details
+          </a>
+        )}
+      </div>
+    );
+  }
   const pending = status === 'pending';
   return (
     <div className={`cd-notice ${pending ? 'is-pending' : ''} ${compact ? 'is-compact' : ''}`} role="note" data-hero>
@@ -95,6 +113,21 @@ export function PayNotice({ user, compact = false }) {
         </a>
       )}
     </div>
+  );
+}
+
+/** A section that isn't open yet on the live site (events, teams). */
+export function SoonSection({ title, lead, children }) {
+  return (
+    <>
+      <PageHead title={title}>{lead}</PageHead>
+      <section className="cd-panel cd-empty" data-hero>
+        <p>{children}</p>
+        <a href="#/dashboard/register" className="cd-btn cd-btn--gold">
+          Check your details
+        </a>
+      </section>
+    </>
   );
 }
 

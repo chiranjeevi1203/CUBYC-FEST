@@ -38,7 +38,7 @@ export function clashesWith(slug, held) {
 /** Check one teammate for a team event. Returns { ok, person, error }. */
 export function checkMember(id, slug, { self, taken = [] }) {
   const cid = String(id).trim().toUpperCase();
-  if (!/^CB27-[2-9A-HJ-NP-Z]{4}$/.test(cid)) return { ok: false, error: 'Enter a CUBYC ID like CB27-7K4Q.' };
+  if (!/^CB27-[2-9A-HJ-NP-Z]{4}([2-9A-HJ-NP-Z]{2})?$/.test(cid)) return { ok: false, error: 'Enter a CUBYC ID like CB27-7K4Q.' };
   if (cid === self) return { ok: false, error: "That's your own ID — you're already in as the leader." };
   if (taken.includes(cid)) return { ok: false, error: 'Already added to this team.' };
   const person = PEOPLE[cid];

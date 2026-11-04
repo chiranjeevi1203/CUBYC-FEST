@@ -1,4 +1,4 @@
-import { useAuth } from '../store/useAuth';
+import { BACKEND, useAuth } from '../store/useAuth';
 import { REGISTRATION_OPEN } from '../config/features';
 import { showComingSoon } from './comingSoon';
 
@@ -10,7 +10,7 @@ import { showComingSoon } from './comingSoon';
  */
 
 const KEY = 'cubyc-after-login';
-export const REGISTER_HASH = '#/dashboard/events';
+export const REGISTER_HASH = BACKEND ? '#/dashboard/register' : '#/dashboard/events';
 /** What a Register link points to (no dashboard address while registration is closed). */
 export const REGISTER_HREF = REGISTRATION_OPEN ? REGISTER_HASH : '#contact';
 

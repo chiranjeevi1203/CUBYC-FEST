@@ -1,0 +1,152 @@
+rules_version = '2';
+
+// CUBYC Fest 2027 — Firestore security rules (Spark plan: no server code, the
+// rules enforce everything).
+//
+//   users/{uid}        a participant's account: created once by its owner on first
+//                      Google sign-in; email and CUBYC ID can never change.
+//   cubycIds/{id}      one document per CUBYC ID, so no two accounts share one.
+//   roles/{email}      admin access: { role: 'admin' | 'superadmin', depts }.
+//                      Only super admins can grant or remove it. The root super
+//                      admin below is built into the rules.
+//   auditLogs/{id}     who changed what (append-only).
+//
+// Anything not listed is closed.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Who is asking ------------------------------------------------------------
+    function signedIn() { return request.auth != null; }
+    function viaGoogle() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.email is string;
+    }
+    function myEmail() { return request.auth.token.email.lower(); }
+
+    // The root super admin(s): cannot be removed from inside the site.
+    function isRoot() { return viaGoogle() && myEmail() in ['chiranjeevi.p@bcah.christuniversity.in']; }
+    function roleDoc() { return /databases/$(database)/documents/roles/$(myEmail()); }
+    function myRole() { return exists(roleDoc()) ? get(roleDoc()).data.role : ''; }
+    function isSuperAdmin() { return isRoot() || (viaGoogle() && myRole() == 'superadmin'); }
+    function isAdmin() { return isSuperAdmin() || (viaGoogle() && myRole() == 'admin'); }
+
+    // ---- The profile ----------------------------------------------------------------
+    function filled(p, k) { return k in p && p[k] is string && p[k].matches('.*[^ ].*'); }
+    function text(p, k, max) { return !(k in p) || (p[k] is string && p[k].size() <= max); }
+    function phone(p, k) { return !(k in p) || (p[k] is string && (p[k] == '' || p[k].matches('^[6-9][0-9]{9}$'))); }
+    function oneOf(p, k, opts) { return !(k in p) || p[k] == '' || p[k] in opts; }
+    function dateOk(p) {
+      return !('dob' in p) || (p.dob is string && (p.dob == '' || p.dob.matches('^(19|20)[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$')));
+    }
+
+    function validProfile(p) {
+      return p is map
+        && p.keys().hasOnly(['name', 'gender', 'dob', 'phone', 'whatsapp', 'college', 'department', 'course', 'year',
+                             'collegeId', 'city', 'state', 'emergencyName', 'emergencyPhone', 'agree'])
+        && text(p, 'name', 80) && text(p, 'college', 120) && text(p, 'department', 80) && text(p, 'course', 60)
+        && text(p, 'collegeId', 40) && text(p, 'city', 60) && text(p, 'state', 60) && text(p, 'emergencyName', 80)
+        && oneOf(p, 'gender', ['Female', 'Male', 'Non-binary', 'Prefer not to say'])
+        && oneOf(p, 'year', ['1st year', '2nd year', '3rd year', '4th year', '5th year', 'Postgraduate'])
+        && dateOk(p) && phone(p, 'phone') && phone(p, 'whatsapp') && phone(p, 'emergencyPhone')
+        && (!('agree' in p) || p.agree is bool);
+    }
+
+    // Every required detail filled in, phones and date well-formed, terms accepted.
+    // (Keep in step with src/lib/fest/profile.js.)
+    function complete(p) {
+      return filled(p, 'name') && filled(p, 'gender') && filled(p, 'dob') && filled(p, 'phone')
+        && filled(p, 'college') && filled(p, 'department') && filled(p, 'course') && filled(p, 'year')
+        && filled(p, 'collegeId') && filled(p, 'city') && filled(p, 'state')
+        && filled(p, 'emergencyName') && filled(p, 'emergencyPhone')
+        && 'agree' in p && p.agree == true;
+    }
+
+    function validCubycId(id) { return id is string && id.matches('^CB27-[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{6}$'); }
+
+    // ---- Participants -------------------------------------------------------------------
+    match /users/{uid} {
+      allow read: if (viaGoogle() && request.auth.uid == uid) || isAdmin();
+
+      // First sign-in: your own account, exactly these fields, your verified Google email,
+      // and a fresh CUBYC ID claimed in the same write (see cubycIds below).
+      allow create: if viaGoogle() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'cubycId', 'profile', 'profileComplete', 'status', 'pass', 'createdAt', 'updatedAt'])
+        && request.resource.data.uid == uid
+        && request.resource.data.email == myEmail()
+        && validCubycId(request.resource.data.cubycId)
+        && getAfter(/databases/$(database)/documents/cubycIds/$(request.resource.data.cubycId)).data.uid == uid
+        && validProfile(request.resource.data.profile)
+        && request.resource.data.profileComplete == complete(request.resource.data.profile)
+        && request.resource.data.status == 'active'
+        && request.resource.data.pass == { 'status': 'none' }
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      // You may change only your profile (never email, CUBYC ID, status or pass), while active.
+      // profileComplete must be the truth about the profile.
+      allow update: if viaGoogle() && request.auth.uid == uid
+        && resource.data.status == 'active'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profile', 'profileComplete', 'updatedAt'])
+        && validProfile(request.resource.data.profile)
+        && request.resource.data.profileComplete == complete(request.resource.data.profile)
+        && request.resource.data.updatedAt == request.time;
+
+      // Super admins: correct a profile or suspend / reactivate an account (logged).
+      allow update: if isSuperAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['profile', 'profileComplete', 'status', 'updatedAt'])
+        && validProfile(request.resource.data.profile)
+        && request.resource.data.profileComplete == complete(request.resource.data.profile)
+        && request.resource.data.status in ['active', 'suspended']
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if isSuperAdmin();
+    }
+
+    // One document per CUBYC ID. You can claim one only together with creating your
+    // account, and you can see only your own (so IDs can't be listed or harvested).
+    match /cubycIds/{id} {
+      allow get: if viaGoogle() && (resource == null || resource.data.uid == request.auth.uid);
+      allow create: if viaGoogle() && validCubycId(id)
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.cubycId == id;
+      allow delete: if isSuperAdmin();
+      allow list, update: if false;
+    }
+
+    // ---- Admin access -------------------------------------------------------------------
+    match /roles/{email} {
+      allow get: if viaGoogle() && (myEmail() == email || isSuperAdmin());
+      allow list: if isSuperAdmin();
+      // Only super admins grant or remove access — never their own, never a root super admin's.
+      allow create, update: if isSuperAdmin() && email != myEmail() && email == email.lower()
+        && !(email in ['chiranjeevi.p@bcah.christuniversity.in'])
+        && request.resource.data.keys().hasOnly(['role', 'depts', 'grantedBy', 'grantedAt'])
+        && request.resource.data.role in ['admin', 'superadmin']
+        && request.resource.data.depts is list && request.resource.data.depts.size() <= 10
+        && request.resource.data.grantedBy == myEmail()
+        && request.resource.data.grantedAt == request.time;
+      allow delete: if isSuperAdmin() && email != myEmail();
+    }
+
+    // Append-only record of admin actions.
+    match /auditLogs/{id} {
+      allow read: if isSuperAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid', 'actorEmail', 'action', 'target', 'details', 'at'])
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.actorEmail == myEmail()
+        && request.resource.data.action is string && request.resource.data.action.size() <= 60
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+
+    // Everything else: closed.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

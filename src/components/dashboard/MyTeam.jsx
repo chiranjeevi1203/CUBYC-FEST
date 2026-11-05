@@ -80,7 +80,7 @@ export default function MyTeam({ user }) {
         <section className="cd-panel cd-empty" data-hero>
           <Frame />
           <p>You’re not in a team yet. To start one, pick a team event and choose “Team up”.</p>
-          <a href="#/dashboard/events" className="cd-btn cd-btn--gold">
+          <a href="/dashboard/events" className="cd-btn cd-btn--gold">
             Browse team events
           </a>
         </section>

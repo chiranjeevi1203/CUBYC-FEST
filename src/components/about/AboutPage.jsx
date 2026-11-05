@@ -222,7 +222,7 @@ function AboutView({ open, onGone }) {
             >
               Meet the team
             </SolarButton>
-            <SolarButton href="#/events" variant="ghost">
+            <SolarButton href="/events" variant="ghost">
               Explore the events
             </SolarButton>
           </div>
@@ -235,7 +235,7 @@ function AboutView({ open, onGone }) {
   );
 }
 
-/** The About page (#/about). */
+/** The About page (/about). */
 export default function AboutPage() {
   const open = useExperience((s) => s.aboutOpen);
   const [mounted, onGone] = useMountedWhile(open);

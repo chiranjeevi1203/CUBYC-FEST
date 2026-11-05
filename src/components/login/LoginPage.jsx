@@ -7,9 +7,10 @@ import { prefersReducedMotion } from '../../config/experience';
 import { useExperience } from '../../store/useExperience';
 import { initialsOf, useAuth } from '../../store/useAuth';
 import { loginForRegister, takeAfterLogin } from '../../lib/registerNav';
+import { go } from '../../lib/route';
 
 /*
- * Sign-in (#/login): a frosted-glass card, in the landing page's gold frame, in
+ * Sign-in (/login): a frosted-glass card, in the landing page's gold frame, in
  * the middle of a galaxy. The Milky Way crosses the sky, stars twinkle and
  * drift with the pointer (near stars more than far ones), shooting stars streak
  * past, and a click on empty sky launches a shooting star from that spot. Google is the only way in.
@@ -199,7 +200,7 @@ function Card({ cardRef }) {
             <p className="lg-card__sub">Your CUBYC ID is waiting in your dashboard.</p>
           )}
           <div className="lg-actions">
-            <a href="#/dashboard" className="lg-btn lg-btn--main">
+            <a href="/dashboard" className="lg-btn lg-btn--main">
               Dashboard
             </a>
             <button type="button" className="lg-btn" onClick={signOut}>
@@ -223,7 +224,7 @@ function Card({ cardRef }) {
             onClick={async () => {
               // Signed in: straight on to the dashboard.
               // Signed in: on to the dashboard (its Events, if a Register button sent you here).
-              if (await signInWithGoogle()) window.location.hash = takeAfterLogin() ?? '#/dashboard';
+              if (await signInWithGoogle()) go(takeAfterLogin() ?? '/dashboard');
             }}
             disabled={busy}
             aria-busy={busy}
@@ -297,7 +298,7 @@ function LoginView({ open, onGone }) {
   );
 }
 
-/** The sign-in page (#/login). */
+/** The sign-in page (/login). */
 export default function LoginPage() {
   const open = useExperience((s) => s.loginOpen);
   const [mounted, onGone] = useMountedWhile(open);

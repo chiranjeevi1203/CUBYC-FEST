@@ -201,7 +201,7 @@ function eventOverview(e) {
       ...people,
       `It has ${e.rules.length} rules — ask me "rules" for the details, or open the event page.`,
     ].join('\n'),
-    links: [eventLink(e), { label: 'All events', href: '#/events' }],
+    links: [eventLink(e), { label: 'All events', href: '/events' }],
     chips: [`Rules of ${short(e)}`, `Who is the contact for ${short(e)}?`, `Other ${e.deptName} events`],
   };
 }
@@ -251,7 +251,7 @@ function eventWhen(e) {
     text: hits.length
       ? [`**${e.name}**:`, ...hits, 'Report 15 minutes before your slot.'].join('\n')
       : `The exact slot for **${e.name}** isn't published yet. The fest runs **${FEST.dateLabel}**; detailed timings will be announced on the Schedule page.`,
-    links: [{ label: 'Open schedule', href: '#/schedule' }, eventLink(e)],
+    links: [{ label: 'Open schedule', href: '/schedule' }, eventLink(e)],
   };
 }
 
@@ -279,7 +279,7 @@ function listDepartments() {
       `**${FEST.deptCount} domains, ${FEST.eventCount} events:**`,
       ...DEPT_ORDER.filter((k) => !DEPARTMENTS[k].hub).map((k) => `• **${DEPARTMENTS[k].name}** — ${DEPARTMENTS[k].events.length} event${DEPARTMENTS[k].events.length === 1 ? '' : 's'}`),
     ].join('\n'),
-    links: [{ label: 'Browse all events', href: '#/events' }],
+    links: [{ label: 'Browse all events', href: '/events' }],
     chips: ['Computer Science events', 'Cultural events', 'Individual events'],
   };
 }
@@ -288,7 +288,7 @@ function listEvents(filter, label) {
   const list = ALL_EVENTS.filter(filter);
   return {
     text: [`**${label} (${list.length}):**`, ...list.map((e) => `• ${e.name} — ${e.deptName} · ${e.format}`)].join('\n'),
-    links: [{ label: 'Open the Events page', href: '#/events' }],
+    links: [{ label: 'Open the Events page', href: '/events' }],
     chips: ['Team events', 'Individual events', 'How do I register?'],
   };
 }
@@ -302,7 +302,7 @@ function scheduleAnswer(q) {
     lines.push(`**${d.label} · ${d.date} — ${d.title}**`);
     d.items.forEach((i) => lines.push(`• ${i.time} — ${i.title} (${i.venue})`));
   }
-  return { text: lines.join('\n'), links: [{ label: 'Open the Schedule', href: '#/schedule' }], chips: which === 0 ? ['Day 2 schedule'] : ['Day 1 schedule'] };
+  return { text: lines.join('\n'), links: [{ label: 'Open the Schedule', href: '/schedule' }], chips: which === 0 ? ['Day 2 schedule'] : ['Day 1 schedule'] };
 }
 
 function rulesAnswer(q) {
@@ -310,11 +310,11 @@ function rulesAnswer(q) {
   const keys = q.tokens.filter((t) => t.length > 3 && !STOP.has(t) && !['rule', 'rules', 'regulation', 'regulations', 'general', 'allowed', 'allow', 'mandatory', 'compulsory', 'need', 'needed', 'required'].includes(t));
   const hits = keys.length ? all.filter((x) => keys.some((k) => norm(x.r).split(' ').some((w) => near(w, k)))) : [];
   if (hits.length && hits.length < all.length) {
-    return { text: ['Here’s what the rules say:', ...hits.slice(0, 5).map((x) => `• ${x.r}`)].join('\n'), links: [{ label: 'All rules', href: '#/rules' }] };
+    return { text: ['Here’s what the rules say:', ...hits.slice(0, 5).map((x) => `• ${x.r}`)].join('\n'), links: [{ label: 'All rules', href: '/rules' }] };
   }
   return {
     text: [`**General rules (${RULE_COUNT}) — highlights:**`, ...all.slice(0, 6).map((x) => `• ${x.r}`), 'Each event also has its own rules on its page.'].join('\n'),
-    links: [{ label: 'Open the Rules', href: '#/rules' }],
+    links: [{ label: 'Open the Rules', href: '/rules' }],
     chips: ['Is ID card mandatory?', 'Reporting time', 'Are phones allowed?'],
   };
 }
@@ -363,7 +363,7 @@ export function createBrain() {
         text: `I was built by **${CREATOR.name}**, ${CREATOR.role} of the ${FEST.name} website team. ${firstName[0].toUpperCase() + firstName.slice(1)} designed and developed this whole website — the galaxy intro, the solar system of domains, the pages — and me, **CUBYC Comms**.\n• Email: ${CREATOR.email}\n• LinkedIn: linkedin.com/in/${CREATOR.linkedin.replace(/\/+$/, '').split('/').pop()}\nThe rest of the website team is on the About page.`,
         links: [
           { label: 'LinkedIn', href: CREATOR.linkedin },
-          { label: 'Meet the team', href: '#/about' },
+          { label: 'Meet the team', href: '/about' },
         ],
         chips: ['When is the fest?', 'List all events'],
       });
@@ -437,13 +437,13 @@ Follow this website for updates.`, chips: ['How do I register?', 'General rules'
     if (has(q, ['register', 'registration', 'registrations', 'sign up', 'signup', 'enroll', 'enrol', 'apply', 'participate', 'join', 'fee', 'fees', 'cost', 'price', 'ticket', 'tickets', 'pass', 'payment', 'charge', 'free'])) {
       return ok({
         text: `Registrations for **${FEST.name}** open soon — the official form will be announced on this website.\n• Registration is confirmed only after the official form is completed\n• Carry a **valid college ID** on both days\n• Fees, if any, will be published with the form\nMeanwhile, pick your events on the Events page.`,
-        links: [{ label: 'Browse events', href: '#/events' }, { label: 'Rules', href: '#/rules' }],
+        links: [{ label: 'Browse events', href: '/events' }, { label: 'Rules', href: '/rules' }],
         chips: ['List all events', 'Team events'],
       });
     }
     if (has(q, ['schedule', 'timetable', 'time table', 'timing', 'timings', 'itinerary', 'programme', 'program', 'agenda', 'day 1', 'day 2', 'day one', 'day two', 'first day', 'second day'])) return ok(scheduleAnswer(q));
     if (has(q, ['when', 'date', 'dates', 'which day', 'what day', 'month', 'start', 'begin', 'starts', 'happening', 'held'])) {
-      return ok({ text: `**${FEST.title}** runs on **${FEST.dateLabel}**:\n• ${FEST.days[0]}\n• ${FEST.days[1]}\n${countdown()}`, links: [{ label: 'Schedule', href: '#/schedule' }] });
+      return ok({ text: `**${FEST.title}** runs on **${FEST.dateLabel}**:\n• ${FEST.days[0]}\n• ${FEST.days[1]}\n${countdown()}`, links: [{ label: 'Schedule', href: '/schedule' }] });
     }
     if (has(q, ['where', 'venue', 'location', 'address', 'campus', 'reach', 'directions', 'map', 'place', 'located'])) {
       return ok({
@@ -454,7 +454,7 @@ Follow this website for updates.`, chips: ['How do I register?', 'General rules'
     if (has(q, ['rule', 'rules', 'regulation', 'regulations', 'id card', 'phone', 'phones', 'mobile', 'late', 'reporting', 'disqualified', 'disqualification', 'conduct', 'judges', 'allowed', 'dress code', 'plagiarism'])) return ok(rulesAnswer(q));
     if (has(q, ['events', 'event', 'competitions', 'competition', 'activities', 'what can i participate'])) return ok(listEvents(() => true, 'All events'));
     if (has(q, ['domain', 'domains', 'department', 'departments', 'dept', 'depts', 'planets', 'worlds'])) return ok(listDepartments());
-    if (has(q, ['gallery', 'photos', 'pictures', 'pics', 'images', 'memories'])) return ok({ text: 'The Gallery has moments from our campus — drawn into a black hole!', links: [{ label: 'Open the Gallery', href: '#/gallery' }] });
+    if (has(q, ['gallery', 'photos', 'pictures', 'pics', 'images', 'memories'])) return ok({ text: 'The Gallery has moments from our campus — drawn into a black hole!', links: [{ label: 'Open the Gallery', href: '/gallery' }] });
     if (has(q, ['cubyc', 'about the fest', 'what is this', 'what is the fest', 'about fest', 'flagship', 'christ university', 'christ'])) {
       return ok({
         text: `**${FEST.title}** is ${FEST.subline.toLowerCase().replace(/^our /, 'the ')} of ${FEST.university}, ${FEST.campus} — ${FEST.deptCount} domains and ${FEST.eventCount} events across two days, ${FEST.dateLabel}.`,
@@ -464,14 +464,14 @@ Follow this website for updates.`, chips: ['How do I register?', 'General rules'
     if (has(q, ['contact', 'organisers', 'organizers', 'helpline', 'email', 'reach you', 'queries', 'support'])) {
       return ok({
         text: 'Each event lists its faculty and student in-charge — just ask, e.g. "contact for the meme battle". Domain faculty in-charges are on each domain page.',
-        links: [{ label: 'Browse events', href: '#/events' }],
+        links: [{ label: 'Browse events', href: '/events' }],
       });
     }
 
     // Not sure — the UI may ask the AI, else this is shown.
     return {
       text: "I'm not sure about that one yet. I know the fest's events, domains, rules, schedule and registration — try one of these:",
-      links: [{ label: 'Browse events', href: '#/events' }],
+      links: [{ label: 'Browse events', href: '/events' }],
       chips: SUGGESTIONS.slice(0, 4),
       confident: false,
     };

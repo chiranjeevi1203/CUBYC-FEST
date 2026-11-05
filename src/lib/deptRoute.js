@@ -1,23 +1,23 @@
 import { DEPARTMENTS } from '../config/departments';
 import { focusIdOf } from '../config/experience';
 import { useExperience } from '../store/useExperience';
+import { currentPath } from './route';
 
 /**
- * Hash routes for the department pages, so the browser Back button and deep
- * links work without a router:
+ * Addresses for the department pages, so the browser Back button and deep
+ * links work:
  *
- *   #/dept/<key>                  the world rising as a semicircle (orbit view)
- *   #/dept/<key>/events           inside the world: every event
- *   #/dept/<key>/events/<slug>    …with one event selected
+ *   /dept/<key>                  the world rising as a semicircle (orbit view)
+ *   /dept/<key>/events           inside the world: every event
+ *   /dept/<key>/events/<slug>    …with one event selected
  *
- * Landing anchors (#events, #cosmos…) never start with "#/", so they are untouched.
  * Each history entry we push carries { cubyc: depth } (1 = orbit, 2 = events),
  * so closing from the UI steps back through history instead of stacking entries.
  */
 
-const PREFIX = '#/dept/';
+const PREFIX = '/dept/';
 
-export function parseHash(hash = window.location.hash) {
+export function parseHash(hash = currentPath()) {
   if (!hash.startsWith(PREFIX)) return null;
   const [key, view, event] = hash.slice(PREFIX.length).split('/');
   if (!DEPARTMENTS[key]) return null;
@@ -32,7 +32,7 @@ function hashOf(route) {
 }
 
 const depth = () => window.history.state?.cubyc ?? 0;
-const urlWith = (hash) => `${window.location.pathname}${window.location.search}${hash}`;
+const urlWith = (path) => path || '/';
 
 /**
  * Go to a department route (or null to leave the department pages).

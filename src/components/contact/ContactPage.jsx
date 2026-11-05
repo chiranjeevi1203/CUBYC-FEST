@@ -414,7 +414,7 @@ function ContactView({ open, onGone }) {
   );
 }
 
-/** The Contact page (#/contact). */
+/** The Contact page (/contact). */
 export default function ContactPage() {
   const open = useExperience((s) => s.contactOpen);
   const [mounted, onGone] = useMountedWhile(open);

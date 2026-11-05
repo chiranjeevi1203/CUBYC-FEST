@@ -11,6 +11,11 @@ import { useAuth } from './store/useAuth';
 import ScrollShip from './components/ui/ScrollShip';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
+import { currentPath, installRouting, onRoute, titleFor } from './lib/route';
+import { DEPARTMENTS } from './config/departments';
+
+// Clean addresses (/about, /dept/earth…): links, Back / Forward, old "#/…" links.
+installRouting();
 
 /*
  * The full-screen pages are split into their own chunks: each loads the first time it is
@@ -69,23 +74,23 @@ function OnDemand({ when, children }) {
   return needed || ever ? <Suspense fallback={null}>{children}</Suspense> : null;
 }
 
-/** Hash routes that open a page (department routes are checked by parseHash). */
-const PAGE_HASHES = ['#/events', '#/gallery', '#/schedule', '#/rules', '#/about', '#/contact', '#/sponsors', ...(REGISTRATION_OPEN ? ['#/login'] : [])];
+/** Addresses that open a page (department routes are checked by parseHash). */
+const PAGE_PATHS = ['/events', '/gallery', '/schedule', '/rules', '/about', '/contact', '/sponsors', ...(REGISTRATION_OPEN ? ['/login'] : [])];
 
 /**
  * Layer stack (bottom → top):
  *   <Experience/>   one persistent R3F canvas — galaxy, warp, solar system (never unmounted)
  *   <LandingPage/>  DOM, transparent over the canvas, revealed by the master timeline
  *   <SpaceOverlays/> planet tooltip, focus card, interaction hint (live landing only)
- *   <DepartmentView/> department pages (own canvas) — #/dept/<key>[/events[/<event>]]
- *   <GalleryPage/>  the campus gallery around a black hole — #/gallery
- *   <SchedulePage/> the two-day flight plan along the Milky Way — #/schedule
- *   <RulesPage/>    the spacecraft bridge; rules on a hologram — #/rules
- *   <EventsPage/>   all 27 events as a fan of glass cards — #/events
- *   <AboutPage/>    the campus floating in space + the dignitaries — #/about
- *   <ContactPage/>  faculty and student coordinators and the campus map — #/contact
- *   <SponsorsPage/> the sponsor tiers, revealed on scroll — #/sponsors
- *   <NotFoundPage/> lost in space: any unknown #/… address or path
+ *   <DepartmentView/> department pages (own canvas) — /dept/<key>[/events[/<event>]]
+ *   <GalleryPage/>  the campus gallery around a black hole — /gallery
+ *   <SchedulePage/> the two-day flight plan along the Milky Way — /schedule
+ *   <RulesPage/>    the spacecraft bridge; rules on a hologram — /rules
+ *   <EventsPage/>   all 27 events as a fan of glass cards — /events
+ *   <AboutPage/>    the campus floating in space + the dignitaries — /about
+ *   <ContactPage/>  faculty and student coordinators and the campus map — /contact
+ *   <SponsorsPage/> the sponsor tiers, revealed on scroll — /sponsors
+ *   <NotFoundPage/> lost in space: any unknown address
  *   <ChatBot/>      CUBYC Comms: floating freighter (every page) → chat overlay
  *   <LoaderHUD/>    DOM overlay that owns the GSAP master timeline; removed at hand-off
  *   <CometCursor/>  pointer layer (fine pointers only)
@@ -95,6 +100,13 @@ export default function App() {
   const hudMounted = useExperience((s) => s.hudMounted);
   const quality = useExperience((s) => s.quality);
   const live = useExperience((s) => s.phase === PHASES.LANDING_IDLE);
+  const dept = useExperience((s) => s.dept);
+  const [path, setPath] = useState(currentPath);
+
+  // The browser tab title follows the page.
+  useEffect(() => {
+    document.title = titleFor(dept ? `/dept/${dept}` : path, dept ? DEPARTMENTS[dept]?.name : null);
+  }, [path, dept]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('is-loading', hudMounted);
@@ -129,8 +141,7 @@ export default function App() {
   useEffect(() => {
     if (!live) return undefined;
     if (parseHash()) syncFromLocation();
-    window.addEventListener('popstate', syncFromLocation);
-    return () => window.removeEventListener('popstate', syncFromLocation);
+    return onRoute(syncFromLocation);
   }, [live]);
 
   // Gallery / schedule pages: open whenever the hash says so (navbar link, Back / Forward, deep link).
@@ -138,30 +149,24 @@ export default function App() {
     if (!live) return undefined;
     const sync = () => {
       const { setGalleryOpen, setScheduleOpen, setRulesOpen, setEventsOpen, setAboutOpen, setContactOpen, setSponsorsOpen, setLoginOpen, setDashboardOpen, setNotFound } = useExperience.getState();
-      setEventsOpen(window.location.hash === '#/events');
-      setGalleryOpen(window.location.hash === '#/gallery');
-      setScheduleOpen(window.location.hash === '#/schedule');
-      setRulesOpen(window.location.hash === '#/rules');
-      setAboutOpen(window.location.hash === '#/about');
-      setContactOpen(window.location.hash === '#/contact');
-      setSponsorsOpen(window.location.hash === '#/sponsors');
-      // While registration is closed, #/login and #/dashboard are just unknown addresses (404).
-      setLoginOpen(REGISTRATION_OPEN && window.location.hash === '#/login');
-      const dash = REGISTRATION_OPEN && (window.location.hash === '#/dashboard' || window.location.hash.startsWith('#/dashboard/'));
+      const path = currentPath();
+      setEventsOpen(path === '/events');
+      setGalleryOpen(path === '/gallery');
+      setScheduleOpen(path === '/schedule');
+      setRulesOpen(path === '/rules');
+      setAboutOpen(path === '/about');
+      setContactOpen(path === '/contact');
+      setSponsorsOpen(path === '/sponsors');
+      // While registration is closed, /login and /dashboard are just unknown addresses (404).
+      setLoginOpen(REGISTRATION_OPEN && path === '/login');
+      const dash = REGISTRATION_OPEN && (path === '/dashboard' || path.startsWith('/dashboard/'));
       setDashboardOpen(dash);
-      // Anything else that looks like a page address (or a path other than /) is lost in space.
-      const hash = window.location.hash;
-      const badPath = !['/', '/index.html'].includes(window.location.pathname);
-      const badHash = hash.startsWith('#/') && !PAGE_HASHES.includes(hash) && !parseHash(hash) && !dash;
-      setNotFound(badPath || badHash);
+      // Any other address is lost in space.
+      setNotFound(path !== '/' && !PAGE_PATHS.includes(path) && !parseHash(path) && !dash);
+      setPath(path);
     };
     sync();
-    window.addEventListener('hashchange', sync);
-    window.addEventListener('popstate', sync);
-    return () => {
-      window.removeEventListener('hashchange', sync);
-      window.removeEventListener('popstate', sync);
-    };
+    return onRoute(sync);
   }, [live]);
 
   return (

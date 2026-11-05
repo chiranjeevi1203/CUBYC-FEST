@@ -23,7 +23,7 @@ const whenText = (slug) => {
   const w = whenOf(slug);
   return w ? `${w.day}, ${w.time}` : 'time to be announced';
 };
-export const joinLink = (code) => `${window.location.origin}${window.location.pathname}#/dashboard/join/${code}`;
+export const joinLink = (code) => `${window.location.origin}/dashboard/join/${code}`;
 const me = (user) => ({ uid: user.uid, cubycId: user.cubycId, name: user.profile?.name || user.name });
 
 function useEscape(onClose) {
@@ -89,7 +89,7 @@ export function RegNotices({ user, compact = false }) {
           <p>
             <b>Complete your details first.</b> You can register for events once your details are saved.
           </p>
-          <a href="#/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">
+          <a href="/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">
             Your details
           </a>
         </div>
@@ -328,7 +328,7 @@ function TeamModal({ slug, user, onClose }) {
           </p>
           {done.leaderUid === user.uid ? <InviteCard team={done} /> : null}
           <div className="cd-actions">
-            <a href="#/dashboard/my-team" className="cd-btn" onClick={onClose}>
+            <a href="/dashboard/my-team" className="cd-btn" onClick={onClose}>
               See My Team
             </a>
             <button type="button" className="cd-btn cd-btn--gold" onClick={onClose}>
@@ -461,7 +461,7 @@ export function LiveEvents({ user }) {
                     </div>
                     <div className="cd-ev__side">
                       {mine ? (
-                        <a href={mine.kind === 'team' ? '#/dashboard/my-team' : '#/dashboard/my-events'} className="cd-ev__state">
+                        <a href={mine.kind === 'team' ? '/dashboard/my-team' : '/dashboard/my-events'} className="cd-ev__state">
                           <Icon name="check" className="h-3.5 w-3.5" /> {mine.kind === 'team' ? 'In a team' : 'Registered'}
                         </a>
                       ) : (
@@ -474,7 +474,7 @@ export function LiveEvents({ user }) {
                           {busy === s.slug ? 'Saving…' : t.team ? 'Team up' : 'Register'}
                         </button>
                       )}
-                      <a href={`#/dept/${ev.dept}/events/${ev.slug}`} className="cd-link cd-link--quiet">
+                      <a href={`/dept/${ev.dept}/events/${ev.slug}`} className="cd-link cd-link--quiet">
                         Details
                       </a>
                     </div>
@@ -522,7 +522,7 @@ export function LiveMyEvents({ user }) {
         <section className="cd-panel cd-empty" data-hero>
           <Frame />
           <p>You haven’t registered for any events yet.</p>
-          <a href="#/dashboard/events" className="cd-btn cd-btn--gold">
+          <a href="/dashboard/events" className="cd-btn cd-btn--gold">
             Browse events
           </a>
         </section>
@@ -579,11 +579,11 @@ export function LiveMyEvents({ user }) {
                   </p>
                 )}
                 <div className="cd-actions">
-                  <a href={`#/dept/${ev.dept}/events/${ev.slug}`} className="cd-btn cd-btn--sm">
+                  <a href={`/dept/${ev.dept}/events/${ev.slug}`} className="cd-btn cd-btn--sm">
                     Event details
                   </a>
                   {r.kind === 'team' ? (
-                    <a href="#/dashboard/my-team" className="cd-btn cd-btn--sm">
+                    <a href="/dashboard/my-team" className="cd-btn cd-btn--sm">
                       Team
                     </a>
                   ) : !open ? null : confirm === r.slug ? (
@@ -676,7 +676,7 @@ export function LiveMyTeam({ user, joinCode = '' }) {
         <section className="cd-panel cd-empty" data-hero>
           <Frame />
           <p>You’re not in a team yet. To start one, pick a team event and choose “Team up”.</p>
-          <a href="#/dashboard/events" className="cd-btn cd-btn--gold">
+          <a href="/dashboard/events" className="cd-btn cd-btn--gold">
             Browse team events
           </a>
         </section>

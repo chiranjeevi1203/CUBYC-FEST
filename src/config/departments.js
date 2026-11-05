@@ -683,7 +683,7 @@ export const DEPT_ORDER = ORDER.filter((k) => !DEPARTMENTS[k].hub);
 
 export const EVENT_COUNT = ORDER.reduce((n, k) => n + DEPARTMENTS[k].events.length, 0);
 
-/** URL-safe id for an event (used in #/dept/<key>/<event>). */
+/** URL-safe id for an event (used in /dept/<key>/<event>). */
 export const eventSlug = (name) =>
   name
     .toLowerCase()

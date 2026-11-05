@@ -5,11 +5,12 @@ import Shuttle from './Shuttle';
 import { SCHEDULE_DAYS, clock } from '../../config/schedule';
 import { prefersReducedMotion } from '../../config/experience';
 import { ALL_EVENTS } from '../../config/allEvents';
+import { go } from '../../lib/route';
 
-const SCHEDULE_HREF = '#/schedule';
+const SCHEDULE_HREF = '/schedule';
 // Each scheduled event links to its own event page.
 const DEPT_OF = Object.fromEntries(ALL_EVENTS.map((e) => [e.slug, e.dept]));
-const eventHref = (slug) => (DEPT_OF[slug] ? `#/dept/${DEPT_OF[slug]}/events/${slug}` : null);
+const eventHref = (slug) => (DEPT_OF[slug] ? `/dept/${DEPT_OF[slug]}/events/${slug}` : null);
 // Routine slots (check-in, lunch) are left to the full page; the cards show the highlights.
 const highlights = (day) => day.items.filter((it) => it.tag !== 'All');
 const SLOT_COUNT = SCHEDULE_DAYS.reduce((n, d) => n + d.items.length, 0);
@@ -143,13 +144,13 @@ function LaunchButton() {
     e.preventDefault();
     if (launching) return;
     if (prefersReducedMotion()) {
-      window.location.hash = SCHEDULE_HREF;
+      go(SCHEDULE_HREF);
       return;
     }
     setLaunching(true);
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => {
-      window.location.hash = SCHEDULE_HREF;
+      go(SCHEDULE_HREF);
       // Reset once we're away, so the shuttle is back when the visitor returns.
       timer.current = window.setTimeout(() => {
         setLaunching(false);

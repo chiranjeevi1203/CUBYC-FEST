@@ -85,7 +85,7 @@ export function PayNotice({ user, compact = false }) {
           {user.profileComplete ? 'Your details are complete. Pick your events meanwhile — they count once your pass is paid.' : 'Complete your details now — then you can pick your events.'}
         </p>
         {!user.profileComplete && (
-          <a href="#/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">
+          <a href="/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">
             Your details
           </a>
         )}
@@ -108,7 +108,7 @@ export function PayNotice({ user, compact = false }) {
         )}
       </p>
       {!pending && (
-        <a href="#/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">
+        <a href="/dashboard/register" className="cd-btn cd-btn--gold cd-btn--sm">
           Pay now
         </a>
       )}
@@ -123,7 +123,7 @@ export function SoonSection({ title, lead, children }) {
       <PageHead title={title}>{lead}</PageHead>
       <section className="cd-panel cd-empty" data-hero>
         <p>{children}</p>
-        <a href="#/dashboard/register" className="cd-btn cd-btn--gold">
+        <a href="/dashboard/register" className="cd-btn cd-btn--gold">
           Check your details
         </a>
       </section>

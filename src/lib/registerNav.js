@@ -1,6 +1,7 @@
 import { BACKEND, useAuth } from '../store/useAuth';
 import { REGISTRATION_OPEN } from '../config/features';
 import { showComingSoon } from './comingSoon';
+import { go } from './route';
 
 /*
  * Every "Register" button on the site goes through here. Signed in → the
@@ -10,7 +11,7 @@ import { showComingSoon } from './comingSoon';
  */
 
 const KEY = 'cubyc-after-login';
-export const REGISTER_HASH = BACKEND ? '#/dashboard/register' : '#/dashboard/events';
+export const REGISTER_HASH = BACKEND ? '/dashboard/register' : '/dashboard/events';
 /** What a Register link points to (no dashboard address while registration is closed). */
 export const REGISTER_HREF = REGISTRATION_OPEN ? REGISTER_HASH : '#contact';
 
@@ -21,7 +22,7 @@ export function goRegister() {
     return;
   }
   if (useAuth.getState().user) {
-    window.location.hash = REGISTER_HASH;
+    go(REGISTER_HASH);
     return;
   }
   try {
@@ -29,7 +30,7 @@ export function goRegister() {
   } catch {
     /* storage blocked: login still goes to the dashboard */
   }
-  window.location.hash = '#/login';
+  go('/login');
 }
 
 /** Where to go after signing in, if a Register button sent the visitor here (read once). */

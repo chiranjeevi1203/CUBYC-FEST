@@ -201,7 +201,7 @@ export function Media({ item, uid, eager = false, small = false }) {
 /** What the site shows: the campus photos if any were added, else the illustrations. */
 export const GALLERY_ITEMS = CAMPUS_PHOTOS.length ? CAMPUS_PHOTOS : GALLERY;
 
-const GALLERY_HREF = '#/gallery';
+const GALLERY_HREF = '/gallery';
 const COPIES = 4; // each row repeats its set so it always overfills the screen while it slides
 const AUTO_SPEED = 26; // px/s the rows glide on their own
 const SCROLL_FACTOR = 0.45; // px of extra travel per px scrolled (either way — it only ever speeds the rows up)

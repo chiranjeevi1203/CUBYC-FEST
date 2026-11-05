@@ -5,7 +5,7 @@ import SolarButton from '../ui/SolarButton';
 import { RULE_COUNT, RULE_SECTIONS } from '../../config/rules';
 import { useViewMore, ViewMoreButton } from '../ui/ViewMore';
 
-const RULES_HREF = '#/rules';
+const RULES_HREF = '/rules';
 const PER_MODULE = 2; // key rules previewed per section; the rest live on the rules page
 
 // One line icon per section (20×20, stroked).

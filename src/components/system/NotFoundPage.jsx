@@ -19,7 +19,7 @@ function NotFoundView({ open, onGone }) {
       );
     },
   });
-  const lost = window.location.pathname !== '/' ? window.location.pathname : window.location.hash;
+  const lost = window.location.pathname;
 
   return (
     <div ref={rootRef} className="space-page nf-page fixed inset-0 z-40 overflow-y-auto overflow-x-hidden overscroll-contain text-[#f4f1ea]" data-no-orbit>
@@ -61,7 +61,7 @@ function NotFoundView({ open, onGone }) {
           <a href="/#home" className="nf-btn nf-btn--main">
             Return to orbit
           </a>
-          <a href="/#/events" className="nf-btn">
+          <a href="/events" className="nf-btn">
             Explore events
           </a>
         </div>
@@ -70,7 +70,7 @@ function NotFoundView({ open, onGone }) {
   );
 }
 
-/** The 404 page: any unknown #/… address or path. */
+/** The 404 page: any unknown /… address or path. */
 export default function NotFoundPage() {
   const open = useExperience((s) => s.notFound);
   const [mounted, onGone] = useMountedWhile(open);

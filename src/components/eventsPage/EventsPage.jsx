@@ -15,6 +15,7 @@ import { createShaderLayer } from '../../lib/blackHole';
 import { COMET_FRAG } from '../../lib/cometSky';
 import { navigate } from '../../lib/deptRoute';
 import { useExperience } from '../../store/useExperience';
+import { go } from '../../lib/route';
 
 /*
  * Every event as a glass card, fanned along an arc. Scrolling (wheel, drag,
@@ -445,7 +446,7 @@ function EventsView({ open, onGone }) {
       if (e.key === 'Escape') {
         e.preventDefault();
         if (filterOpen) setFilterOpen(false);
-        else window.location.hash = '#events';
+        else go('#events');
       } else if (e.key === 'ArrowRight') go(activeRef.current + 1);
       else if (e.key === 'ArrowLeft') go(activeRef.current - 1);
       else if (e.key === 'Enter' && list[activeRef.current] && !(e.target instanceof Element && e.target.closest('button, a'))) setBrief(list[activeRef.current]);
@@ -673,7 +674,7 @@ function EventsView({ open, onGone }) {
   );
 }
 
-/** The events page (#/events): mounted while open, plus its exit animation. */
+/** The events page (/events): mounted while open, plus its exit animation. */
 export default function EventsPage() {
   const open = useExperience((s) => s.eventsOpen);
   const [mounted, setMounted] = useState(false);

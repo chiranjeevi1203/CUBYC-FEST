@@ -9,6 +9,7 @@ import { EVENT, prefersReducedMotion } from '../../config/experience';
 import { createShaderLayer } from '../../lib/blackHole';
 import { MILKY_FRAG } from '../../lib/milkyWay';
 import { useExperience } from '../../store/useExperience';
+import { go } from '../../lib/route';
 
 /*
  * Flight plan: the shuttle flies from centre-left toward centre-right as you
@@ -277,7 +278,7 @@ function ScheduleView({ open, onGone }) {
 
   /* ---------- input ---------- */
   const leave = () => {
-    window.location.hash = '#schedule';
+    go('#schedule');
   };
   const stepTo = useCallback(
     (dir) => {
@@ -431,7 +432,7 @@ function ScheduleView({ open, onGone }) {
   );
 }
 
-/** The schedule page (#/schedule): mounted while open, plus its exit animation. */
+/** The schedule page (/schedule): mounted while open, plus its exit animation. */
 export default function SchedulePage() {
   const open = useExperience((s) => s.scheduleOpen);
   const [mounted, setMounted] = useState(false);

@@ -8,6 +8,7 @@ import { chirp } from '../../lib/droidVoice';
 import { navigate } from '../../lib/deptRoute';
 import { prefersReducedMotion } from '../../config/experience';
 import { useExperience } from '../../store/useExperience';
+import { go, onRoute as onPageChange } from '../../lib/route';
 
 /*
  * CUBYC Comms — the site-wide chatbot.
@@ -26,14 +27,14 @@ const API = import.meta.env.VITE_CHAT_API || '/api/chat';
 const STORE_KEY = 'cubyc-comms';
 const NAV = [
   { label: 'Home', href: '#home', icon: 'M3 10 10 4l7 6v7h-5v-4H8v4H3Z' },
-  { label: 'Events', href: '#/events', icon: 'M4 4h12v12H4Z M4 8h12 M8 4v12' },
-  { label: 'Schedule', href: '#/schedule', icon: 'M4 5h12v11H4Z M4 9h12 M7 3v4 M13 3v4' },
-  { label: 'Gallery', href: '#/gallery', icon: 'M3 5h14v10H3Z M6 12l3-3 3 3 2-2 3 3' },
-  { label: 'Rules', href: '#/rules', icon: 'M6 3h8v14H6Z M8 7h4 M8 10h4 M8 13h3' },
+  { label: 'Events', href: '/events', icon: 'M4 4h12v12H4Z M4 8h12 M8 4v12' },
+  { label: 'Schedule', href: '/schedule', icon: 'M4 5h12v11H4Z M4 9h12 M7 3v4 M13 3v4' },
+  { label: 'Gallery', href: '/gallery', icon: 'M3 5h14v10H3Z M6 12l3-3 3 3 2-2 3 3' },
+  { label: 'Rules', href: '/rules', icon: 'M6 3h8v14H6Z M8 7h4 M8 10h4 M8 13h3' },
   { label: 'Domains', href: '#cosmos', icon: 'M10 10m-6 0a6 6 0 1 0 12 0a6 6 0 1 0-12 0 M4 10h12' },
-  { label: 'Contact', href: '#/contact', icon: 'M6.6 3.5 8.3 7 6.8 8.4a9.6 9.6 0 0 0 4.8 4.8l1.4-1.5 3.5 1.7-.6 2.7c-.1.5-.6.9-1.1.9A13 13 0 0 1 2.9 4.1c0-.5.4-1 .9-1.1l2.8-.5Z' },
-  { label: 'Sponsors', href: '#/sponsors', icon: 'M10 2.5l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L2.8 7.8l5-.7Z' },
-  { label: 'About', href: '#/about', icon: 'M3 17h14 M5 17V8l5-4 5 4v9 M8 17v-4h4v4' },
+  { label: 'Contact', href: '/contact', icon: 'M6.6 3.5 8.3 7 6.8 8.4a9.6 9.6 0 0 0 4.8 4.8l1.4-1.5 3.5 1.7-.6 2.7c-.1.5-.6.9-1.1.9A13 13 0 0 1 2.9 4.1c0-.5.4-1 .9-1.1l2.8-.5Z' },
+  { label: 'Sponsors', href: '/sponsors', icon: 'M10 2.5l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L2.8 7.8l5-.7Z' },
+  { label: 'About', href: '/about', icon: 'M3 17h14 M5 17V8l5-4 5 4v9 M8 17v-4h4v4' },
 ];
 const SOUND_KEY = 'cubyc-comms-sound';
 
@@ -190,12 +191,12 @@ export default function ChatBot() {
     const onRoute = () => [0, 400, 1200].forEach((t) => window.setTimeout(watch, t));
     onRoute();
     window.addEventListener('resize', queue);
-    window.addEventListener('hashchange', onRoute);
+    const stopRoute = onPageChange(onRoute);
     return () => {
       cancelAnimationFrame(raf);
       ro?.disconnect();
       window.removeEventListener('resize', queue);
-      window.removeEventListener('hashchange', onRoute);
+      stopRoute();
     };
   }, []);
 
@@ -405,7 +406,7 @@ export default function ChatBot() {
         s.setEventsOpen(false);
         navigate({ dept: l.dept, view: l.event ? 'events' : 'orbit', event: l.event ?? null });
       } else if (l.href) {
-        window.location.hash = l.href;
+        go(l.href);
       }
     });
   };

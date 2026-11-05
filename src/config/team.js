@@ -36,7 +36,7 @@ import athreya from '../assets/team/website/Athreya S Parande (Developer).jpg';
 import sohail from '../assets/team/website/Md Sohail (Developer).jpg';
 
 /**
- * The people behind the fest, for the Dignitaries section of the About page (#/about).
+ * The people behind the fest, for the Dignitaries section of the About page (/about).
  *
  * EDIT THIS FILE to fill in the real names. Each person is
  *   { name, role, phone?, email?, linkedin?, photo? }

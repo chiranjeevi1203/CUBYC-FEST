@@ -8,6 +8,7 @@ import { BRAND, prefersReducedMotion } from '../../config/experience';
 import { createShaderLayer } from '../../lib/blackHole';
 import { SPACE_FRAG } from '../../lib/spaceView';
 import { useExperience } from '../../store/useExperience';
+import { go } from '../../lib/route';
 
 /*
  * The bridge of a spacecraft. Through the window, galaxies and streaming stars
@@ -304,7 +305,7 @@ function RulesView({ open, onGone }) {
 
   /* ---------- keyboard, section tabs ---------- */
   const leave = () => {
-    window.location.hash = '#rules';
+    go('#rules');
   };
   useEffect(() => {
     const onKey = (e) => {
@@ -565,7 +566,7 @@ function RulesView({ open, onGone }) {
   );
 }
 
-/** The rules page (#/rules): mounted while open, plus its exit animation. */
+/** The rules page (/rules): mounted while open, plus its exit animation. */
 export default function RulesPage() {
   const open = useExperience((s) => s.rulesOpen);
   const [mounted, setMounted] = useState(false);

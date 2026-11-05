@@ -363,7 +363,7 @@ export default function LandingPage({ landingRef }) {
             {EVENTS.map((e, i) => (
               <li key={e.key} className={vmDomains.cls(i)}>
                 <a
-                  href={`#/dept/${e.key}`}
+                  href={`/dept/${e.key}`}
                   onClick={(ev) => {
                     ev.preventDefault();
                     navigate({ dept: e.key, view: 'orbit' });
@@ -398,7 +398,7 @@ export default function LandingPage({ landingRef }) {
           </ul>
           <ViewMoreButton {...vmDomains} label="All domains" />
           <div className="mt-12 flex justify-center">
-            <SolarButton href="#/events" royal>View all events</SolarButton>
+            <SolarButton href="/events" royal>View all events</SolarButton>
           </div>
         </section>
 
@@ -454,7 +454,7 @@ export default function LandingPage({ landingRef }) {
             </div>
           </div>
           <div className="mt-12 flex justify-center">
-            <SolarButton href="#/about" royal>Discover the campus</SolarButton>
+            <SolarButton href="/about" royal>Discover the campus</SolarButton>
           </div>
         </section>
 
@@ -507,7 +507,7 @@ export default function LandingPage({ landingRef }) {
                 ))}
               </ul>
               <ViewMoreButton {...vmCore} />
-              <a href="#/contact" className="mt-7 inline-block font-mono text-[0.6rem] tracking-[0.3em] text-gold-200/80 uppercase transition hover:text-white">
+              <a href="/contact" className="mt-7 inline-block font-mono text-[0.6rem] tracking-[0.3em] text-gold-200/80 uppercase transition hover:text-white">
                 All contacts &amp; campus map →
               </a>
             </div>

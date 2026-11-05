@@ -1651,6 +1651,17 @@
     letter-spacing: 0.24em;
     color: rgba(243, 217, 164, 0.4);
   }
+  .ft-bar__credit {
+    color: rgba(243, 217, 164, 0.75);
+    text-decoration: underline;
+    text-decoration-color: rgba(243, 217, 164, 0.3);
+    text-underline-offset: 0.25em;
+    transition: color 0.2s ease;
+  }
+  .ft-bar__credit:hover,
+  .ft-bar__credit:focus-visible {
+    color: #fff1cf;
+  }
   .ft-uni {
     display: flex;
     flex-direction: column;

@@ -30,10 +30,10 @@ export default function Overview({ user }) {
   const first = user.name.split(/\s+/)[0];
 
   const steps = [
-    { done: Boolean(p.agree), title: 'Fill in your details', sub: p.agree ? 'Done' : 'Name, college, course and contact', href: '#/dashboard/register', cta: p.agree ? 'Edit' : 'Start' },
-    { done: regs.length > 0, title: 'Pick your events', sub: regs.length ? `${regs.length} event${regs.length === 1 ? '' : 's'} registered` : 'Individual or with a team', href: '#/dashboard/events', cta: regs.length ? 'Add more' : 'Browse' },
-    { done: pass === 'verified', wait: pass === 'pending', title: `Pay the ₹${PAYMENT.amount} fest pass`, sub: BACKEND && pass === 'none' ? 'Opens soon' : PAY[pass], href: '#/dashboard/register', cta: BACKEND && pass === 'none' ? null : pass === 'none' ? 'Pay' : 'View' },
-    { done: pass === 'verified', title: 'Get your festival ticket', sub: pass === 'verified' ? 'Ready — show it at the registration desk' : 'Issued once your payment is verified', href: '#/dashboard/register', cta: pass === 'verified' ? 'Open' : null },
+    { done: Boolean(p.agree), title: 'Fill in your details', sub: p.agree ? 'Done' : 'Name, college, course and contact', href: '/dashboard/register', cta: p.agree ? 'Edit' : 'Start' },
+    { done: regs.length > 0, title: 'Pick your events', sub: regs.length ? `${regs.length} event${regs.length === 1 ? '' : 's'} registered` : 'Individual or with a team', href: '/dashboard/events', cta: regs.length ? 'Add more' : 'Browse' },
+    { done: pass === 'verified', wait: pass === 'pending', title: `Pay the ₹${PAYMENT.amount} fest pass`, sub: BACKEND && pass === 'none' ? 'Opens soon' : PAY[pass], href: '/dashboard/register', cta: BACKEND && pass === 'none' ? null : pass === 'none' ? 'Pay' : 'View' },
+    { done: pass === 'verified', title: 'Get your festival ticket', sub: pass === 'verified' ? 'Ready — show it at the registration desk' : 'Issued once your payment is verified', href: '/dashboard/register', cta: pass === 'verified' ? 'Open' : null },
   ];
 
   return (
@@ -106,14 +106,14 @@ export default function Overview({ user }) {
               <p>
                 <Icon name="pin" className="h-3.5 w-3.5" /> {next.venue}
               </p>
-              <a href="#/dashboard/my-events" className="cd-link">
+              <a href="/dashboard/my-events" className="cd-link">
                 All my events <Icon name="arrow" className="h-3.5 w-3.5" />
               </a>
             </div>
           ) : (
             <div className="cd-empty">
               <p>You haven’t picked any events yet.</p>
-              <a href="#/dashboard/events" className="cd-btn cd-btn--gold">
+              <a href="/dashboard/events" className="cd-btn cd-btn--gold">
                 Browse events
               </a>
             </div>
@@ -128,7 +128,7 @@ export default function Overview({ user }) {
           </p>
           <h3 className="cd-note__title">{latest.title}</h3>
           <p className="cd-note__body">{latest.body}</p>
-          <a href="#/dashboard/announcements" className="cd-link">
+          <a href="/dashboard/announcements" className="cd-link">
             All announcements <Icon name="arrow" className="h-3.5 w-3.5" />
           </a>
         </section>

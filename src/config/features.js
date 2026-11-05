@@ -5,7 +5,7 @@
  * REGISTRATION_OPEN — the login page, the participant dashboard and every
  * Register / Login button. While false (the default) none of that code is
  * even included in the published site: the buttons say "Coming soon",
- * and #/login and #/dashboard show the 404 page.
+ * and /login and /dashboard show the 404 page.
  *
  * To turn it on (once the backend is ready), build with
  *   VITE_REGISTRATION_OPEN=true

@@ -1,5 +1,5 @@
 /**
- * Sponsors for the Sponsors page (#/sponsors).
+ * Sponsors for the Sponsors page (/sponsors).
  *
  * EDIT THIS FILE to add the real sponsors. Each sponsor is
  *   { name, tagline?, logo?, url? }

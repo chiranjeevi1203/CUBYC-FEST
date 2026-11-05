@@ -14,9 +14,10 @@ import MyTeam from './MyTeam';
 import { LiveEvents, LiveMyEvents, LiveMyTeam } from './Live';
 import { useRegs } from '../../store/useRegs';
 import { Icon, PageHead, SpaceBackdrop } from './ui';
+import { currentPath, go, onRoute } from '../../lib/route';
 
 /*
- * The participant dashboard (#/dashboard, #/dashboard/<section>). A framed
+ * The participant dashboard (/dashboard, /dashboard/<section>). A framed
  * panel on the left lists the sections; each one opens on the right, over a
  * blue galaxy. Everything is open from the start: the CUBYC ID is issued at
  * sign-in, events can be picked straight away, and registrations count once
@@ -33,14 +34,14 @@ const SECTIONS = [
 ];
 const KEYS = SECTIONS.map((s) => s.key);
 const sectionFromHash = () => {
-  const k = window.location.hash.replace(/^#\/dashboard\/?/, '');
+  const k = currentPath().replace(/^\/dashboard\/?/, '');
   if (BACKEND && /^join\/[\w-]{1,16}$/.test(k)) return 'my-team';
   return KEYS.includes(k) ? k : 'overview';
 };
-// A team invite link (#/dashboard/join/TM-XXXXXX) → the code, kept through sign-in.
+// A team invite link (/dashboard/join/TM-XXXXXX) → the code, kept through sign-in.
 const JOIN_KEY = 'cubyc-join';
 const joinFromHash = () => {
-  const m = window.location.hash.match(/^#\/dashboard\/join\/([\w-]{1,16})$/);
+  const m = currentPath().match(/^\/dashboard\/join\/([\w-]{1,16})$/);
   if (m) {
     try {
       sessionStorage.setItem(JOIN_KEY, m[1]);
@@ -98,7 +99,7 @@ function Sidebar({ user, active, open, onClose, onLogout, badges }) {
         {SECTIONS.map((s) => (
           <a
             key={s.key}
-            href={s.key === 'overview' ? '#/dashboard' : `#/dashboard/${s.key}`}
+            href={s.key === 'overview' ? '/dashboard' : `/dashboard/${s.key}`}
             className={`nv-plate nv-plate--bar cd-menu__item ${active === s.key ? 'is-active' : ''}`}
             aria-current={active === s.key ? 'page' : undefined}
             onClick={onClose}
@@ -201,18 +202,17 @@ function DashboardView({ open, onGone }) {
   useEffect(() => {
     if (!BACKEND || !user) return;
     const saved = takeSavedJoin();
-    if (saved && !window.location.hash.startsWith('#/dashboard/join/')) window.location.hash = `#/dashboard/join/${saved}`;
+    if (saved && !currentPath().startsWith('/dashboard/join/')) go(`/dashboard/join/${saved}`);
   }, [user]);
   useEffect(() => {
     const onHash = () => {
-      if (!window.location.hash.startsWith('#/dashboard')) return;
+      if (!currentPath().startsWith('/dashboard')) return;
       setActive(sectionFromHash());
       setJoinCode(joinFromHash());
       setDrawer(false);
       rootRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     };
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
+    return onRoute(onHash);
   }, [rootRef]);
   useEffect(() => {
     if (!drawer) return undefined;
@@ -230,7 +230,7 @@ function DashboardView({ open, onGone }) {
     signOut();
     if (BACKEND) watchRegs(null);
     else loadFest(null);
-    window.location.hash = '#/login';
+    go('/login');
   };
 
   const current = SECTIONS.find((s) => s.key === active);
@@ -286,7 +286,7 @@ function DashboardView({ open, onGone }) {
             <Icon name="register" className="h-7 w-7" />
             <h2>Sign in to open your dashboard</h2>
             <p>Your CUBYC ID, events, team and festival ticket live here.</p>
-            <a href="#/login" className="cd-btn cd-btn--gold">
+            <a href="/login" className="cd-btn cd-btn--gold">
               Sign in with Google
             </a>
           </section>
@@ -296,7 +296,7 @@ function DashboardView({ open, onGone }) {
   );
 }
 
-/** The participant dashboard (#/dashboard). */
+/** The participant dashboard (/dashboard). */
 export default function DashboardPage() {
   const open = useExperience((s) => s.dashboardOpen);
   const [mounted, onGone] = useMountedWhile(open);

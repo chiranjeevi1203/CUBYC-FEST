@@ -27,7 +27,7 @@ export default function MyEvents({ user }) {
         <section className="cd-panel cd-empty" data-hero>
           <Frame />
           <p>You haven’t registered for any events yet.</p>
-          <a href="#/dashboard/events" className="cd-btn cd-btn--gold">
+          <a href="/dashboard/events" className="cd-btn cd-btn--gold">
             Browse events
           </a>
         </section>
@@ -77,11 +77,11 @@ export default function MyEvents({ user }) {
                   </p>
                 )}
                 <div className="cd-actions">
-                  <a href={`#/dept/${ev.dept}/events/${ev.slug}`} className="cd-btn cd-btn--sm">
+                  <a href={`/dept/${ev.dept}/events/${ev.slug}`} className="cd-btn cd-btn--sm">
                     Event details
                   </a>
                   {t && (
-                    <a href="#/dashboard/my-team" className="cd-btn cd-btn--sm">
+                    <a href="/dashboard/my-team" className="cd-btn cd-btn--sm">
                       Team
                     </a>
                   )}

@@ -66,8 +66,8 @@ export function buildKnowledge() {
     lines.push(`${s.title}: ${s.rules.map(plain).join(' ')}`);
   }
   lines.push(
-    `\nCREATOR: This website and its chatbot (CUBYC Comms) were designed and built by ${CREATOR.name}, ${CREATOR.role} of the ${FEST.name} website team. Email: ${CREATOR.email}. LinkedIn: ${CREATOR.linkedin}. The full website team is on the About page (#/about).`,
+    `\nCREATOR: This website and its chatbot (CUBYC Comms) were designed and built by ${CREATOR.name}, ${CREATOR.role} of the ${FEST.name} website team. Email: ${CREATOR.email}. LinkedIn: ${CREATOR.linkedin}. The full website team is on the About page (/about).`,
   );
-  lines.push('\nWEBSITE PAGES: Home (#home), Events (#/events), each domain (#/dept/<key>), Gallery (#/gallery), Schedule (#/schedule), Rules (#/rules), About the campus, with the dignitaries and organising team (#/about), Contact: faculty coordinators, student coordinators and the campus map (#/contact), Sponsors (#/sponsors).');
+  lines.push('\nWEBSITE PAGES: Home (/), Events (/events), each domain (/dept/<key>), Gallery (/gallery), Schedule (/schedule), Rules (/rules), About the campus, with the dignitaries and organising team (/about), Contact: faculty coordinators, student coordinators and the campus map (/contact), Sponsors (/sponsors).');
   return lines.join('\n');
 }

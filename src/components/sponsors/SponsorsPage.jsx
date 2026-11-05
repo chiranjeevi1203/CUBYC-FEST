@@ -179,8 +179,8 @@ function SponsorsView({ open, onGone }) {
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-white/65">{SPONSOR_CONTACT.note}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <SolarButton href={SPONSOR_CONTACT.email ? `mailto:${SPONSOR_CONTACT.email}` : '#/contact'}>Become a sponsor</SolarButton>
-              <SolarButton href="#/contact" variant="ghost">
+              <SolarButton href={SPONSOR_CONTACT.email ? `mailto:${SPONSOR_CONTACT.email}` : '/contact'}>Become a sponsor</SolarButton>
+              <SolarButton href="/contact" variant="ghost">
                 Contact the team
               </SolarButton>
             </div>
@@ -192,7 +192,7 @@ function SponsorsView({ open, onGone }) {
   );
 }
 
-/** The Sponsors page (#/sponsors). */
+/** The Sponsors page (/sponsors). */
 export default function SponsorsPage() {
   const open = useExperience((s) => s.sponsorsOpen);
   const [mounted, onGone] = useMountedWhile(open);

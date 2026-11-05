@@ -7,6 +7,7 @@ import { GALLERY_ITEMS as GALLERY_PHOTOS, Media } from '../Gallery';
 import { BRAND, prefersReducedMotion } from '../../config/experience';
 import { BACKGROUND_FRAG, HOLE_FRAG, createPhotoLayer, createShaderLayer } from '../../lib/blackHole';
 import { useExperience } from '../../store/useExperience';
+import { go } from '../../lib/route';
 
 /*
  * Photos drift in on two spiral streams (from the left and from the right) and
@@ -407,7 +408,7 @@ function GalleryView({ open, onGone }) {
 
   const step = useCallback((dir) => setLightbox((i) => (i === null ? i : mod(i + dir, TOTAL))), []);
   const leave = () => {
-    window.location.hash = '#gallery';
+    go('#gallery');
   };
 
   useEffect(() => {
@@ -605,7 +606,7 @@ function GalleryView({ open, onGone }) {
   );
 }
 
-/** The campus gallery page (#/gallery): mounted while open, plus its exit animation. */
+/** The campus gallery page (/gallery): mounted while open, plus its exit animation. */
 export default function GalleryPage() {
   const open = useExperience((s) => s.galleryOpen);
   const [mounted, setMounted] = useState(false);

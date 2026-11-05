@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import gsap from 'gsap';
 import { prefersReducedMotion } from '../../config/experience';
 import { useExperience } from '../../store/useExperience';
+import { go } from '../../lib/route';
 
 /**
  * Mount / unmount around a full-screen page's open flag, keeping it mounted for
@@ -59,7 +60,7 @@ export function usePageShell({ open, onGone, leaveHash, onEnter }) {
     if (!open) return undefined;
     const onKey = (e) => {
       if (e.key !== 'Escape' || document.documentElement.classList.contains('chat-open')) return;
-      window.location.hash = leaveHash;
+      go(leaveHash);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);

@@ -4,25 +4,26 @@ import Star from './Star';
 import BrandLogo from '../hud/BrandLogo';
 import Shuttle from '../schedule/Shuttle';
 import { BRAND, SOCIAL } from '../../config/experience';
+import { WEB_LEAD } from '../../config/team';
 
 const USEFUL = [
   { label: 'FAQs', note: 'Ask CB-27', action: 'chat' },
   { label: 'Registration Process', href: '#contact' },
-  { label: 'Participant’s Guidelines', href: '#/rules' },
+  { label: 'Participant’s Guidelines', href: '/rules' },
 ];
 const POLICIES = [
   { label: 'Terms & Conditions' },
   { label: 'Privacy Policy' },
-  { label: 'Rules & Regulations', href: '#/rules' },
+  { label: 'Rules & Regulations', href: '/rules' },
 ];
 const EXPLORE = [
-  { label: 'All Events', href: '#/events' },
+  { label: 'All Events', href: '/events' },
   { label: 'Domains', href: '#cosmos' },
-  { label: 'Gallery', href: '#/gallery' },
-  { label: 'Schedule', href: '#/schedule' },
-  { label: 'About & Dignitaries', href: '#/about' },
-  { label: 'Sponsors', href: '#/sponsors' },
-  { label: 'Contact & Map', href: '#/contact' },
+  { label: 'Gallery', href: '/gallery' },
+  { label: 'Schedule', href: '/schedule' },
+  { label: 'About & Dignitaries', href: '/about' },
+  { label: 'Sponsors', href: '/sponsors' },
+  { label: 'Contact & Map', href: '/contact' },
 ];
 
 const SOCIAL_ICONS = {
@@ -335,8 +336,13 @@ export default function SiteFooter({ map = true }) {
         <div className="ft-bar__copy">
           <FestMark className="h-6" />
           <span>
-            © 2027 {BRAND.fest} · {BRAND.edition}
-            <small>Made with stardust on campus</small>
+            © 2027 {BRAND.fest} · FEST 2027
+            <small>
+              Designed and Developed by{' '}
+              <a href={WEB_LEAD.linkedin} target="_blank" rel="noopener noreferrer" className="ft-bar__credit">
+                {WEB_LEAD.name} and Team
+              </a>
+            </small>
           </span>
         </div>
         <div className="ft-uni">

@@ -56,16 +56,16 @@ export const useExperience = create((set) => ({
   deptEvent: null,
   // true once a full-screen page (a department, the gallery) covers the landing → the main canvas can pause.
   deptCovered: false,
-  // The campus gallery page (#/gallery) and the schedule page (#/schedule).
+  // The campus gallery page (/gallery) and the schedule page (/schedule).
   galleryOpen: false,
   scheduleOpen: false,
   rulesOpen: false,
   aboutOpen: false,
   contactOpen: false,
   sponsorsOpen: false,
-  // The sign-in page (#/login).
+  // The sign-in page (/login).
   loginOpen: false,
-  // The participant dashboard (#/dashboard and #/dashboard/<section>).
+  // The participant dashboard (/dashboard and /dashboard/<section>).
   dashboardOpen: false,
   notFound: false,
   eventsOpen: false,

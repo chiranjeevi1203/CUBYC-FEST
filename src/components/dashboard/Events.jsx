@@ -91,7 +91,7 @@ function TeamBuilder({ slug, user, onClose }) {
               ))}
             </ul>
             <div className="cd-actions">
-              <a href="#/dashboard/my-team" className="cd-btn" onClick={onClose}>
+              <a href="/dashboard/my-team" className="cd-btn" onClick={onClose}>
                 See My Team
               </a>
               <button type="button" className="cd-btn cd-btn--gold" onClick={onClose}>
@@ -267,7 +267,7 @@ export default function Events({ user }) {
                           {ev.team_event ? 'Team up' : 'Register'}
                         </button>
                       )}
-                      <a href={`#/dept/${ev.dept}/events/${ev.slug}`} className="cd-link cd-link--quiet">
+                      <a href={`/dept/${ev.dept}/events/${ev.slug}`} className="cd-link cd-link--quiet">
                         Details
                       </a>
                     </div>

@@ -21,7 +21,7 @@ function LoginCta({ menu = false, onClick, style }) {
   };
   return (
     <a
-      href={REGISTRATION_OPEN ? (user ? '#/dashboard' : '#/login') : '#home'}
+      href={REGISTRATION_OPEN ? (user ? '/dashboard' : '/login') : '#home'}
       role={REGISTRATION_OPEN ? undefined : 'button'}
       className={`nv-cta ${menu ? 'nv-cta--menu' : ''}`}
       onClick={press}
@@ -49,13 +49,13 @@ function LoginCta({ menu = false, onClick, style }) {
  */
 export const NAV_LINKS = [
   { label: 'Home', id: 'home' },
-  { label: 'Events', id: 'events', href: '#/events' },
-  { label: 'About', id: 'about', href: '#/about' },
-  { label: 'Gallery', id: 'gallery', href: '#/gallery' },
-  { label: 'Schedule', id: 'schedule', href: '#/schedule' },
-  { label: 'Rules', id: 'rules', href: '#/rules' },
-  { label: 'Sponsors', id: 'sponsors', href: '#/sponsors' },
-  { label: 'Contact', id: 'contact', href: '#/contact' },
+  { label: 'Events', id: 'events', href: '/events' },
+  { label: 'About', id: 'about', href: '/about' },
+  { label: 'Gallery', id: 'gallery', href: '/gallery' },
+  { label: 'Schedule', id: 'schedule', href: '/schedule' },
+  { label: 'Rules', id: 'rules', href: '/rules' },
+  { label: 'Sponsors', id: 'sponsors', href: '/sponsors' },
+  { label: 'Contact', id: 'contact', href: '/contact' },
 ];
 export const MENU_LINKS = NAV_LINKS;
 const hrefOf = (l) => l.href ?? `#${l.id}`;

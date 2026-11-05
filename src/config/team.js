@@ -31,9 +31,11 @@ import vaieshnu from '../assets/team/core-students/Vaieshnu CV.jpg';
 import krishna from '../assets/team/core-students/Krishna Khandelwal.jpg';
 import sarang from '../assets/team/core-students/Sarang Pillai.jpg';
 import chiranjeevi from '../assets/team/website/Chiranjeevi P (Lead Developer & Designer).jpg';
-import jeevan from '../assets/team/website/P B Jeevan (Developer).jpg';
-import athreya from '../assets/team/website/Athreya S Parande (Developer).jpg';
-import sohail from '../assets/team/website/Md Sohail (Developer).jpg';
+import jeevan from '../assets/team/website/P B Jeevan (Tech Lead).jpg';
+import athreya from '../assets/team/website/Athreya S Parande (Tech Lead).jpg';
+import sohail from '../assets/team/website/Md Sohail (Operations Lead).jpg';
+import anees from '../assets/team/website/Anees Moidheen M M (Operations Lead).jpg';
+import samarth from '../assets/team/website/Samarth Ghag (Operations Lead).jpg';
 
 /**
  * The people behind the fest, for the Dignitaries section of the About page (/about).
@@ -173,7 +175,7 @@ export const TEAM_SECTIONS = [
         email: 'vansh.modi@bscemsh.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/vansh-modi',
       },
-      { name: 'Vaieshnu CV', role: 'Student Coordinator', photo: vaieshnu, phone: '9578615005', email: 'vaieshnu.c@bscpsyh.christuniversity.in', linkedin: 'https://www.linkedin.com/in/vaieshnu-cv-5568a7336' },
+      { name: 'Vaieshnu CV', role: 'Student Coordinator', photo: vaieshnu, phone: '9578615005', email: 'vaieshnu.c@bscpsyh.christuniversity.in', linkedin: 'https://www.linkedin.com/in/vaieshnu-c-v-5568a7336/' },
       { name: 'Krishna Khandelwal', role: 'Student Coordinator', photo: krishna, phone: '9890993838', email: 'krishna.jitendra@bbafeh.christuniversity.in', linkedin: 'https://www.linkedin.com/in/krishna-khandelwal-13129a331' },
       { name: 'Sarang Pillai', role: 'Student Coordinator', photo: sarang, phone: '9496996661', email: 'sarang.pillai@bbafeh.christuniversity.in', linkedin: 'https://www.linkedin.com/in/sarang-pillai-7293aa261' },
     ],
@@ -223,7 +225,7 @@ export const TEAM_SECTIONS = [
       {
         group: 'tech',
         name: 'P B Jeevan',
-        role: 'Developer',
+        role: 'Tech Lead',
         photo: jeevan,
         phone: '8088227116',
         email: 'jeevan.pb@christuniversity.in',
@@ -232,7 +234,7 @@ export const TEAM_SECTIONS = [
       {
         group: 'tech',
         name: 'Athreya S Parande',
-        role: 'Developer',
+        role: 'Tech Lead',
         photo: athreya,
         phone: '8088617880',
         email: 'athreya.s@msaic.christuniversity.in',
@@ -241,15 +243,30 @@ export const TEAM_SECTIONS = [
       {
         group: 'ops',
         name: 'Md Sohail',
-        role: 'Developer',
+        role: 'Operations Lead',
         photo: sohail,
         phone: '9945157324',
         email: 'mohammed.sohail@bcah.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/md-sohail05',
       },
-      // Two more members to be added.
-      { group: 'ops', name: TBA, role: 'Operations Team' },
-      { group: 'ops', name: TBA, role: 'Operations Team' },
+      {
+        group: 'ops',
+        name: 'Anees Moidheen M M',
+        role: 'Operations Lead',
+        photo: anees,
+        phone: '9353230254',
+        email: 'anees.moidheen@bcah.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/aneesmoidheenmm/',
+      },
+      {
+        group: 'ops',
+        name: 'Samarth Ghag',
+        role: 'Operations Lead',
+        photo: samarth,
+        phone: '9872409169',
+        email: 'samarth.ghag@bcah.christuniversity.in',
+        linkedin: 'https://www.linkedin.com/in/samarth-ghag',
+      },
     ],
   },
 ];

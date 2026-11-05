@@ -178,7 +178,7 @@ service cloud.firestore {
         'convince-the-time-keeper': 't,2,d2-0930',
         'crack-the-psyche': 't,3,d2-1330',
         'creative-curveball': 't,4,d2-0900,d2-0930,d2-1215',
-        'cybertronian-wars-gaming': 't,4,d1-1430',
+        'cybertronian-wars-gaming': 't,5,d1-1430',
         'escape-room': 't,2,d1-1430,d1-1715',
         'indian-film-and-folk-dance-solo': 'i,1,d1-1430',
         'indian-group-dance-non-theme': 't,15,d2-0930',

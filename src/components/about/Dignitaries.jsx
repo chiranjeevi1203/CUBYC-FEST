@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import Star from '../ui/Star';
 import { Flourish, OrnateDivider } from './Ornaments';
 import { BRAND } from '../../config/experience';
@@ -28,6 +29,56 @@ const untilt = (e) => {
   e.currentTarget.style.setProperty('--ry', '0deg');
 };
 
+// The widest each section's grid may grow (its data-cols), as in the stylesheet.
+const GRID_MAX_REM = { 3: 66, 4: 80, 5: 86, 6: 90 };
+
+/**
+ * Cards per row for this screen: as many as fit at a comfortable width (never
+ * more than the section's own maximum), then evened out so a row never ends with
+ * one lonely card — 9 cards become 5 + 4 or 3 + 3 + 3, not 4 + 4 + 1.
+ * Returns the grid's ref and its style (--cols, and the row width that balances it).
+ */
+function useCardGrid(count, maxCols) {
+  const ref = useRef(null);
+  const [style, setStyle] = useState(undefined);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const parent = el?.parentElement;
+    if (!el || !parent) return undefined;
+    const calc = () => {
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const width = Math.min(parent.clientWidth, (GRID_MAX_REM[maxCols] ?? 66) * rem);
+      const gap = parseFloat(getComputedStyle(el).columnGap) || 16;
+      const narrow = width < 520;
+      const minCard = narrow ? 136 : 180; // phones keep two across; elsewhere cards stay readable
+      const maxCard = narrow ? 260 : 300; // …and never grow oversized
+      let cols = Math.floor((width + gap) / (minCard + gap));
+      cols = Math.max(cols, Math.ceil((width + gap) / (maxCard + gap)));
+      cols = Math.max(narrow ? 2 : 1, Math.min(cols, maxCols));
+      const perRow = Math.ceil(count / Math.ceil(count / cols));
+      const card = (width - (cols - 1) * gap) / cols;
+      setStyle({ '--cols': cols, '--card-w': `${Math.floor(card)}px`, maxWidth: `${Math.ceil(perRow * card + (perRow - 1) * gap) + 1}px` });
+    };
+    calc();
+    const ro = new ResizeObserver(calc);
+    ro.observe(parent);
+    return () => ro.disconnect();
+  }, [count, maxCols]);
+  return [ref, style];
+}
+
+/** One group's grid of cards. */
+function CardGrid({ people, s, start = 0, cls }) {
+  const [ref, style] = useCardGrid(people.length, s.cols ?? 3);
+  return (
+    <ul ref={ref} className="dg-grid" data-cols={s.cols ?? 3} style={style}>
+      {people.map((p, k) => (
+        <PersonCard key={`${p.name}-${p.role}-${start + k}`} person={p} index={start + k} section={s} className={cls?.(start + k) ?? ''} />
+      ))}
+    </ul>
+  );
+}
+
 /** A section split into groups (the website team): each group under its own small heading. */
 function GroupedCards({ s }) {
   let n = 0;
@@ -43,12 +94,7 @@ function GroupedCards({ s }) {
             <span className="dg-group__line" aria-hidden="true" />
           </div>
         )}
-        <ul className="dg-grid" data-cols={s.cols ?? 3}>
-          {members.map((p) => {
-            const i = n++;
-            return <PersonCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} section={s} />;
-          })}
-        </ul>
+        <CardGrid people={members} s={s} start={(n += members.length) - members.length} />
       </div>
     );
   });
@@ -72,11 +118,7 @@ function TeamSection({ s }) {
         <GroupedCards s={s} />
       ) : (
         <>
-          <ul className="dg-grid" data-cols={s.cols ?? 3}>
-            {s.people.map((p, i) => (
-              <PersonCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} section={s} className={vm.cls(i)} />
-            ))}
-          </ul>
+          <CardGrid people={s.people} s={s} cls={vm.cls} />
           <ViewMoreButton {...vm} />
         </>
       )}

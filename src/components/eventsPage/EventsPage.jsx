@@ -32,20 +32,35 @@ const FORMATS = [
   { key: 'team', label: 'Team' },
 ];
 
-function layoutFor(w, h) {
+const CARD_RATIO = 1.45; // height / width — room for the emblem and up to three lines of name
+const NAV_H = 84; // the menu bar, plus a little air
+const HUD_H = 84; // the navigator strip at the bottom, plus a little air
+const LIFT = 22; // the centre card rides this much higher…
+const GROW = 1.06; // …and this much larger
+
+/** headBottom: where the heading ends (portrait screens stack the cards below it). */
+function layoutFor(w, h, headBottom = 0) {
   const portrait = w < h * 0.85;
   const short = !portrait && h < 560; // phones held sideways: the fan sits right of the heading
-  const cardW = portrait ? clamp(w * 0.52, 168, 230) : short ? clamp(h * 0.4, 130, 190) : clamp(w * 0.15, 190, 250);
+  let cardW = portrait ? clamp(w * 0.52, 160, 230) : short ? clamp(h * 0.4, 120, 190) : clamp(w * 0.15, 180, 250);
+  // The centre card always fits between the top (menu bar, or the heading on portrait
+  // screens) and the navigator at the bottom.
+  const top = portrait ? Math.max(NAV_H, headBottom + 22) : NAV_H;
+  const room = h - top - HUD_H;
+  if (cardW * CARD_RATIO * GROW > room) cardW = Math.max(110, room / GROW / CARD_RATIO);
+  const cardH = cardW * CARD_RATIO;
+  const half = (cardH * GROW) / 2;
+  const want = short ? (NAV_H + h - HUD_H) / 2 + LIFT : h * (portrait ? 0.62 : 0.6);
+  const cy = clamp(want, top + LIFT + half, Math.max(top + LIFT + half, h - HUD_H + LIFT - half));
   return {
     w,
     h,
     portrait,
     cardW,
-    cardH: cardW * 1.38,
+    cardH,
     spacing: cardW * (portrait ? 0.9 : 1.04),
     cx: w * (portrait ? 0.5 : short ? 0.64 : 0.56),
-    // Short screens: centred between the nav (~76px) and the control strip (~64px).
-    cy: short ? (76 + h - 64) / 2 : h * (portrait ? 0.62 : 0.6),
+    cy,
     curve: portrait ? 12 : 16,
   };
 }
@@ -349,11 +364,13 @@ function EventsView({ open, onGone }) {
     const dpr = Math.min(window.devicePixelRatio || 1, quality === 'low' ? 0.75 : 1);
     const bg = createShaderLayer(bgRef.current, COMET_FRAG);
     const resize = () => {
-      layout.current = layoutFor(window.innerWidth, window.innerHeight);
+      const head = headRef.current;
+      layout.current = layoutFor(window.innerWidth, window.innerHeight, head ? head.offsetTop + head.offsetHeight : 0);
       bg?.resize(window.innerWidth, window.innerHeight, dpr);
       setVersion((v) => v + 1);
     };
     resize();
+    document.fonts?.ready.then(resize).catch(() => {});
     window.addEventListener('resize', resize);
     const onMove = (e) => {
       flow.current.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;

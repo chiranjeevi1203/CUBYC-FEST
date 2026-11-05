@@ -2249,49 +2249,6 @@
     max-width: 90rem;
     --gap: clamp(0.8rem, 1.3vw, 1.2rem);
   }
-  .dg-grid[data-cols="6"] .gcard {
-    padding: 1.4rem 0.8rem 1rem;
-  }
-  .dg-grid[data-cols="6"] .gcard__name {
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-  }
-  .dg-grid[data-cols="6"] .gcard__role,
-  .dg-grid[data-cols="6"] .gcard__contact--soon {
-    font-size: 0.46rem;
-    letter-spacing: 0.16em;
-  }
-  .dg-grid[data-cols="6"] .gcard__contact {
-    gap: 0.4rem;
-  }
-  .dg-grid[data-cols="6"] .gcard__contact a {
-    width: 1.45rem;
-  }
-  .dg-grid[data-cols="6"] .gcard__contact a.gcard__phone {
-    width: auto;
-    font-size: 0.64rem;
-  }
-  .dg-grid[data-cols="6"] .gcard__stud {
-    width: 1.05rem;
-    height: 1.05rem;
-  }
-  /* Smaller cards in the 4- and 5-across rows */
-  .dg-grid[data-cols="4"] .gcard,
-  .dg-grid[data-cols="5"] .gcard {
-    padding: 1.5rem 1rem 1.1rem;
-  }
-  .dg-grid[data-cols="5"] .gcard__name {
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-  }
-  .dg-grid[data-cols="5"] .gcard__role {
-    font-size: 0.5rem;
-    letter-spacing: 0.2em;
-  }
-  .dg-grid[data-cols="5"] .gcard__stud {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
   @media (max-width: 1180px) {
     .dg-grid[data-cols="5"] {
       --cols: 4;
@@ -2404,32 +2361,18 @@
       --cols: 2;
       --gap: 0.7rem;
     }
-    .dg-grid .gcard {
-      padding: 1.3rem 0.7rem 0.9rem;
-    }
-    .dg-grid .gcard__name {
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-    }
-    .dg-grid .gcard__role {
-      font-size: 0.46rem;
-      letter-spacing: 0.16em;
-    }
-    .dg-grid .gcard__stud {
-      width: 1.1rem;
-      height: 1.1rem;
-    }
-    .dg-grid .gcard__c {
-      width: 1.9rem;
-    }
   }
 
   /* The game card */
   .gcard-wrap {
-    flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+    flex: 0 0 var(--card-w, calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)));
+    display: flex;
     min-width: 0;
     list-style: none;
     perspective: 1000px;
+    /* Everything inside a card is sized from the card's width (cqi), so a card looks
+       the same at any size — a large card on a laptop, a small one on a phone. */
+    container-type: inline-size;
   }
   .gcard {
     --rx: 0deg;
@@ -2440,8 +2383,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    aspect-ratio: 5 / 7;
-    padding: 1.6rem 1.4rem 1.4rem;
+    width: 100%;
+    /* 5 : 7, but taller if the name or contact needs it — text is never cut off */
+    min-height: 140cqi;
+    padding: clamp(0.9rem, 10cqi, 1.6rem) clamp(0.55rem, 6cqi, 1.4rem) clamp(0.7rem, 6.5cqi, 1.4rem);
     overflow: hidden;
     color: #f6efe0;
     background:
@@ -4121,6 +4066,13 @@
     background: linear-gradient(180deg, rgba(3, 4, 10, 0.94) 0%, rgba(3, 4, 10, 0.88) 78%, rgba(3, 4, 10, 0));
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+  }
+  /* Phones held sideways: a slimmer strip, so the event below keeps most of the screen */
+  @media (max-height: 520px) and (orientation: landscape) and (max-width: 1023px) {
+    .odial {
+      top: calc(3.6rem + env(safe-area-inset-top));
+      height: 6.2rem;
+    }
   }
   @media (min-width: 1024px) {
     /* A sticky column: stays on screen while the brief scrolls beside it */
@@ -6746,6 +6698,61 @@
     aspect-ratio: 1;
     margin: 0.7rem 0 0.4rem;
   }
+  /* In the fan, everything on a card scales with the card, and the emblem gives way
+     so the name, domain and "View brief" always fit — whatever the screen. */
+  .ev-card .ev-card__glass,
+  .ev-brief .ev-brief__card {
+    container-type: size;
+    padding: clamp(0.6rem, 7cqw, 1rem) clamp(0.6rem, 7cqw, 1rem) clamp(0.65rem, 7.5cqw, 1.1rem);
+  }
+  .ev-card .ev-card__top,
+  .ev-brief__card .ev-card__top {
+    font-size: clamp(0.46rem, 3.6cqw, 0.55rem);
+  }
+  .ev-card .ev-card__fmt,
+  .ev-brief__card .ev-card__fmt {
+    font-size: clamp(0.42rem, 3.1cqw, 0.5rem);
+  }
+  /* The emblem takes whatever height is left; its ring stays round and as large as fits. */
+  .ev-card .ev-card__emblem,
+  .ev-brief__card .ev-card__emblem {
+    flex: 1 1 0;
+    width: 100%;
+    min-height: 2.5rem;
+    aspect-ratio: auto;
+    margin: clamp(0.3rem, 4cqw, 0.6rem) 0 clamp(0.2rem, 2.5cqw, 0.4rem);
+    container-type: size;
+  }
+  .ev-card .ev-card__ring,
+  .ev-brief__card .ev-card__ring {
+    inset: auto;
+    left: 50%;
+    top: 50%;
+    width: min(100cqh, 76cqw);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+  }
+  .ev-card .ev-card__emblem .constellation,
+  .ev-brief__card .ev-card__emblem .constellation {
+    width: min(78cqh, 59cqw) !important;
+  }
+  .ev-card .ev-card__const,
+  .ev-brief__card .ev-card__const {
+    font-size: clamp(0.42rem, 3.1cqw, 0.5rem);
+    letter-spacing: 0.32em;
+  }
+  .ev-card .ev-card__name {
+    font-size: clamp(0.68rem, 6.4cqw, 0.95rem);
+  }
+  .ev-card .ev-card__dept,
+  .ev-brief__card .ev-card__dept {
+    margin-top: clamp(0.2rem, 2.5cqw, 0.4rem);
+    font-size: clamp(0.44rem, 3.4cqw, 0.54rem);
+  }
+  .ev-card .ev-card__more {
+    margin-top: clamp(0.35rem, 4.5cqw, 0.75rem);
+    font-size: clamp(0.42rem, 3.2cqw, 0.52rem);
+  }
   .ev-card__ring {
     position: absolute;
     inset: 0;
@@ -7230,7 +7237,9 @@
     transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .ev-hud__open {
-    padding: 0 1rem;
+    flex: none;
+    white-space: nowrap;
+    padding: 0 clamp(0.6rem, 3vw, 1rem);
     height: 2.6rem;
     border: 1px solid rgba(233, 194, 122, 0.5);
     background: rgba(233, 194, 122, 0.1);
@@ -7293,7 +7302,7 @@
   }
   .ev-brief__card {
     width: 62%;
-    aspect-ratio: 1 / 1.38;
+    aspect-ratio: 1 / 1.45;
     height: auto;
     padding: 1.3rem 1.2rem 1.4rem;
     transform: rotate(-4deg);
@@ -7303,8 +7312,24 @@
       0 50px 90px -30px rgba(0, 0, 0, 0.95),
       0 0 90px -10px rgba(233, 194, 122, 0.7);
   }
-  .ev-brief__card .ev-card__name {
-    font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  .ev-brief .ev-brief__card .ev-card__name {
+    font-size: clamp(0.72rem, 7cqw, 1.15rem);
+  }
+  /* Phones held sideways: a smaller card beside the details, so both start on screen */
+  @media (max-height: 560px) and (orientation: landscape) {
+    .ev-brief {
+      padding-top: 4.8rem;
+      place-items: start center;
+    }
+    .ev-brief__inner {
+      align-items: start;
+    }
+    .ev-brief__stage {
+      width: min(100%, calc(100vh - 6.5rem));
+      margin-inline: auto;
+      position: sticky;
+      top: 0;
+    }
   }
   .ev-brief__eyebrow {
     display: inline-flex;
@@ -10262,8 +10287,11 @@
   }
   .xd-kicker {
     display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.35rem 0.6rem;
+    white-space: nowrap;
     font-family: var(--font-mono);
     font-size: 0.58rem;
     letter-spacing: 0.36em;
@@ -13477,3 +13505,70 @@
 @property --accent { syntax: "<color>"; inherits: true; initial-value: #e9c27a; }
 @property --line-a { syntax: "<color>"; inherits: true; initial-value: #f3d9a4; }
 @property --line-b { syntax: "<color>"; inherits: true; initial-value: #fff3d6; }
+
+@layer components {
+  /* ---------- Team cards: proportional at every size (sized from the card's width) ---------- */
+  .gcard__c {
+    width: clamp(1.4rem, 16cqi, 2.6rem);
+  }
+  .gcard__stud {
+    width: clamp(0.8rem, 9cqi, 1.5rem);
+    height: clamp(0.8rem, 9cqi, 1.5rem);
+  }
+  .gcard__stud::after {
+    inset: 30%;
+  }
+  .gcard__art {
+    flex: 1 0 auto;
+    min-height: 58cqi;
+  }
+  .gcard__medal {
+    width: 56cqi;
+  }
+  .gcard__medal b {
+    font-size: clamp(1.1rem, 14cqi, 2.4rem);
+  }
+  .gcard__plate {
+    margin-top: clamp(0.5rem, 5cqi, 0.9rem);
+    padding: clamp(0.35rem, 3.4cqi, 0.55rem) 0.3rem;
+  }
+  .gcard__name {
+    font-size: clamp(0.62rem, 5.7cqi, 1rem);
+    letter-spacing: clamp(0.06em, 0.6cqi, 0.14em);
+    overflow-wrap: anywhere;
+  }
+  .gcard__role {
+    margin-top: clamp(0.35rem, 3.6cqi, 0.55rem);
+    font-size: clamp(0.42rem, 3.35cqi, 0.6rem);
+    letter-spacing: clamp(0.12em, 1cqi, 0.26em);
+  }
+  .gcard__contact {
+    gap: clamp(0.25rem, 2.4cqi, 0.4rem) clamp(0.3rem, 2.8cqi, 0.45rem);
+    margin-top: clamp(0.4rem, 3.8cqi, 0.6rem);
+    min-height: clamp(2.6rem, 22cqi, 3.4rem);
+  }
+  .gcard__contact a {
+    width: clamp(1.35rem, 10.5cqi, 1.75rem);
+  }
+  .gcard__contact svg {
+    width: clamp(0.62rem, 4.8cqi, 0.8rem);
+    height: clamp(0.62rem, 4.8cqi, 0.8rem);
+  }
+  .gcard__contact a.gcard__phone {
+    gap: clamp(0.25rem, 2.4cqi, 0.4rem);
+    font-size: clamp(0.56rem, 4.5cqi, 0.78rem);
+    letter-spacing: 0.04em;
+  }
+  .gcard__contact--soon {
+    font-size: clamp(0.4rem, 3.1cqi, 0.5rem);
+    letter-spacing: 0.2em;
+  }
+  .gcard__ranks {
+    gap: clamp(0.25rem, 2.8cqi, 0.45rem);
+    padding-top: clamp(0.4rem, 4.4cqi, 0.7rem);
+  }
+  .gcard__ranks i,
+  .gcard__ranks b {
+    height: clamp(0.6rem, 6.4cqi, 1.05rem);
+  }
+}

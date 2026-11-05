@@ -1,6 +1,6 @@
 import { EVENT } from '../../config/experience';
 import Frame from '../ui/Frame';
-import { ANNOUNCEMENTS } from '../../config/announcements';
+import { useAnnouncementList } from './useAnnouncementList';
 import { PAYMENT } from '../../config/payment';
 import { CATALOG } from '../../lib/registration/catalog';
 import { whenKey, whenOf } from '../../lib/fest/when';
@@ -25,7 +25,8 @@ export default function Overview({ user }) {
   const pass = user.pass.status;
   const mine = [...regs].sort((a, b) => whenKey(a.slug).localeCompare(whenKey(b.slug)));
   const next = mine[0] && whenOf(mine[0].slug);
-  const latest = ANNOUNCEMENTS.find((a) => a.pinned) ?? ANNOUNCEMENTS[0];
+  const announcements = useAnnouncementList();
+  const latest = announcements.find((a) => a.pinned) ?? [...announcements].sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
   const p = user.profile ?? {};
   const first = user.name.split(/\s+/)[0];
 

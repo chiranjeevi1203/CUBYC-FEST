@@ -11,7 +11,7 @@
     "test": "node --test",
     "knowledge": "node scripts/build-knowledge.mjs",
     "emulators": "firebase emulators:start --project demo-cubyc --only auth,firestore",
-    "test:backend": "node scripts/build-rules.mjs && firebase emulators:exec --project demo-cubyc --only auth,firestore \"node --test --test-concurrency=1 emulator-tests/rules.spec.mjs emulator-tests/account.spec.mjs emulator-tests/events.spec.mjs\"",
+    "test:backend": "node scripts/build-rules.mjs && firebase emulators:exec --project demo-cubyc --only auth,firestore \"node --test --test-concurrency=1 emulator-tests/rules.spec.mjs emulator-tests/account.spec.mjs emulator-tests/events.spec.mjs emulator-tests/admin.spec.mjs\"",
     "dev:emulator": "vite --mode emulator",
     "rules": "node scripts/build-rules.mjs"
   },

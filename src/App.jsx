@@ -8,14 +8,19 @@ import ChatBot from './components/chat/ChatBot';
 import ComingSoon from './components/ui/ComingSoon';
 import { REGISTRATION_OPEN } from './config/features';
 import { useAuth } from './store/useAuth';
+import { useSite } from './store/useSite';
+import MaintenancePage from './components/system/MaintenancePage';
 import ScrollShip from './components/ui/ScrollShip';
 import { PHASES, useExperience } from './store/useExperience';
 import { parseHash, syncFromLocation } from './lib/deptRoute';
 import { currentPath, installRouting, onRoute, titleFor } from './lib/route';
 import { DEPARTMENTS } from './config/departments';
 
+// The admin portal (/festadmin) is a separate app: none of the public site's start-up runs there.
+const ADMIN_PAGE = /^\/festadmin(\/|$)/.test(window.location.pathname);
+
 // Clean addresses (/about, /dept/earth…): links, Back / Forward, old "#/…" links.
-installRouting();
+if (!ADMIN_PAGE) installRouting();
 
 /*
  * The full-screen pages are split into their own chunks: each loads the first time it is
@@ -36,7 +41,9 @@ if (!REGISTRATION_OPEN) {
 }
 
 // Registration open: follow the signed-in account (loads Firebase on demand).
-if (REGISTRATION_OPEN) useAuth.getState().init();
+if (REGISTRATION_OPEN && !ADMIN_PAGE) useAuth.getState().init();
+// Maintenance mode (set from the admin portal): followed live by every visitor.
+if (!ADMIN_PAGE) useSite.getState().init();
 
 const PAGES = {
   dept: () => import('./components/dept/DepartmentView'),
@@ -216,6 +223,7 @@ export default function App() {
       <ScrollShip />
       {hudMounted && <LoaderHUD landingRef={landingRef} />}
       <CometCursor />
+      <MaintenancePage />
     </>
   );
 }

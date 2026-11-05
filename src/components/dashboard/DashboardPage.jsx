@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import SiteNav, { PlateStar } from '../ui/SiteNav';
 import Frame from '../ui/Frame';
 import { useMountedWhile, usePageShell } from '../about/usePageShell';
-import { ANNOUNCEMENTS } from '../../config/announcements';
+import { useAnnouncementList } from './useAnnouncementList';
 import { useExperience } from '../../store/useExperience';
 import { BACKEND, useAuth } from '../../store/useAuth';
 import { useFest } from '../../store/useFest';
@@ -64,7 +64,7 @@ const takeSavedJoin = () => {
 const fmtDate = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
 function Announcements() {
-  const list = [...ANNOUNCEMENTS].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.date.localeCompare(a.date));
+  const list = [...useAnnouncementList()].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.date.localeCompare(a.date));
   return (
     <>
       <PageHead title="Announcements">News and updates from the CUBYC team.</PageHead>
@@ -79,6 +79,11 @@ function Announcements() {
             </p>
             <h3 className="cd-note__title">{a.title}</h3>
             <p className="cd-note__body">{a.body}</p>
+            {a.link && (
+              <a className="cd-link" href={a.link} {...(a.link.startsWith('https://') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                Open link <Icon name="arrow" className="h-3.5 w-3.5" />
+              </a>
+            )}
           </li>
         ))}
       </ol>

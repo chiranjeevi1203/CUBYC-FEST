@@ -262,6 +262,55 @@ service cloud.firestore {
       return viaGoogle() && regOpen() && t.leaderUid == request.auth.uid && t.status == 'dismantling';
     }
 
+    // ---- Site settings and announcements (admin portal, /festadmin) ----------------------
+    //   settings/site        { maintenance, message } — anyone may read (the public site checks it)
+    //   settings/payment     fees and how to pay — read by signed-in participants
+    //   announcements/{id}   published ones are public; drafts only for admins
+    function stamped(d) { return d.updatedBy == myEmail() && d.updatedAt == request.time; }
+    function str(d, k, max) { return k in d && d[k] is string && d[k].size() <= max; }
+    function optStr(d, k, max) { return !(k in d) || (d[k] is string && d[k].size() <= max); }
+
+    match /settings/site {
+      allow get: if true;
+      allow create, update: if isSuperAdmin()
+        && request.resource.data.keys().hasOnly(['maintenance', 'message', 'updatedBy', 'updatedAt'])
+        && request.resource.data.maintenance is bool
+        && str(request.resource.data, 'message', 400)
+        && stamped(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /settings/payment {
+      allow get: if viaGoogle();
+      allow create, update: if isSuperAdmin()
+        && request.resource.data.keys().hasOnly(['open', 'christite', 'external', 'payee', 'upiId', 'bank', 'account', 'ifsc', 'portalUrl', 'instructions', 'updatedBy', 'updatedAt'])
+        && request.resource.data.open is bool
+        && request.resource.data.christite is int && request.resource.data.christite >= 0 && request.resource.data.christite <= 100000
+        && request.resource.data.external is int && request.resource.data.external >= 0 && request.resource.data.external <= 100000
+        && optStr(request.resource.data, 'payee', 120) && optStr(request.resource.data, 'upiId', 80)
+        && optStr(request.resource.data, 'bank', 120) && optStr(request.resource.data, 'account', 40)
+        && optStr(request.resource.data, 'ifsc', 20) && optStr(request.resource.data, 'portalUrl', 300)
+        && optStr(request.resource.data, 'instructions', 1500)
+        && stamped(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /announcements/{id} {
+      allow get: if (resource != null && resource.data.published == true) || isAdmin();
+      allow list: if resource.data.published == true || isAdmin();
+      allow create, update: if isSuperAdmin()
+        && id.matches('^[A-Za-z0-9_-]{6,40}$')
+        && request.resource.data.keys().hasOnly(['title', 'body', 'tag', 'pinned', 'published', 'link', 'date', 'updatedBy', 'updatedAt'])
+        && str(request.resource.data, 'title', 140) && request.resource.data.title.size() > 0
+        && str(request.resource.data, 'body', 3000)
+        && str(request.resource.data, 'tag', 24)
+        && request.resource.data.pinned is bool && request.resource.data.published is bool
+        && (!('link' in request.resource.data) || request.resource.data.link == '' || (request.resource.data.link is string && request.resource.data.link.size() <= 300 && request.resource.data.link.matches('^(https://|/)[^ <>"]*$')))
+        && request.resource.data.date is string && request.resource.data.date.matches('^20[0-9]{2}-[01][0-9]-[0-3][0-9]$')
+        && stamped(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
     match /settings/registration {
       allow get: if viaGoogle();
       allow create, update: if isSuperAdmin()

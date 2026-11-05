@@ -28,9 +28,36 @@ const untilt = (e) => {
   e.currentTarget.style.setProperty('--ry', '0deg');
 };
 
+/** A section split into groups (the website team): each group under its own small heading. */
+function GroupedCards({ s }) {
+  let n = 0;
+  return s.groups.map((g) => {
+    const members = s.people.filter((p) => p.group === g.key);
+    if (!members.length) return null;
+    return (
+      <div key={g.key} className={`dg-group ${g.title ? '' : 'dg-group--lead'}`}>
+        {g.title && (
+          <div data-rise className="dg-group__head">
+            <span className="dg-group__line" aria-hidden="true" />
+            <h4 className="dg-group__title">{g.title}</h4>
+            <span className="dg-group__line" aria-hidden="true" />
+          </div>
+        )}
+        <ul className="dg-grid" data-cols={s.cols ?? 3}>
+          {members.map((p) => {
+            const i = n++;
+            return <PersonCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} section={s} />;
+          })}
+        </ul>
+      </div>
+    );
+  });
+}
+
 /** One group of the team; phones show the first four cards until "View more". */
 function TeamSection({ s }) {
-  const vm = useViewMore(s.people.length, 4);
+  const vm = useViewMore(s.groups ? 0 : s.people.length, 4);
+  const count = s.people.filter((p) => !isTBA(p)).length;
   return (
     <section data-team={s.key} className={`dg-section ${s.featured ? 'dg-section--featured' : ''} ${s.plain ? 'dg-section--plain' : ''}`} aria-labelledby={`dg-${s.key}`}>
       <div data-rise className="dg-head">
@@ -39,14 +66,20 @@ function TeamSection({ s }) {
           {s.title}
         </h3>
         <OrnateDivider className="mx-auto mt-3 w-52 text-gold-300/60" />
-        <p className="mt-2 font-mono text-[0.55rem] tracking-[0.3em] text-white/40 uppercase">{pad(s.people.length)} members</p>
+        <p className="mt-2 font-mono text-[0.55rem] tracking-[0.3em] text-white/40 uppercase">{pad(s.groups ? count : s.people.length)} members</p>
       </div>
-      <ul className="dg-grid" data-cols={s.cols ?? 3}>
-        {s.people.map((p, i) => (
-          <PersonCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} section={s} className={vm.cls(i)} />
-        ))}
-      </ul>
-      <ViewMoreButton {...vm} />
+      {s.groups ? (
+        <GroupedCards s={s} />
+      ) : (
+        <>
+          <ul className="dg-grid" data-cols={s.cols ?? 3}>
+            {s.people.map((p, i) => (
+              <PersonCard key={`${p.name}-${p.role}-${i}`} person={p} index={i} section={s} className={vm.cls(i)} />
+            ))}
+          </ul>
+          <ViewMoreButton {...vm} />
+        </>
+      )}
     </section>
   );
 }

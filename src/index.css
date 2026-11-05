@@ -2316,6 +2316,42 @@
     }
   }
 
+  /* The website team, in groups: the lead, then each team under a small ruled heading */
+  .dg-group {
+    margin-top: clamp(2.2rem, 5vw, 3.2rem);
+  }
+  .dg-group--lead {
+    margin-top: 0;
+  }
+  .dg-group__head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    max-width: 34rem;
+    margin: 0 auto;
+  }
+  .dg-group__line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(243, 217, 164, 0.55));
+  }
+  .dg-group__line:last-child {
+    background: linear-gradient(90deg, rgba(243, 217, 164, 0.55), transparent);
+  }
+  .dg-group__title {
+    font-family: var(--font-display);
+    font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-gold-200);
+  }
+  .dg-group .dg-grid {
+    margin-top: 1.5rem;
+  }
+
   /* The website team: no panel — the cards themselves are glass */
   .dg-section--featured .gcard {
     background:

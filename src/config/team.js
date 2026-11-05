@@ -204,16 +204,24 @@ export const TEAM_SECTIONS = [
     cols: 4,
     plain: true,
     featured: true,
+    // Shown in this order, each group under its own heading (the lead's card has none).
+    groups: [
+      { key: 'lead', title: null },
+      { key: 'tech', title: 'Tech Team' },
+      { key: 'ops', title: 'Operations Team' },
+    ],
     people: [
       {
+        group: 'lead',
         name: 'Chiranjeevi P',
-        role: 'Lead Developer & Designer',
+        role: 'Lead Designer & Developer',
         photo: chiranjeevi,
         phone: '7892304079',
         email: 'chiranjeevi.p@bcah.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/chiranjeevi-purushotham/',
       },
       {
+        group: 'tech',
         name: 'P B Jeevan',
         role: 'Developer',
         photo: jeevan,
@@ -222,6 +230,7 @@ export const TEAM_SECTIONS = [
         linkedin: 'https://www.linkedin.com/in/pbjeevan/',
       },
       {
+        group: 'tech',
         name: 'Athreya S Parande',
         role: 'Developer',
         photo: athreya,
@@ -230,6 +239,7 @@ export const TEAM_SECTIONS = [
         linkedin: 'https://www.linkedin.com/in/athreya-s-parande/',
       },
       {
+        group: 'ops',
         name: 'Md Sohail',
         role: 'Developer',
         photo: sohail,
@@ -237,6 +247,9 @@ export const TEAM_SECTIONS = [
         email: 'mohammed.sohail@bcah.christuniversity.in',
         linkedin: 'https://www.linkedin.com/in/md-sohail05',
       },
+      // Two more members to be added.
+      { group: 'ops', name: TBA, role: 'Operations Team' },
+      { group: 'ops', name: TBA, role: 'Operations Team' },
     ],
   },
 ];

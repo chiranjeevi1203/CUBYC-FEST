@@ -55,7 +55,7 @@ function Stop({ item, index, x, y, up, on, L }) {
     <div className={`sch-stop ${up ? 'is-up' : 'is-down'} ${on ? 'is-on' : ''}`} style={{ left: x, top: y, '--stem': `${L.stem}px` }}>
       <span className="sch-stop__stem" aria-hidden="true" />
       <span className="sch-stop__node" aria-hidden="true" />
-      <article className="sch-card" aria-hidden={!on}>
+      <article className="sch-card">
         <Frame size="sm" star={false} />
         <span className="sch-card__index">{pad(index + 1)}</span>
         <time className="sch-card__time">
@@ -118,6 +118,40 @@ function ScheduleView({ open, onGone }) {
     gsap.to(flow.current, { target: s, duration: d, ease: 'power2.inOut', overwrite: 'auto' });
   }, []);
 
+  /*
+   * Fit the flight line and its cards between the heading and the HUD on this
+   * screen: measure the space and the tallest card, then centre the line and size
+   * the stems so cards above and below both fit. If they can't, step down —
+   * compact cards (1), a smaller heading (2), no big heading (3) — and measure again.
+   */
+  const fit = useCallback(() => {
+    const root = rootRef.current;
+    const head = headRef.current;
+    const hud = root?.querySelector('.sch-hud');
+    if (!root || !head || !hud) return;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const base = layoutFor(W, H, MAX_STOPS);
+    const gap = H < 400 ? 4 : H < 520 ? 8 : 14;
+    const MIN_STEM = H < 520 ? 12 : 18;
+    let out = null;
+    for (let level = 0; level <= 3 && !out; level++) {
+      root.dataset.fit = String(level);
+      const days = head.querySelector('.sch-days');
+      const top = head.offsetTop + (days ? days.offsetTop + days.offsetHeight : head.offsetHeight) + gap;
+      const bottom = hud.offsetTop - gap;
+      const cardH = Math.max(0, ...Array.from(root.querySelectorAll('.sch-card'), (c) => c.offsetHeight));
+      const half = (bottom - top) / 2;
+      const amp = Math.min(base.amp, Math.max(0, half - cardH - MIN_STEM) / 2);
+      const room = half - cardH - amp;
+      if (room >= MIN_STEM || level === 3) {
+        out = { ...base, amp, baseY: top + half, stem: clamp(room, MIN_STEM * (room < MIN_STEM ? 0.5 : 1), base.portrait ? 96 : 120) };
+      }
+    }
+    layout.current = out;
+    setVersion((v) => v + 1);
+  }, []);
+
   useLayoutEffect(() => {
     const root = rootRef.current;
     document.documentElement.classList.add('dept-open');
@@ -163,12 +197,13 @@ function ScheduleView({ open, onGone }) {
     const bg = createShaderLayer(bgRef.current, MILKY_FRAG);
 
     const resize = () => {
-      layout.current = layoutFor(window.innerWidth, window.innerHeight, MAX_STOPS);
       bg?.resize(window.innerWidth, window.innerHeight, dpr);
-      setVersion((v) => v + 1);
+      fit();
     };
     resize();
+    document.fonts?.ready.then(() => fit()).catch(() => {});
     window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', resize);
 
     let raf = 0;
     let last = performance.now();
@@ -218,9 +253,15 @@ function ScheduleView({ open, onGone }) {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('orientationchange', resize);
       bg?.destroy();
     };
-  }, [quality, reduced]);
+  }, [quality, reduced, fit]);
+
+  // The other day's cards can be taller: fit again once they're drawn.
+  useLayoutEffect(() => {
+    fit();
+  }, [day, fit]);
 
   /* ---------- day switch ---------- */
   const switchTo = useCallback(
@@ -314,19 +355,41 @@ function ScheduleView({ open, onGone }) {
     gsap.killTweensOf(flow.current, 'target');
     flow.current.target += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 0.9;
   };
+  // Drag / swipe; a quick flick keeps gliding.
   const drag = useRef(null);
   const onPointerDown = (e) => {
     if (e.target instanceof Element && e.target.closest('a, button')) return;
-    drag.current = { x: e.clientX };
+    drag.current = { x: e.clientX, t: performance.now(), v: 0, id: e.pointerId };
     gsap.killTweensOf(flow.current, 'target');
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* not capturable */
+    }
   };
   const onPointerMove = (e) => {
-    if (!drag.current || switching.current) return;
-    flow.current.target -= (e.clientX - drag.current.x) * 1.6;
-    drag.current.x = e.clientX;
+    const d = drag.current;
+    if (!d || switching.current) return;
+    const now = performance.now();
+    const dx = e.clientX - d.x;
+    const k = e.pointerType === 'mouse' ? 1.6 : 1.9;
+    flow.current.target -= dx * k;
+    const dt = Math.max(now - d.t, 1);
+    d.v = d.v * 0.6 + ((dx * k) / dt) * 0.4;
+    d.x = e.clientX;
+    d.t = now;
   };
-  const endDrag = () => {
+  const endDrag = (e) => {
+    const d = drag.current;
     drag.current = null;
+    if (!d) return;
+    try {
+      e?.currentTarget?.releasePointerCapture?.(d.id);
+    } catch {
+      /* already released */
+    }
+    // Released while moving: carry on in that direction (only if the finger was still moving).
+    if (performance.now() - d.t < 90 && Math.abs(d.v) > 0.25) flow.current.target -= clamp(d.v, -6, 6) * 260;
   };
 
   const other = SCHEDULE_DAYS[1 - day];
@@ -343,7 +406,6 @@ function ScheduleView({ open, onGone }) {
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onPointerLeave={endDrag}
     >
       <canvas ref={bgRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
       <div className="sch-vignette pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -422,7 +484,7 @@ function ScheduleView({ open, onGone }) {
         <div className="sch-hud__bar">
           <span ref={barRef} className="sch-hud__fill" />
         </div>
-        <p className="mt-2 text-center font-mono text-[0.52rem] tracking-[0.26em] text-white/45 uppercase">
+        <p className="sch-hud__hint mt-2 text-center font-mono text-[0.52rem] tracking-[0.26em] text-white/45 uppercase">
           <span className="hidden sm:inline">Scroll or drag to fly · </span>
           <span className="sm:hidden">Swipe to fly · </span>
           Click the shuttle for {other.label}

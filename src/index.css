@@ -5419,6 +5419,7 @@
 
   /* ---------- Schedule page: flight plan along the Milky Way ---------- */
   .sch-page {
+    touch-action: none;
     --hull-hi: #ffffff;
     --hull: #e6e8ee;
     --hull-lo: #a9adbb;
@@ -5454,9 +5455,11 @@
       radial-gradient(ellipse 100% 80% at 50% 55%, transparent 55%, rgba(2, 3, 8, 0.7) 100%),
       linear-gradient(180deg, rgba(2, 3, 8, 0.75), transparent 28%);
   }
+  /* Above the shuttle (z 20), so a card is never hidden behind it; clicks pass through to the shuttle. */
   .sch-track {
-    z-index: 10;
+    z-index: 21;
     will-change: transform;
+    pointer-events: none;
   }
   .sch-line-ghost {
     fill: none;
@@ -5505,13 +5508,14 @@
     background: var(--line-a);
     box-shadow: 0 0 16px 2px color-mix(in srgb, var(--line-a) 70%, transparent);
   }
+  /* Every stem and card is always shown; the stops the shuttle has passed light up. */
   .sch-stop__stem {
     position: absolute;
     left: -0.5px;
     width: 1px;
     height: var(--stem);
-    transform: scaleY(0);
-    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s;
+    opacity: 0.45;
+    transition: opacity 0.4s ease;
   }
   .sch-stop.is-up .sch-stop__stem {
     bottom: 0;
@@ -5524,7 +5528,7 @@
     background: linear-gradient(180deg, var(--line-a), transparent);
   }
   .sch-stop.is-on .sch-stop__stem {
-    transform: scaleY(1);
+    opacity: 1;
   }
   .sch-card {
     position: absolute;
@@ -5537,30 +5541,120 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
       0 0 40px -18px color-mix(in srgb, var(--line-a) 70%, transparent),
       0 30px 60px -30px rgba(0, 0, 0, 0.95);
-    opacity: 0;
-    filter: blur(6px);
+    transform: translateX(-1.4rem);
     transition:
-      opacity 0.55s ease 0.25s,
-      transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s,
-      filter 0.6s ease 0.2s;
-    pointer-events: none;
+      border-color 0.4s ease,
+      box-shadow 0.5s ease;
+    contain: layout paint;
   }
-  /* Cards open forward (in the direction of flight) from their stem. */
+  /* Cards hang from their stem: above or below the flight line. */
   .sch-stop.is-up .sch-card {
     bottom: var(--stem);
-    transform-origin: 1.4rem 100%;
-    transform: translate(-1.4rem, 14px) scale(0.96);
   }
   .sch-stop.is-down .sch-card {
     top: var(--stem);
-    transform-origin: 1.4rem 0;
-    transform: translate(-1.4rem, -14px) scale(0.96);
   }
   .sch-stop.is-on .sch-card {
-    opacity: 1;
-    filter: blur(0);
-    transform: translate(-1.4rem, 0) scale(1);
-    pointer-events: auto;
+    border-color: color-mix(in srgb, var(--line-a) 55%, rgba(243, 217, 164, 0.3));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 46px -14px color-mix(in srgb, var(--line-a) 85%, transparent),
+      0 30px 60px -30px rgba(0, 0, 0, 0.95);
+  }
+
+  /* Short screens (set by the page after measuring, data-fit 1–3): compact cards,
+     then a smaller heading, then no big heading — so every card fits on screen. */
+  .sch-page[data-fit="1"] .sch-card,
+  .sch-page[data-fit="2"] .sch-card,
+  .sch-page[data-fit="3"] .sch-card {
+    width: clamp(9.5rem, 15vw, 12rem);
+    padding: 0.6rem 0.75rem 0.65rem;
+  }
+  .sch-page[data-fit="1"] .sch-card__time,
+  .sch-page[data-fit="2"] .sch-card__time,
+  .sch-page[data-fit="3"] .sch-card__time {
+    font-size: 1.1rem;
+  }
+  .sch-page[data-fit="1"] .sch-card__until,
+  .sch-page[data-fit="2"] .sch-card__until,
+  .sch-page[data-fit="3"] .sch-card__until {
+    margin-top: 0.2rem;
+  }
+  .sch-page[data-fit="1"] .sch-card__title,
+  .sch-page[data-fit="2"] .sch-card__title,
+  .sch-page[data-fit="3"] .sch-card__title {
+    margin-top: 0.35rem;
+    font-size: 0.72rem;
+  }
+  .sch-page[data-fit="1"] .sch-card__venue,
+  .sch-page[data-fit="2"] .sch-card__venue,
+  .sch-page[data-fit="3"] .sch-card__venue {
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+  }
+  .sch-page[data-fit="1"] .sch-card__tag,
+  .sch-page[data-fit="2"] .sch-card__tag,
+  .sch-page[data-fit="3"] .sch-card__tag {
+    display: none;
+  }
+  .sch-page[data-fit="1"] .sch-hud__hint,
+  .sch-page[data-fit="2"] .sch-hud__hint,
+  .sch-page[data-fit="3"] .sch-hud__hint {
+    display: none;
+  }
+  /* (!important: these override the heading's utility classes) */
+  .sch-page[data-fit="2"] .sch-head h1 {
+    margin-top: 0.3rem !important;
+    font-size: clamp(1.4rem, 3.2vw, 2rem) !important;
+  }
+  .sch-page[data-fit="2"] .sch-head .sch-days,
+  .sch-page[data-fit="3"] .sch-head .sch-days {
+    margin-top: 0.5rem !important;
+  }
+  .sch-page[data-fit="3"] .sch-head > p,
+  .sch-page[data-fit="3"] .sch-head h1 {
+    display: none !important;
+  }
+  /* The tightest fit (phones held sideways): slim day tabs under the menu bar,
+     a one-line HUD, and wider, shorter cards (end time on the same line). */
+  .sch-page[data-fit="3"] .sch-head {
+    top: calc(env(safe-area-inset-top) + 4.7rem) !important;
+  }
+  .sch-page[data-fit="3"] .sch-head .sch-days {
+    margin-top: 0 !important;
+  }
+  .sch-page[data-fit="3"] .sch-day {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.35rem 0.9rem;
+  }
+  .sch-page[data-fit="3"] .sch-hud {
+    bottom: calc(env(safe-area-inset-bottom) + 0.35rem);
+    width: min(28rem, calc(100vw - 2rem));
+    padding: 0.4rem 0.8rem 0.4rem;
+  }
+  .sch-page[data-fit="3"] .sch-hud__bar {
+    margin-top: 0.35rem;
+  }
+  .sch-page[data-fit="3"] .sch-card {
+    width: clamp(11rem, 24vw, 13.5rem);
+    padding: 0.5rem 0.7rem 0.55rem;
+  }
+  .sch-page[data-fit="3"] .sch-card__time {
+    font-size: 1rem;
+  }
+  .sch-page[data-fit="3"] .sch-card__until {
+    display: inline;
+    margin: 0 0 0 0.45rem;
+    font-size: 0.5rem;
+  }
+  .sch-page[data-fit="3"] .sch-card__title {
+    margin-top: 0.25rem;
+    font-size: 0.68rem;
+  }
+  .sch-page[data-fit="3"] .sch-card__venue {
+    margin-top: 0.15rem;
+    font-size: 0.66rem;
   }
   .sch-card__index {
     position: absolute;

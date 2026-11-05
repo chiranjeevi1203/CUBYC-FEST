@@ -15,7 +15,7 @@ Photos:
 DIGNITARIES  (add or remove blocks as needed; top to bottom = order on the page)
 -----------
 
-name:      DR. FR. JOSEPH C C
+name:      Col. DR. FR. JOSEPH C C
 role:      Vice Chancellor
 photo:     Dr Fr Joseph C C(Vice Chancellor).jpg
 

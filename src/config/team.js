@@ -88,7 +88,7 @@ export const TEAM_SECTIONS = [
     contact: false,
     cols: 5,
     people: [
-      { name: 'DR. FR. JOSEPH C C', role: 'Vice Chancellor', photo: joseph },
+      { name: 'Col. DR. FR. JOSEPH C C', role: 'Vice Chancellor', photo: joseph },
       { name: 'DR. FR.BENNY THOMAS', role: 'Director', photo: benny },
       { name: 'DR. FR. BIJU K C', role: 'Associate Director', photo: biju },
       { name: 'DR. JOBY THOMAS', role: 'Dean', photo: joby },

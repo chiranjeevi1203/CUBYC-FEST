@@ -473,8 +473,8 @@ export const DEPARTMENTS = {
   },
 
   saturn: {
-    name: 'English & Cultural Studies',
-    short: 'ENG',
+    name: 'Languages and Cultural Studies',
+    short: 'LCS',
     tagline: 'Where Words Create Worlds.',
     intro: 'The ringed world of stories. Argue literature in a mock high court, then convince the Time Keeper whether a character should return or remain.',
     events: [

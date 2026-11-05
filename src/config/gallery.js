@@ -40,7 +40,7 @@ const DEPT_CODES = {
   maths: 'Mathematics',
   com: 'Commerce',
   media: 'Media Studies',
-  eng: 'English & Cultural Studies',
+  eng: 'Languages and Cultural Studies',
   sbm: 'Management',
   mgmt: 'Management',
   dps: 'Professional Studies',

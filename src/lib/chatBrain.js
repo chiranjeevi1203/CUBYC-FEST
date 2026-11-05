@@ -127,7 +127,7 @@ const DEPT_ALIASES = {
   mars: ['commerce', 'bcom', 'mars'],
   station: ['cultural events', 'cultural', 'culturals', 'swo', 'space station', 'station'],
   jupiter: ['media studies', 'media', 'journalism', 'jupiter'],
-  saturn: ['cultural studies and languages', 'cultural studies', 'languages', 'english', 'english and cultural studies', 'literature', 'saturn'],
+  saturn: ['languages and cultural studies', 'languages & cultural studies', 'cultural studies and languages', 'cultural studies', 'languages', 'english', 'english and cultural studies', 'literature', 'saturn'],
   uranus: ['management', 'sbm', 'bba', 'uranus'],
   neptune: ['dps', 'professional studies', 'neptune'],
 };

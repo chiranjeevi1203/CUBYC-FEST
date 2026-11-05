@@ -63,7 +63,7 @@ department: Media Studies
 name:	    DR. NIRMALA MN
 photo:      DR. NIRMALA MN (HOD, MEDIA STUDIES).jpg
 
-department: English & Cultural Studies
+department: Languages and Cultural Studies
 name:       DR. ARUN D M 
 photo:      DR. ARUN D M (HOD, CULTURAL STUDIES & LANGUAGES).jpg
 
